@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supaul Conference Hall Requisition System</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -22,50 +20,13 @@
         .portal-border-accent { border-color: var(--portal-accent) !important; }
 
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 8mm;
-            }
-            html, body {
-                background: #ffffff !important;
-                color: #000000 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            body > *:not(#supaul-portal-app) {
-                display: none !important;
-            }
-            #supaul-portal-app {
-                display: block !important;
-                position: static !important;
-                width: 100% !important;
-                border: none !important;
-                box-shadow: none !important;
-                background: #ffffff !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            #supaul-portal-app > *:not(#modal-slip) {
-                display: none !important;
-            }
-            #modal-slip {
-                display: block !important;
-                position: static !important;
-                width: 100% !important;
-                padding: 0 !important;
-                background: #ffffff !important;
-                box-shadow: none !important;
-                border: none !important;
-            }
-            #modal-slip > div {
-                box-shadow: none !important;
-                border: 2px solid #0b3b60 !important;
-                max-width: 100% !important;
-                margin: 0 auto !important;
-            }
-            .print\:hidden {
-                display: none !important;
-            }
+            @page { size: A4 portrait; margin: 8mm; }
+            body > *:not(#supaul-portal-app) { display: none !important; }
+            #supaul-portal-app { display: block !important; border: none !important; box-shadow: none !important; background: #fff !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            #supaul-portal-app > *:not(#modal-slip) { display: none !important; }
+            #modal-slip { display: block !important; position: static !important; background: #fff !important; padding: 0 !important; }
+            #modal-slip > div { border: 2px solid #0b3b60 !important; box-shadow: none !important; max-width: 700px !important; margin: 0 auto !important; }
+            .print\:hidden { display: none !important; }
         }
     </style>
 </head>
@@ -73,7 +34,7 @@
 
     <div id="supaul-portal-app" class="font-sans antialiased text-slate-800 bg-slate-50 border border-slate-200 rounded-xl shadow-md max-w-7xl mx-auto overflow-hidden">
         
-        <!-- TOP GOVERNMENT HEADER -->
+        <!-- HEADER -->
         <div class="portal-bg-primary text-white border-b-4 portal-border-accent">
             <div class="bg-black/25 px-4 py-1.5 flex flex-wrap items-center justify-between text-[11px] text-slate-300 border-b border-white/10">
                 <div class="flex items-center gap-3">
@@ -81,9 +42,7 @@
                     <span class="text-slate-500">|</span>
                     <span class="font-medium portal-text-accent">जिला प्रशासन सुपौल</span>
                 </div>
-                <div class="flex items-center gap-3 font-mono">
-                    <span>supaul.nic.in</span>
-                </div>
+                <div class="flex items-center gap-3 font-mono"><span>supaul.nic.in</span></div>
             </div>
 
             <div class="px-4 sm:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -96,344 +55,285 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white m-0 leading-tight">
-                                सुपौल | SUPAUL
-                            </h1>
-                            <span id="user-role-badge" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-amber-200 border border-white/20 font-medium">
-                                सार्वजनिक पटल (Public View)
-                            </span>
+                            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white m-0">सुपौल | SUPAUL</h1>
+                            <span id="user-role-badge" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-amber-200 border border-white/20 font-medium">सार्वजनिक पटल</span>
                         </div>
-                        <p class="text-xs text-slate-200 m-0 mt-0.5">
-                            समाहरणालय सभागार आरक्षण प्रणाली | Conference Hall Management System
-                        </p>
+                        <p class="text-xs text-slate-200 m-0 mt-0.5">समाहरणालय सभागार आरक्षण प्रणाली | Conference Hall Management System</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2.5 w-full md:w-auto justify-end">
-                    <button type="button" id="open-login-btn" class="px-4 py-2 rounded-lg text-xs font-semibold portal-bg-accent hover:opacity-90 text-slate-950 shadow flex items-center gap-1.5 transition">
-                        <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-                        <span>विभागीय / प्राधिकृत लॉगिन</span>
+                    <button type="button" id="open-login-btn" class="px-4 py-2 rounded-lg text-xs font-semibold portal-bg-accent text-slate-950 shadow flex items-center gap-1.5 transition hover:opacity-90">
+                        <i data-lucide="lock" class="w-3.5 h-3.5"></i> <span>विभागीय लॉगिन</span>
                     </button>
 
+                    <!-- Notifications Button -->
+                    <div id="notif-wrapper" class="hidden relative">
+                        <button type="button" id="notif-toggle-btn" class="p-2 rounded-lg bg-black/25 border border-white/15 text-amber-300 relative transition hover:bg-black/40">
+                            <i data-lucide="bell" class="w-4 h-4"></i>
+                            <span id="notif-unread-badge" class="hidden absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">0</span>
+                        </button>
+                        <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-slate-300 rounded-lg shadow-2xl z-50 overflow-hidden text-slate-800">
+                            <div class="bg-slate-100 p-2.5 px-3 border-b flex items-center justify-between text-xs">
+                                <span class="font-bold portal-text-primary">अद्यतन सूचनाएं</span>
+                                <button type="button" id="notif-clear-btn" class="text-[10px] text-slate-500 hover:text-black">साफ़ करें</button>
+                            </div>
+                            <div id="notif-list-container" class="max-h-64 overflow-y-auto divide-y text-xs"></div>
+                        </div>
+                    </div>
+
+                    <!-- User Box -->
                     <div id="user-profile-widget" class="hidden flex items-center gap-2 bg-black/25 border border-white/15 px-3.5 py-1.5 rounded-lg text-xs">
                         <div class="text-right">
                             <span id="user-name-display" class="font-bold text-white block text-xs"></span>
                             <span id="user-email-display" class="text-[10px] portal-text-accent font-mono"></span>
                         </div>
-                        <button type="button" id="portal-logout-btn" class="p-1.5 rounded bg-rose-700 hover:bg-rose-800 text-white transition ml-1" title="लॉगआउट / Logout">
+                        <button type="button" id="portal-logout-btn" class="p-1.5 rounded bg-rose-700 hover:bg-rose-800 text-white transition ml-1" title="लॉगआउट">
                             <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Navigation Bar -->
+            <!-- TABS -->
             <div id="navigation-tabs" class="bg-black/15 px-4 sm:px-6 flex items-center gap-1 overflow-x-auto text-xs font-medium border-t border-white/10">
                 <button type="button" id="tab-btn-schedule" class="nav-tab-btn active px-4 py-2.5 border-b-2 portal-border-accent text-white font-bold flex items-center gap-1.5 whitespace-nowrap">
-                    <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
-                    <span>उपलब्धता कैलेंडर / Vacancy Calendar</span>
+                    <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i> <span>उपलब्धता कैलेंडर</span>
                 </button>
                 <button type="button" id="tab-btn-new-req" class="nav-tab-btn hidden px-4 py-2.5 border-b-2 border-transparent text-slate-200 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                    <span id="book-hall-tab-label">मांग-पत्र भरें / Book Hall</span>
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> <span id="book-hall-tab-label">मांग-पत्र भरें</span>
                 </button>
                 <button type="button" id="tab-btn-my-reqs" class="nav-tab-btn hidden px-4 py-2.5 border-b-2 border-transparent text-slate-200 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                    <span>मेरे मांग-पत्र / My Requisitions</span>
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i> <span>मेरे मांग-पत्र</span>
+                </button>
+                <button type="button" id="tab-btn-tech-dashboard" class="nav-tab-btn hidden px-4 py-2.5 border-b-2 border-transparent text-slate-200 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+                    <i data-lucide="monitor" class="w-3.5 h-3.5"></i> <span>तकनीकी सहायता (VC Roster)</span>
                 </button>
                 <button type="button" id="tab-btn-requests" class="nav-tab-btn hidden px-4 py-2.5 border-b-2 border-transparent text-slate-200 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-                    <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
-                    <span>आवेदन समीक्षा एवं स्थिति नियंत्रण</span>
+                    <i data-lucide="check-square" class="w-3.5 h-3.5"></i> <span>आवेदन समीक्षा</span>
                     <span id="badge-pending-count" class="w-4 h-4 portal-bg-accent text-slate-950 font-bold text-[9px] rounded-full flex items-center justify-center ml-0.5">0</span>
                 </button>
+                <button type="button" id="tab-btn-halls" class="nav-tab-btn hidden px-4 py-2.5 border-b-2 border-transparent text-slate-200 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+                    <i data-lucide="building-2" class="w-3.5 h-3.5"></i> <span>सभागार प्रबंधन</span>
+                </button>
+                <button type="button" id="tab-btn-users" class="nav-tab-btn hidden px-4 py-2.5 border-b-2 border-transparent text-slate-200 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+                    <i data-lucide="users" class="w-3.5 h-3.5"></i> <span>उपयोगकर्ता</span>
+                </button>
                 <button type="button" id="tab-btn-ledger" class="nav-tab-btn hidden px-4 py-2.5 border-b-2 border-transparent text-slate-200 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-                    <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>
-                    <span>मास्टर पंजी / Master Ledger</span>
+                    <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> <span>मास्टर पंजी</span>
                 </button>
             </div>
         </div>
 
-        <!-- MAIN CONTENT AREA -->
         <div class="p-4 sm:p-6 space-y-6">
 
-            <!-- SECTION 1: SCHEDULE VIEW -->
+            <!-- SCHEDULE SECTION -->
             <div id="section-schedule" class="portal-section space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    
-                    <!-- Left: Venue List -->
                     <div class="lg:col-span-4 space-y-4">
                         <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-                                <h2 class="text-xs uppercase font-bold tracking-wider portal-text-primary flex items-center gap-1.5 m-0">
-                                    <i data-lucide="building" class="w-4 h-4 portal-text-primary"></i>
-                                    सभागार विवरण (Facilities)
-                                </h2>
-                            </div>
+                            <h2 class="text-xs uppercase font-bold tracking-wider portal-text-primary flex items-center gap-1.5 mb-3">
+                                <i data-lucide="building" class="w-4 h-4"></i> सभागार सूची (Venues)
+                            </h2>
                             <div class="space-y-2.5" id="venue-list-container"></div>
-                        </div>
-
-                        <div class="bg-amber-50/80 border border-amber-200 rounded-lg p-3.5 text-xs text-slate-700 space-y-1.5">
-                            <div class="flex items-center gap-2 font-bold text-amber-900">
-                                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700"></i>
-                                <span>आरक्षण नियम एवं दिशा-निर्देश</span>
-                            </div>
-                            <ul class="text-[11px] text-slate-700 leading-relaxed space-y-1 list-disc list-inside m-0 pl-1">
-                                <li><strong>समय सीमा:</strong> किसी भी स्लॉट का आरक्षण बैठक शुरू होने से कम से कम 1 घंटे पूर्व किया जाना अनिवार्य है।</li>
-                                <li><strong>पिछला समय निषेध:</strong> आज के बीते हुए समय अथवा पूर्व तिथि का स्लॉट आरक्षित नहीं किया जा सकता।</li>
-                                <li><strong>प्राथमिकता:</strong> विधि-व्यवस्था, निर्वाचन व डीएम समीक्षा बैठकों को सर्वोच्च प्राथमिकता।</li>
-                            </ul>
                         </div>
                     </div>
 
-                    <!-- Right: Slot Matrix -->
                     <div class="lg:col-span-8 space-y-4">
-                        <div id="active-hall-banner" class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between gap-4">
-                            <div class="flex-1 space-y-3">
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <h2 id="current-hall-name" class="text-base font-bold portal-text-primary m-0">लहटन चौधरी सभागार</h2>
-                                        <span id="current-hall-capacity-badge" class="text-xs px-2.5 py-0.5 rounded-full bg-blue-50 portal-text-primary border border-blue-200 font-semibold">
-                                            क्षमता: 120 सीट्स
-                                        </span>
-                                    </div>
-                                    <p id="current-hall-wings" class="text-[11px] text-slate-500 m-0 mt-0.5">समाहरणालय मुख्य परिसर, सुपौल - 852131</p>
+                        <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between gap-4">
+                            <div class="flex-1 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <h2 id="current-hall-name" class="text-base font-bold portal-text-primary m-0">लहटन चौधरी सभागार</h2>
+                                    <span id="current-hall-cap" class="text-xs px-2.5 py-0.5 rounded-full bg-blue-50 portal-text-primary font-semibold border border-blue-200">120 सीट्स</span>
                                 </div>
-                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mb-0.5">सभागार का विवरण (Description):</span>
-                                    <p id="current-hall-desc" class="text-xs text-slate-700 m-0 leading-relaxed"></p>
-                                </div>
-                                <div class="space-y-1.5">
-                                    <span class="text-[11px] font-bold portal-text-primary uppercase tracking-wider flex items-center gap-1">
-                                        <i data-lucide="cpu" class="w-3.5 h-3.5 portal-text-primary"></i> सुविधाएं एवं उपकरण
-                                    </span>
-                                    <div id="current-hall-features" class="flex flex-wrap gap-1.5"></div>
-                                </div>
+                                <p id="current-hall-desc" class="text-xs text-slate-600 m-0"></p>
+                                <div id="current-hall-features" class="flex flex-wrap gap-1.5 pt-1"></div>
                             </div>
-                            <div class="bg-blue-50/60 p-3 rounded-lg border border-blue-200 text-xs text-slate-700 flex-shrink-0 w-full sm:w-56">
-                                <span class="text-[10px] uppercase font-bold text-slate-500 block">नोडल प्राधिकार (In-Charge)</span>
-                                <span id="current-hall-incharge" class="font-bold portal-text-primary block mt-1 text-xs">नजारत उप समाहर्ता, सुपौल</span>
+                            <div class="bg-blue-50/60 p-3 rounded-lg border border-blue-200 text-xs text-slate-700 w-full sm:w-52 flex-shrink-0">
+                                <span class="text-[10px] uppercase font-bold text-slate-500 block">प्रभारी प्राधिकारी</span>
+                                <span id="current-hall-incharge" class="font-bold portal-text-primary block mt-1">नजारत उप समाहर्ता, सुपौल</span>
                             </div>
                         </div>
 
-                        <!-- Date Navigation Bar -->
+                        <!-- Date Picker Bar -->
                         <div class="bg-white rounded-lg p-3 border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-2">
                                 <div class="flex items-center bg-slate-100 border border-slate-300 rounded p-0.5">
-                                    <button type="button" id="prev-day-btn" class="p-1 text-slate-600 hover:text-black rounded transition">
-                                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                                    </button>
-                                    <button type="button" id="today-btn" class="px-3 py-1 text-xs font-bold text-slate-700 hover:text-black rounded transition">आज</button>
-                                    <button type="button" id="next-day-btn" class="p-1 text-slate-600 hover:text-black rounded transition">
-                                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                                    </button>
+                                    <button type="button" id="prev-day-btn" class="p-1 text-slate-600 hover:text-black rounded"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                    <button type="button" id="today-btn" class="px-3 py-1 text-xs font-bold text-slate-700 hover:text-black">आज</button>
+                                    <button type="button" id="next-day-btn" class="p-1 text-slate-600 hover:text-black rounded"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
                                 </div>
                                 <span id="display-date-label" class="text-xs font-bold portal-text-primary flex items-center gap-1.5 ml-1"></span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <label for="calendar-date-picker" class="text-xs font-semibold text-slate-600">तारीख चुनें:</label>
-                                <input type="date" id="calendar-date-picker" class="bg-white border border-slate-300 text-slate-800 text-xs px-2.5 py-1 rounded focus:outline-none portal-border-primary">
+                                <label for="calendar-date-picker" class="text-xs font-semibold text-slate-600">तारीख:</label>
+                                <input type="date" id="calendar-date-picker" class="bg-white border border-slate-300 text-slate-800 text-xs px-2.5 py-1 rounded focus:outline-none">
                             </div>
                         </div>
 
-                        <!-- Slot Matrix Grid -->
+                        <!-- Slot Grid -->
                         <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
-                                <h3 class="text-xs font-bold portal-text-primary uppercase tracking-wider m-0">समय चक्र स्लॉट (08:00 AM – 08:00 PM)</h3>
-                                <div class="flex items-center gap-3 text-[11px] text-slate-600 font-medium flex-wrap">
-                                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-white border border-emerald-500 inline-block"></span> रिक्त</span>
-                                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded portal-bg-primary inline-block"></span> चयनित</span>
-                                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-100 border border-amber-400 inline-block"></span> समीक्षाधीन</span>
-                                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-100 border border-rose-400 inline-block"></span> आरक्षित</span>
-                                </div>
-                            </div>
-                            <div id="slots-grid-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 mt-4"></div>
+                            <h3 class="text-xs font-bold portal-text-primary uppercase tracking-wider mb-3">समय चक्र स्लॉट (08:00 AM – 08:00 PM)</h3>
+                            <div id="slots-grid-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5"></div>
                         </div>
 
-                        <!-- Selection Summary & Proceed Bar -->
+                        <!-- Proceed -->
                         <div class="bg-slate-100 rounded-lg p-4 border border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div>
                                 <span class="text-xs font-semibold text-slate-600">चयनित स्लॉट:</span>
-                                <div class="flex items-center gap-2 mt-0.5">
-                                    <span id="selected-slot-count-label" class="text-sm font-bold portal-text-primary">कोई स्लॉट चयनित नहीं</span>
-                                    <span id="selected-slot-badges" class="flex gap-1"></span>
-                                </div>
+                                <div id="selected-slot-badges" class="mt-1 font-mono text-xs font-bold portal-text-primary">कोई स्लॉट चयनित नहीं</div>
                             </div>
-                            <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <button type="button" id="clear-selected-slots-btn" class="hidden px-3 py-1.5 rounded text-xs text-slate-600 hover:text-black bg-white border border-slate-300">रीसेट</button>
-                                <button type="button" id="proceed-requisition-btn" class="w-full sm:w-auto px-5 py-2 rounded font-semibold text-xs transition bg-slate-300 text-slate-500 cursor-not-allowed border border-slate-300">
-                                    आरक्षण प्रपत्र भरें
-                                </button>
-                            </div>
+                            <button type="button" id="proceed-requisition-btn" class="w-full sm:w-auto px-5 py-2 rounded font-semibold text-xs bg-slate-300 text-slate-500 cursor-not-allowed">
+                                आरक्षण प्रपत्र भरें
+                            </button>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 2: REQUISITION FORM -->
+            <!-- FORM SECTION -->
             <div id="section-new-req" class="portal-section hidden max-w-3xl mx-auto bg-white rounded-lg p-6 border border-slate-200 shadow-md space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div class="flex items-center justify-between pb-3 border-b">
                     <h2 class="text-base font-bold portal-text-primary flex items-center gap-2 m-0">
-                        <i data-lucide="file-text" class="w-4 h-4 portal-text-primary"></i> सभागार आरक्षण मांग-पत्र (Requisition Slip)
+                        <i data-lucide="file-text" class="w-4 h-4"></i> सभागार आरक्षण मांग-पत्र
                     </h2>
-                    <button type="button" id="cancel-req-btn" class="text-xs font-semibold portal-text-primary hover:underline">&larr; कैलेंडर पर वापस जाएं</button>
-                </div>
-                <div class="bg-blue-50/70 p-3.5 rounded border border-blue-200 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div>
-                        <span class="text-[10px] uppercase text-slate-500 block font-bold">सभागार</span>
-                        <span id="summary-venue" class="font-bold portal-text-primary truncate block">लहटन चौधरी सभागार</span>
-                    </div>
-                    <div>
-                        <span class="text-[10px] uppercase text-slate-500 block font-bold">तारीख</span>
-                        <span id="summary-date" class="font-bold text-slate-800 block"></span>
-                    </div>
-                    <div>
-                        <span class="text-[10px] uppercase text-slate-500 block font-bold">समय</span>
-                        <span id="summary-hours" class="font-bold portal-text-primary block">None</span>
-                    </div>
-                    <div>
-                        <span class="text-[10px] uppercase text-slate-500 block font-bold">क्षमता</span>
-                        <span id="summary-capacity" class="font-bold text-slate-800 block">120 Seats</span>
-                    </div>
+                    <button type="button" onclick="switchTab('schedule')" class="text-xs font-semibold portal-text-primary hover:underline">&larr; वापस जाएं</button>
                 </div>
                 <form id="requisition-form" class="space-y-4 text-xs">
                     <div>
-                        <label class="block text-slate-700 font-bold mb-1">बैठक का विषय / Agenda Title <span class="text-rose-600">*</span></label>
-                        <input type="text" id="req-subject" required placeholder="उदा. अनुमंडल राजस्व एवं विधि-व्यवस्था समीक्षा बैठक" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary">
-                    </div>
-                    <div>
-                        <label class="block text-slate-700 font-bold mb-1">विस्तृत एजेंडा</label>
-                        <textarea id="req-agenda" rows="2" placeholder="कार्यवाही के मुख्य बिंदु..." class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800"></textarea>
+                        <label class="block text-slate-700 font-bold mb-1">बैठक का विषय / Agenda Title *</label>
+                        <input type="text" id="req-subject" required class="w-full border border-slate-300 rounded px-3 py-2 text-slate-800">
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-slate-700 font-bold mb-1">अध्यक्षता करने वाले पदाधिकारी <span class="text-rose-600">*</span></label>
-                            <input type="text" id="req-chair" required value="District Magistrate & Collector, Supaul" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800">
+                            <label class="block text-slate-700 font-bold mb-1">अध्यक्षता करने वाले पदाधिकारी *</label>
+                            <input type="text" id="req-chair" required value="District Magistrate & Collector, Supaul" class="w-full border border-slate-300 rounded px-3 py-2">
                         </div>
                         <div>
-                            <label class="block text-slate-700 font-bold mb-1">विभागीय पत्रांक / ज्ञापांक</label>
-                            <input type="text" id="req-memo" placeholder="SPL/REV/2026/108" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 font-mono">
+                            <label class="block text-slate-700 font-bold mb-1">विभागीय पत्रांक / Memo</label>
+                            <input type="text" id="req-memo" placeholder="SPL/REV/2026/108" class="w-full border border-slate-300 rounded px-3 py-2 font-mono">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-slate-700 font-bold mb-1">प्राथमिकता</label>
-                            <select id="req-priority" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800">
+                            <select id="req-priority" class="w-full border border-slate-300 rounded px-3 py-2">
                                 <option value="VVIP">अति विशिष्ट (VVIP)</option>
                                 <option value="High" selected>उच्च प्राथमिकता (High)</option>
-                                <option value="Standard">मानक बैठक (Standard)</option>
-                                <option value="Routine">कार्यशाला / प्रशिक्षण</option>
+                                <option value="Standard">मानक बैठक</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-slate-700 font-bold mb-1">प्रतिभागी संख्या</label>
-                            <input type="number" id="req-attendees" min="1" max="500" value="45" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800">
+                            <input type="number" id="req-attendees" value="45" class="w-full border border-slate-300 rounded px-3 py-2">
                         </div>
                     </div>
-                    <div class="bg-slate-50 rounded border border-slate-200 p-3.5 space-y-3">
-                        <span class="block text-[11px] font-bold portal-text-primary uppercase tracking-wider">तकनीकी उपकरण एवं स्वल्पाहार</span>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            <label class="flex items-center gap-2 text-slate-800 cursor-pointer bg-white p-2 rounded border border-slate-200">
-                                <input type="checkbox" id="req-vc" class="w-4 h-4">
-                                <span class="font-semibold text-xs portal-text-primary">वी.सी. बुकिंग आवश्यक (VC Link)</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-slate-800 cursor-pointer bg-white p-2 rounded border border-slate-200">
-                                <input type="checkbox" id="req-ppt" class="w-4 h-4">
-                                <span class="font-semibold text-xs text-blue-800">पी.पी.टी प्रस्तुति (PPT)</span>
-                            </label>
-                        </div>
-                        <div class="pt-2 border-t border-slate-200">
-                            <label class="block text-[11px] font-bold text-slate-600 mb-1">स्वल्पाहार प्रोटोकॉल</label>
-                            <select id="req-refreshments" class="w-full bg-white border border-slate-300 rounded px-3 py-1.5 text-slate-800">
-                                <option value="Executive Tea & Biscuits">टी एवं बिस्कुट</option>
-                                <option value="Formal Green Tea & Light Snacks">टी एवं अल्पाहार</option>
-                                <option value="Working Lunch & Tea Protocol">टी एवं भोजन</option>
-                                <option value="No Refreshments Required">स्वल्पाहार की आवश्यकता नहीं</option>
-                            </select>
+                    <div class="bg-slate-50 border p-3 rounded space-y-2">
+                        <span class="font-bold block text-slate-700">उपकरण व स्वल्पाहार</span>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-1.5"><input type="checkbox" id="req-vc" class="w-4 h-4"> वी.सी. (Video Conference)</label>
+                            <label class="flex items-center gap-1.5"><input type="checkbox" id="req-ppt" class="w-4 h-4"> पी.पी.टी (PPT Screen)</label>
                         </div>
                     </div>
-                    <div class="flex items-center justify-end gap-2 pt-2">
-                        <button type="button" id="cancel-req-btn-2" class="px-4 py-2 rounded text-slate-600 hover:text-black">रद्द करें</button>
-                        <button type="submit" class="px-5 py-2.5 rounded font-bold portal-bg-primary hover:opacity-90 text-white shadow flex items-center gap-1.5">
-                            <i data-lucide="check" class="w-4 h-4"></i>
-                            <span id="submit-req-btn-text">मांग-पत्र प्रस्तुत करें</span>
-                        </button>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" onclick="switchTab('schedule')" class="px-4 py-2 rounded text-slate-600">रद्द करें</button>
+                        <button type="submit" class="px-5 py-2 rounded font-bold portal-bg-primary text-white shadow">जमा करें / Submit</button>
                     </div>
                 </form>
             </div>
 
-            <!-- SECTION 3: MY REQUISITIONS -->
+            <!-- MY REQUISITIONS -->
             <div id="section-my-reqs" class="portal-section hidden space-y-4">
-                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                    <h2 class="text-sm font-bold portal-text-primary flex items-center gap-2 m-0">
-                        <i data-lucide="file-text" class="w-4 h-4 portal-text-primary"></i> मेरे विभागीय मांग-पत्र (My Requisitions)
-                    </h2>
-                </div>
-                <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-200 bg-slate-50 portal-text-primary font-bold">
-                                <th class="p-3 pl-4">मांग संदर्भ / पत्रांक</th>
-                                <th class="p-3">सभागार एवं समय</th>
-                                <th class="p-3">बैठक का विषय</th>
-                                <th class="p-3">अध्यक्षता</th>
-                                <th class="p-3 text-center">स्थिति</th>
-                                <th class="p-3 text-right pr-4">आदेश पर्ची</th>
-                            </tr>
+                <h2 class="text-sm font-bold portal-text-primary">मेरे विभागीय मांग-पत्र</h2>
+                <div class="bg-white rounded-lg border shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 font-bold border-b">
+                            <tr><th class="p-3">संदर्भ</th><th class="p-3">तिथि व समय</th><th class="p-3">विषय</th><th class="p-3">स्थिति</th><th class="p-3 text-right">पर्ची</th></tr>
                         </thead>
-                        <tbody id="my-reqs-table-body" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="my-reqs-tbody" class="divide-y"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- SECTION 4: ADMINISTRATIVE REVIEW & QUEUE -->
+            <!-- TECH DASHBOARD -->
+            <div id="section-tech-dashboard" class="portal-section hidden space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 border-l-4 border-cyan-600 border rounded shadow-sm">
+                        <span class="text-xs text-slate-500 font-bold">वी.सी. आवश्यक बैठकें</span>
+                        <p id="stat-tech-vc" class="text-2xl font-extrabold text-cyan-700 m-0 mt-1">0</p>
+                    </div>
+                    <div class="bg-white p-4 border-l-4 border-blue-600 border rounded shadow-sm">
+                        <span class="text-xs text-slate-500 font-bold">पी.पी.टी. आवश्यक बैठकें</span>
+                        <p id="stat-tech-ppt" class="text-2xl font-extrabold text-blue-700 m-0 mt-1">0</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg border shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 font-bold border-b">
+                            <tr><th class="p-3">संदर्भ</th><th class="p-3">तिथि/समय</th><th class="p-3">विषय</th><th class="p-3 text-center">वी.सी.</th><th class="p-3 text-center">पी.पी.टी.</th><th class="p-3 text-center">स्थिति</th></tr>
+                        </thead>
+                        <tbody id="tech-tbody" class="divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ADMIN REVIEWS -->
             <div id="section-requests" class="portal-section hidden space-y-4">
-                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                    <h2 class="text-sm font-bold portal-text-primary flex items-center gap-2 m-0">
-                        <i data-lucide="check-square" class="w-4 h-4 portal-text-primary"></i> प्रशासनिक समीक्षा एवं स्थिति नियंत्रण पटल
-                    </h2>
-                </div>
-                <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-200 bg-slate-50 portal-text-primary font-bold">
-                                <th class="p-3 pl-4">मांग संदर्भ / विभाग</th>
-                                <th class="p-3">सभागार एवं समय</th>
-                                <th class="p-3">विषय एवं अध्यक्षता</th>
-                                <th class="p-3 text-center">प्राथमिकता</th>
-                                <th class="p-3 text-center">वर्तमान स्थिति</th>
-                                <th class="p-3 text-center">स्थिति बदलें</th>
-                                <th class="p-3 text-right pr-4">कार्यवाही</th>
-                            </tr>
+                <h2 class="text-sm font-bold portal-text-primary">प्रशासनिक समीक्षा एवं नियंत्रण</h2>
+                <div class="bg-white rounded-lg border shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 font-bold border-b">
+                            <tr><th class="p-3">संदर्भ</th><th class="p-3">तिथि/समय</th><th class="p-3">विषय</th><th class="p-3 text-center">स्थिति</th><th class="p-3 text-center">स्थिति बदलें</th><th class="p-3 text-right">कार्यवाही</th></tr>
                         </thead>
-                        <tbody id="admin-requests-table-body" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="admin-reqs-tbody" class="divide-y"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- SECTION 5: MASTER LEDGER & CSV EXPORT -->
-            <div id="section-ledger" class="portal-section hidden space-y-4">
-                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <h2 class="text-sm font-bold portal-text-primary flex items-center gap-2 m-0">
-                        <i data-lucide="clipboard-list" class="w-4 h-4 portal-text-primary"></i> सभागार आवंटन मास्टर पंजी (Master Ledger)
-                    </h2>
-                    <button type="button" id="export-csv-btn" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded flex items-center gap-1.5 shadow">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> CSV डाउनलोड
-                    </button>
+            <!-- HALL MANAGEMENT -->
+            <div id="section-halls" class="portal-section hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-bold portal-text-primary">सभागार प्रबंधन</h2>
+                    <button type="button" onclick="openHallModal()" class="px-3 py-1.5 rounded portal-bg-primary text-white text-xs font-bold">+ नया सभागार</button>
                 </div>
-                <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-200 bg-slate-50 portal-text-primary font-bold">
-                                <th class="p-3 pl-4">संदर्भ / पत्रांक</th>
-                                <th class="p-3">सभागार व समय</th>
-                                <th class="p-3">अध्यक्षता</th>
-                                <th class="p-3">बैठक का विषय एवं विभाग</th>
-                                <th class="p-3 text-center">स्थिति</th>
-                                <th class="p-3 text-right pr-4">कार्यवाही</th>
-                            </tr>
+                <div class="bg-white rounded-lg border shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 font-bold border-b">
+                            <tr><th class="p-3">नाम</th><th class="p-3">स्थान</th><th class="p-3 text-center">क्षमता</th><th class="p-3">प्रभारी</th><th class="p-3 text-right">हटाएं</th></tr>
                         </thead>
-                        <tbody id="admin-ledger-table-body" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="halls-tbody" class="divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- USERS -->
+            <div id="section-users" class="portal-section hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-bold portal-text-primary">उपयोगकर्ता प्रबंधन</h2>
+                    <button type="button" onclick="openUserModal()" class="px-3 py-1.5 rounded portal-bg-primary text-white text-xs font-bold">+ नया खाता</button>
+                </div>
+                <div class="bg-white rounded-lg border shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 font-bold border-b">
+                            <tr><th class="p-3">नाम</th><th class="p-3">विभाग</th><th class="p-3">ईमेल</th><th class="p-3 text-center">स्तर</th></tr>
+                        </thead>
+                        <tbody id="users-tbody" class="divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- LEDGER -->
+            <div id="section-ledger" class="portal-section hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-bold portal-text-primary">सभागार आवंटन मास्टर पंजी</h2>
+                    <button type="button" id="export-csv-btn" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded">CSV डाउनलोड</button>
+                </div>
+                <div class="bg-white rounded-lg border shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 font-bold border-b">
+                            <tr><th class="p-3">संदर्भ</th><th class="p-3">सभागार</th><th class="p-3">तारीख</th><th class="p-3">विषय</th><th class="p-3 text-center">स्थिति</th></tr>
+                        </thead>
+                        <tbody id="ledger-tbody" class="divide-y"></tbody>
                     </table>
                 </div>
             </div>
@@ -443,98 +343,59 @@
         <!-- MODAL: LOGIN -->
         <div id="modal-login" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
             <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-6 shadow-2xl relative">
-                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-                <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
-                    <div class="w-10 h-10 rounded portal-bg-primary text-white flex items-center justify-center flex-shrink-0">
-                        <i data-lucide="lock" class="w-5 h-5"></i>
+                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <h2 class="text-base font-bold portal-text-primary mb-3">विभागीय पोर्टल लॉगिन</h2>
+                
+                <form id="login-form" class="space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold mb-1 text-slate-700">सरकारी ईमेल आईडी</label>
+                        <input type="email" id="login-email" required placeholder="name@nic.in" class="w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:border-blue-600">
                     </div>
                     <div>
-                        <h2 class="text-base font-bold portal-text-primary m-0">विभागीय पोर्टल लॉगिन</h2>
-                        <p class="text-[11px] text-slate-500 m-0">जिला सभागार आरक्षण पोर्टल</p>
+                        <label class="block font-bold mb-1 text-slate-700">पासवर्ड</label>
+                        <div class="relative flex items-center">
+                            <input type="password" id="login-pwd" required placeholder="पासवर्ड दर्ज करें" class="w-full border border-slate-300 rounded pl-3 pr-10 py-2 focus:outline-none focus:border-blue-600">
+                            <button type="button" id="toggle-password-btn" class="absolute right-2 text-slate-500 hover:text-slate-800 p-1 focus:outline-none" title="पासवर्ड दिखाएं / छुपाएं">
+                                <i data-lucide="eye" id="toggle-password-icon" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-blue-50 border border-blue-200 p-2.5 rounded text-[11px] text-slate-700 mb-3">
-                    <strong>डेमो खाते:</strong><br>
-                    1. <code>dio-spl@nic.in</code> (Admin)<br>
-                    2. <code>ndcsupaul@nic.in</code> (Nazarat / NDC)<br>
-                    3. <code>officer@bihar.gov.in</code> (Nodal Officer)<br>
-                    <strong>पासवर्ड:</strong> <code>admin@12345</code>
-                </div>
-                <form id="login-form" class="space-y-3.5 text-xs">
-                    <div>
-                        <label class="block text-slate-700 font-bold mb-1">सरकारी ईमेल आईडी</label>
-                        <input type="email" id="login-email" required value="dio-spl@nic.in" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary">
-                    </div>
-                    <div>
-                        <label class="block text-slate-700 font-bold mb-1">पासवर्ड</label>
-                        <input type="password" id="login-pwd" required value="admin@12345" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary">
-                    </div>
-                    <div id="login-error-msg" class="hidden text-rose-700 text-xs p-2 rounded bg-rose-50 border border-rose-300"></div>
-                    <div class="pt-2 flex items-center justify-end gap-2">
+                    <div id="login-error-msg" class="hidden text-rose-700 text-xs p-2 rounded bg-rose-50 border border-rose-300 font-medium"></div>
+                    <div class="flex justify-end gap-2 pt-2">
                         <button type="button" class="modal-close-btn px-4 py-2 rounded text-slate-600 hover:text-black font-medium">रद्द करें</button>
-                        <button type="submit" class="px-5 py-2 rounded portal-bg-primary hover:opacity-90 text-white font-bold flex items-center gap-1.5 shadow">
-                            <i data-lucide="log-in" class="w-3.5 h-3.5"></i> प्रवेश करें
-                        </button>
+                        <button type="submit" class="px-5 py-2 rounded portal-bg-primary hover:opacity-90 text-white font-bold shadow">प्रवेश करें</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- MODAL: ORDER SLIP (PRINT READY) -->
+        <!-- MODAL: SLIP -->
         <div id="modal-slip" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
-            <div class="bg-white text-slate-900 rounded-lg max-w-xl w-full p-6 shadow-2xl relative border-4 portal-border-primary">
-                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1 print:hidden">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-                <div class="text-center pb-3 border-b-2 border-slate-900">
-                    <span class="text-[11px] font-bold text-slate-600 uppercase tracking-widest block leading-tight">समाहरणालय सुपौल | जिला प्रशासन, सुपौल (बिहार)</span>
-                    <h2 id="slip-heading-title" class="text-base font-black uppercase portal-text-primary mt-0.5 m-0 leading-tight">सभागार आवंटन आदेश</h2>
-                    <p id="slip-meta-ref" class="text-[11px] font-mono font-bold text-slate-700 mt-0.5 m-0"></p>
+            <div class="bg-white rounded-lg max-w-lg w-full p-6 shadow-2xl relative border-4 portal-border-primary text-xs">
+                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1 print:hidden"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <div class="text-center pb-2 border-b-2 border-slate-900 mb-3">
+                    <span class="text-[10px] uppercase font-bold text-slate-600 block">समाहरणालय सुपौल | जिला प्रशासन</span>
+                    <h2 class="text-base font-black uppercase portal-text-primary m-0">सभागार आवंटन आदेश</h2>
+                    <p id="slip-meta-ref" class="text-[10px] font-mono mt-0.5 m-0"></p>
                 </div>
-                <div class="py-3 space-y-2 text-xs">
-                    <div class="flex justify-between border-b border-slate-200 pb-1">
-                        <span class="font-bold text-slate-600">आवंटित सभागार:</span>
-                        <span id="slip-venue" class="font-bold portal-text-primary text-right">लहटन चौधरी सभागार</span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-200 pb-1">
-                        <span class="font-bold text-slate-600">तिथि एवं समयावधि:</span>
-                        <span id="slip-time" class="font-bold text-slate-900"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-200 pb-1">
-                        <span class="font-bold text-slate-600">अध्यक्षता:</span>
-                        <span id="slip-chair" class="font-bold text-slate-900"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-200 pb-1">
-                        <span class="font-bold text-slate-600">मांगकर्ता विभाग:</span>
-                        <span id="slip-department" class="font-medium text-slate-800"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-200 pb-1">
-                        <span class="font-bold text-slate-600">बैठक का विषय:</span>
-                        <span id="slip-subject" class="font-medium text-slate-900 text-right max-w-[280px]"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-200 pb-1">
-                        <span class="font-bold text-slate-600">वी.सी. लिंक:</span>
-                        <span id="slip-vc" class="font-bold portal-text-primary"></span>
-                    </div>
+                <div class="space-y-1.5 pb-3">
+                    <div class="flex justify-between border-b pb-1"><span class="font-bold">सभागार:</span><span id="slip-venue" class="font-bold portal-text-primary"></span></div>
+                    <div class="flex justify-between border-b pb-1"><span class="font-bold">तिथि एवं समय:</span><span id="slip-time" class="font-bold"></span></div>
+                    <div class="flex justify-between border-b pb-1"><span class="font-bold">अध्यक्षता:</span><span id="slip-chair"></span></div>
+                    <div class="flex justify-between border-b pb-1"><span class="font-bold">मांगकर्ता:</span><span id="slip-dept"></span></div>
+                    <div class="flex justify-between border-b pb-1"><span class="font-bold">विषय:</span><span id="slip-sub" class="text-right max-w-xs font-semibold"></span></div>
+                    <div class="flex justify-between border-b pb-1"><span class="font-bold">वी.सी.:</span><span id="slip-vc" class="font-bold"></span></div>
                 </div>
-                <div class="pt-3 border-t-2 border-slate-900 flex items-center justify-between text-xs text-slate-700">
-                    <div>
-                        <span id="slip-dynamic-status" class="font-bold block">स्थिति: समीक्षाधीन</span>
-                        <span class="text-[10px] text-slate-500 block">समाहरणालय, सुपौल (बिहार)</span>
-                    </div>
+                <div class="flex justify-between items-center pt-2 border-t text-slate-700">
+                    <span id="slip-status" class="font-bold text-emerald-800 text-xs"></span>
                     <div class="text-right">
-                        <span class="font-bold text-slate-900 block">ह०/- (Sd/-)</span>
-                        <span id="slip-signer-name" class="font-bold text-slate-900 block">प्राधिकृत पदाधिकारी</span>
-                        <span class="text-[10px] text-slate-500 block">सुपौल</span>
+                        <span class="font-bold block">ह०/- (Sd/-)</span>
+                        <span class="text-[10px] text-slate-500 block">नजारत शाखा / सुपौल</span>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center justify-end gap-2 print:hidden border-t border-slate-200 pt-2.5">
-                    <button type="button" class="modal-close-btn px-4 py-2 rounded text-xs font-semibold bg-slate-200 text-slate-800 hover:bg-slate-300">बंद करें</button>
-                    <button type="button" id="slip-print-btn" class="px-5 py-2 rounded text-xs font-bold portal-bg-primary hover:opacity-90 text-white flex items-center gap-1.5 shadow">
-                        <i data-lucide="printer" class="w-4 h-4"></i> पर्ची प्रिंट करें
-                    </button>
+                <div class="mt-4 flex justify-end gap-2 print:hidden">
+                    <button type="button" class="modal-close-btn px-4 py-1.5 rounded bg-slate-200">बंद करें</button>
+                    <button type="button" onclick="window.print()" class="px-5 py-1.5 rounded portal-bg-primary text-white font-bold">प्रिंट करें</button>
                 </div>
             </div>
         </div>
@@ -542,41 +403,32 @@
         <div id="toast-box" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-xl border text-xs sm:text-sm font-semibold flex items-center gap-2"></div>
     </div>
 
-    <!-- CLIENT JAVASCRIPT & LOCALSTORAGE DATABASE ENGINE -->
     <script>
-        // Seed Default State in localStorage
         const DEFAULT_HALLS = [{
-            id: 'hall-lahtan-choudhary-sabhagar',
+            id: 'hall-lahtan-choudhary',
             name: 'Lahtan Choudhary Sabhagar',
             name_hi: 'लहटन चौधरी सभागार',
-            wings: 'समाहरणालय मुख्य परिसर, सुपौल - 852131',
             capacity: 120,
             in_charge: 'नजारत उप समाहर्ता, सुपौल',
-            badge: 'समाहरणालय मुख्य परिसर',
-            description: 'जिला समाहरणालय सुपौल का प्रधान सभागार - समीक्षा बैठकों एवं वीसी हेतु।',
-            features: ['Polycom Studio HD VC Link', 'Dual 85" Smart Screens', 'Gooseneck Delegate Mics', 'Dedicated UPS Backup']
+            description: 'जिला समाहरणालय सुपौल का प्रधान सभागार - समीक्षा बैठकों एवं वी.सी. हेतु।',
+            features: ['Polycom HD VC Link', 'Dual 85" Smart Screens', 'PA Console', 'UPS Backup']
         }];
 
         const DEFAULT_USERS = [
-            { email: 'dio-spl@nic.in', password: 'admin@12345', name: 'जिला सूचना विज्ञान पदाधिकारी (DIO)', role: 'admin', department: 'National Informatics Centre / NIC', designation: 'District Informatics Officer' },
-            { email: 'ndcsupaul@nic.in', password: 'admin@12345', name: 'नजारत उप समाहर्ता (NDC)', role: 'nazarat', department: 'Nazarat Section', designation: 'Nazarat Deputy Collector' },
-            { email: 'officer@bihar.gov.in', password: 'admin@12345', name: 'राजस्व पदाधिकारी', role: 'officer', department: 'Revenue Branch', designation: 'Revenue Officer' }
+            { email: 'dio-spl@nic.in', password: 'admin@12345', name: 'जिला सूचना विज्ञान पदाधिकारी (DIO)', role: 'admin', department: 'NIC Supaul' },
+            { email: 'ndcsupaul@nic.in', password: 'admin@12345', name: 'नजारत उप समाहर्ता (NDC)', role: 'nazarat', department: 'Nazarat Section' },
+            { email: 'techteam@nic.in', password: 'admin@12345', name: 'तकनीकी टीम (Technical Team)', role: 'technical', department: 'BSWAN / IT' },
+            { email: 'officer@bihar.gov.in', password: 'admin@12345', name: 'राजस्व पदाधिकारी', role: 'officer', department: 'Revenue Branch' }
         ];
 
-        function getDB(key, defaultVal) {
-            const data = localStorage.getItem('supaul_' + key);
-            return data ? JSON.parse(data) : defaultVal;
-        }
+        function getDB(k, d) { const v = localStorage.getItem('spl_' + k); return v ? JSON.parse(v) : d; }
+        function setDB(k, v) { localStorage.setItem('spl_' + k, JSON.stringify(v)); }
 
-        function setDB(key, val) {
-            localStorage.setItem('supaul_' + key, JSON.stringify(val));
-        }
+        if (!localStorage.getItem('spl_halls')) setDB('halls', DEFAULT_HALLS);
+        if (!localStorage.getItem('spl_users')) setDB('users', DEFAULT_USERS);
+        if (!localStorage.getItem('spl_reqs')) setDB('reqs', []);
+        if (!localStorage.getItem('spl_notifs')) setDB('notifs', []);
 
-        if (!localStorage.getItem('supaul_halls')) setDB('halls', DEFAULT_HALLS);
-        if (!localStorage.getItem('supaul_users')) setDB('users', DEFAULT_USERS);
-        if (!localStorage.getItem('supaul_reqs')) setDB('reqs', []);
-
-        // Runtime State
         let currentUser = null;
         let selectedHall = getDB('halls', DEFAULT_HALLS)[0];
         let todayStr = new Date().toISOString().split('T')[0];
@@ -584,401 +436,325 @@
         let selectedHours = [];
 
         const TIME_SLOTS = [
-            { hour: 8, label: '08:00 AM - 09:00 AM' },
-            { hour: 9, label: '09:00 AM - 10:00 AM' },
-            { hour: 10, label: '10:00 AM - 11:00 AM' },
-            { hour: 11, label: '11:00 AM - 12:00 PM' },
-            { hour: 12, label: '12:00 PM - 01:00 PM' },
-            { hour: 13, label: '01:00 PM - 02:00 PM' },
-            { hour: 14, label: '02:00 PM - 03:00 PM' },
-            { hour: 15, label: '03:00 PM - 04:00 PM' },
-            { hour: 16, label: '04:00 PM - 05:00 PM' },
-            { hour: 17, label: '05:00 PM - 06:00 PM' },
-            { hour: 18, label: '06:00 PM - 07:00 PM' },
-            { hour: 19, label: '07:00 PM - 08:00 PM' }
+            { hour: 8, label: '08:00 AM - 09:00 AM' }, { hour: 9, label: '09:00 AM - 10:00 AM' },
+            { hour: 10, label: '10:00 AM - 11:00 AM' }, { hour: 11, label: '11:00 AM - 12:00 PM' },
+            { hour: 12, label: '12:00 PM - 01:00 PM' }, { hour: 13, label: '01:00 PM - 02:00 PM' },
+            { hour: 14, label: '02:00 PM - 03:00 PM' }, { hour: 15, label: '03:00 PM - 04:00 PM' },
+            { hour: 16, label: '04:00 PM - 05:00 PM' }, { hour: 17, label: '05:00 PM - 06:00 PM' },
+            { hour: 18, label: '06:00 PM - 07:00 PM' }, { hour: 19, label: '07:00 PM - 08:00 PM' }
         ];
 
         function showToast(msg, type = 'success') {
             const t = document.getElementById('toast-box');
-            t.className = `fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 ${
-                type === 'error' ? 'bg-rose-50 text-rose-900 border-rose-300' : 'bg-emerald-50 text-emerald-900 border-emerald-300'
-            }`;
-            t.innerHTML = `<i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle-2'}" class="w-4 h-4"></i><span>${msg}</span>`;
+            t.className = `fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 ${type === 'error' ? 'bg-rose-50 text-rose-900 border-rose-300' : 'bg-emerald-50 text-emerald-900 border-emerald-300'}`;
+            t.innerHTML = `<span>${msg}</span>`;
             t.classList.remove('hidden');
-            if (window.lucide) window.lucide.createIcons();
             setTimeout(() => t.classList.add('hidden'), 4000);
         }
 
-        function updateUIForAuth() {
-            const openLogin = document.getElementById('open-login-btn');
-            const profileBox = document.getElementById('user-profile-widget');
-            const roleBadge = document.getElementById('user-role-badge');
-            const tabNewReq = document.getElementById('tab-btn-new-req');
-            const tabMyReqs = document.getElementById('tab-btn-my-reqs');
-            const tabRequests = document.getElementById('tab-btn-requests');
-            const tabLedger = document.getElementById('tab-btn-ledger');
-            const bookLabel = document.getElementById('book-hall-tab-label');
+        function updateUI() {
+            const isAuth = !!currentUser;
+            document.getElementById('open-login-btn').classList.toggle('hidden', isAuth);
+            document.getElementById('user-profile-widget').classList.toggle('hidden', !isAuth);
+            document.getElementById('notif-wrapper').classList.toggle('hidden', !isAuth);
 
             if (currentUser) {
-                openLogin.classList.add('hidden');
-                profileBox.classList.remove('hidden');
                 document.getElementById('user-name-display').textContent = currentUser.name;
                 document.getElementById('user-email-display').textContent = currentUser.email;
-
-                tabNewReq.classList.remove('hidden');
-                if (currentUser.role === 'admin' || currentUser.role === 'nazarat') {
-                    roleBadge.textContent = currentUser.role === 'admin' ? 'जिला प्रशासक / DIO (Super Admin)' : 'नजारत शाखा / NDC';
-                    roleBadge.className = 'text-[10px] bg-rose-500/20 px-2 py-0.5 rounded text-rose-200 border border-rose-400 font-bold';
-                    tabRequests.classList.remove('hidden');
-                    tabLedger.classList.remove('hidden');
-                    tabMyReqs.classList.add('hidden');
-                    bookLabel.textContent = 'सीधा आवंटन / Sanction Slot';
-                } else {
-                    roleBadge.textContent = 'विभागीय नोडल लॉगिन';
-                    roleBadge.className = 'text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-200 border border-emerald-400 font-bold';
-                    tabMyReqs.classList.remove('hidden');
-                    tabRequests.classList.add('hidden');
-                    tabLedger.classList.add('hidden');
-                    bookLabel.textContent = 'मांग-पत्र भरें / Book Hall';
-                }
-            } else {
-                openLogin.classList.remove('hidden');
-                profileBox.classList.add('hidden');
-                roleBadge.textContent = 'सार्वजनिक पटल (Public View)';
-                roleBadge.className = 'text-[10px] bg-white/10 px-2 py-0.5 rounded text-amber-200 border border-white/20 font-medium';
-                tabNewReq.classList.add('hidden');
-                tabMyReqs.classList.add('hidden');
-                tabRequests.classList.add('hidden');
-                tabLedger.classList.add('hidden');
+                document.getElementById('user-role-badge').textContent = currentUser.role.toUpperCase();
             }
+
+            const r = currentUser ? currentUser.role : 'public';
+            document.getElementById('tab-btn-new-req').classList.toggle('hidden', !isAuth || r === 'technical');
+            document.getElementById('tab-btn-my-reqs').classList.toggle('hidden', r !== 'officer');
+            document.getElementById('tab-btn-tech-dashboard').classList.toggle('hidden', r !== 'technical');
+            document.getElementById('tab-btn-requests').classList.toggle('hidden', r !== 'admin' && r !== 'nazarat');
+            document.getElementById('tab-btn-halls').classList.toggle('hidden', r !== 'admin');
+            document.getElementById('tab-btn-users').classList.toggle('hidden', r !== 'admin');
+            document.getElementById('tab-btn-ledger').classList.toggle('hidden', r !== 'admin' && r !== 'nazarat');
+
+            renderVenues();
+            renderSlots();
+            renderNotifications();
             if (window.lucide) window.lucide.createIcons();
         }
 
-        function renderVenueCards() {
-            const container = document.getElementById('venue-list-container');
-            const halls = getDB('halls', DEFAULT_HALLS);
-            container.innerHTML = '';
-            halls.forEach(h => {
-                const isSelected = h.id === selectedHall.id;
-                const card = document.createElement('div');
-                card.className = `p-3.5 rounded-lg border cursor-pointer transition ${isSelected ? 'bg-blue-50/80 portal-border-primary shadow-sm ring-1 ring-slate-400' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
-                card.innerHTML = `
-                    <div class="flex items-start justify-between">
-                        <h3 class="text-xs font-bold portal-text-primary m-0">${h.name_hi}</h3>
-                        <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-100">${h.badge}</span>
-                    </div>
-                    <div class="mt-2 text-[11px] text-slate-600">क्षमता: ${h.capacity} सीट्स</div>
-                `;
-                card.onclick = () => {
-                    selectedHall = h;
-                    selectedHours = [];
-                    updateSelectionBar();
-                    renderVenueCards();
-                    renderSlotsGrid();
-                };
-                container.appendChild(card);
+        function renderVenues() {
+            const c = document.getElementById('venue-list-container');
+            c.innerHTML = '';
+            getDB('halls', DEFAULT_HALLS).forEach(h => {
+                const isSel = h.id === selectedHall.id;
+                const d = document.createElement('div');
+                d.className = `p-3 rounded-lg border cursor-pointer ${isSel ? 'bg-blue-50 border-blue-600 font-bold' : 'bg-white hover:bg-slate-50'}`;
+                d.innerHTML = `<div class="flex justify-between text-xs"><span>${h.name_hi}</span><span class="text-[10px] text-slate-500">${h.capacity} सीट्स</span></div>`;
+                d.onclick = () => { selectedHall = h; selectedHours = []; renderVenues(); renderSlots(); };
+                c.appendChild(d);
             });
             document.getElementById('current-hall-name').textContent = selectedHall.name_hi;
-            document.getElementById('current-hall-capacity-badge').textContent = `क्षमता: ${selectedHall.capacity} सीट्स`;
-            document.getElementById('current-hall-wings').textContent = selectedHall.wings;
+            document.getElementById('current-hall-cap').textContent = selectedHall.capacity + ' सीट्स';
             document.getElementById('current-hall-desc').textContent = selectedHall.description;
             document.getElementById('current-hall-incharge').textContent = selectedHall.in_charge;
-
-            const fContainer = document.getElementById('current-hall-features');
-            fContainer.innerHTML = '';
-            selectedHall.features.forEach(f => {
-                fContainer.innerHTML += `<span class="text-[10px] px-2.5 py-1 rounded bg-slate-100 text-slate-700 border border-slate-200 font-medium">${f}</span>`;
-            });
+            document.getElementById('current-hall-features').innerHTML = selectedHall.features.map(f => `<span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded border">${f}</span>`).join('');
         }
 
-        function renderSlotsGrid() {
-            const container = document.getElementById('slots-grid-container');
-            container.innerHTML = '';
-            const allReqs = getDB('reqs', []);
-            const bookedMap = {};
+        function renderSlots() {
+            const c = document.getElementById('slots-grid-container');
+            c.innerHTML = '';
+            const reqs = getDB('reqs', []).filter(r => r.hall_id === selectedHall.id && r.booking_date === selectedDate && r.status !== 'Rejected');
+            const booked = {};
+            reqs.forEach(r => r.hours.forEach(h => booked[h] = r));
 
-            allReqs.filter(r => r.hall_id === selectedHall.id && r.booking_date === selectedDate && r.status !== 'Rejected')
-                   .forEach(r => {
-                       r.hours.forEach(h => {
-                           bookedMap[h] = r;
-                       });
-                   });
-
-            TIME_SLOTS.forEach(slot => {
-                const booking = bookedMap[slot.hour];
-                const isApproved = booking && booking.status === 'Approved';
-                const isPending = booking && booking.status === 'Pending';
-                const isSelected = selectedHours.includes(slot.hour);
-
-                const card = document.createElement('button');
-                card.type = 'button';
-                card.disabled = !!booking;
-                card.className = `p-3 rounded-lg border text-left transition flex flex-col justify-between min-h-[85px] ${
-                    isApproved ? 'bg-rose-50 border-rose-300 cursor-not-allowed' :
-                    isPending ? 'bg-amber-50 border-amber-300 cursor-not-allowed' :
-                    isSelected ? 'bg-blue-100 portal-border-primary ring-2 ring-slate-400' :
-                    'bg-white hover:bg-slate-50 border-slate-200'
-                }`;
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between w-full">
-                        <span class="text-xs font-mono font-bold">${slot.label}</span>
-                        ${isApproved ? '<span class="text-[9px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 font-bold">आरक्षित</span>' :
-                          isPending ? '<span class="text-[9px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 font-bold">समीक्षाधीन</span>' :
-                          isSelected ? '<span class="text-[9px] px-2 py-0.5 rounded portal-bg-primary text-white font-bold">चयनित</span>' :
-                          '<span class="text-[9px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold">रिक्त</span>'}
-                    </div>
-                    <div class="mt-1 text-xs">
-                        ${booking ? `<span class="font-bold text-slate-800 text-[11px] block truncate">${booking.subject}</span>` :
-                          isSelected ? '<span class="portal-text-primary text-xs font-bold">स्लॉट चुना गया</span>' :
-                          '<span class="text-slate-400 text-[11px]">क्लिक कर चुनें</span>'}
-                    </div>
+            TIME_SLOTS.forEach(s => {
+                const b = booked[s.hour];
+                const isSel = selectedHours.includes(s.hour);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.disabled = !!b;
+                btn.className = `p-3 rounded-lg border text-left flex flex-col justify-between min-h-[75px] ${b ? (b.status === 'Approved' ? 'bg-rose-50 border-rose-300' : 'bg-amber-50 border-amber-300') : isSel ? 'bg-blue-100 border-blue-600 font-bold' : 'bg-white hover:bg-slate-50'}`;
+                btn.innerHTML = `
+                    <div class="flex justify-between text-xs w-full"><span class="font-mono">${s.label}</span><span class="text-[9px] font-bold">${b ? b.status : isSel ? 'चयनित' : 'रिक्त'}</span></div>
+                    <div class="text-[11px] truncate mt-1 text-slate-600">${b ? b.subject : isSel ? 'स्लॉट चुना गया' : 'क्लिक कर चुनें'}</div>
                 `;
-
-                if (!booking) {
-                    card.onclick = () => {
-                        if (selectedHours.includes(slot.hour)) {
-                            selectedHours = selectedHours.filter(h => h !== slot.hour);
-                        } else {
-                            selectedHours.push(slot.hour);
-                            selectedHours.sort((a,b) => a-b);
-                        }
-                        updateSelectionBar();
-                        renderSlotsGrid();
+                if (!b) {
+                    btn.onclick = () => {
+                        selectedHours = isSel ? selectedHours.filter(h => h !== s.hour) : [...selectedHours, s.hour].sort((x,y) => x-y);
+                        updateBar();
+                        renderSlots();
                     };
                 }
-                container.appendChild(card);
+                c.appendChild(btn);
             });
+            updateBar();
         }
 
-        function updateSelectionBar() {
-            const countLabel = document.getElementById('selected-slot-count-label');
-            const badges = document.getElementById('selected-slot-badges');
-            const clearBtn = document.getElementById('clear-selected-slots-btn');
-            const proceedBtn = document.getElementById('proceed-requisition-btn');
-
-            if (selectedHours.length > 0) {
-                countLabel.textContent = `${selectedHours.length} घंटे का स्लॉट चयनित`;
-                badges.innerHTML = `<span class="text-xs font-mono font-bold portal-text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${selectedHours.map(h => `${h}:00`).join(', ')}</span>`;
-                clearBtn.classList.remove('hidden');
-                proceedBtn.className = 'w-full sm:w-auto px-5 py-2 rounded font-bold text-xs flex items-center justify-center gap-1.5 transition portal-bg-primary hover:opacity-90 text-white shadow cursor-pointer';
+        function updateBar() {
+            const b = document.getElementById('selected-slot-badges');
+            const btn = document.getElementById('proceed-requisition-btn');
+            if (selectedHours.length) {
+                b.textContent = `${selectedHours.length} घंटे चयनित: ` + selectedHours.map(h => `${h}:00`).join(', ');
+                btn.className = 'w-full sm:w-auto px-5 py-2 rounded font-bold text-xs portal-bg-primary text-white shadow cursor-pointer';
             } else {
-                countLabel.textContent = 'कोई स्लॉट चयनित नहीं';
-                badges.innerHTML = '';
-                clearBtn.classList.add('hidden');
-                proceedBtn.className = 'w-full sm:w-auto px-5 py-2 rounded font-semibold text-xs flex items-center justify-center gap-1.5 transition bg-slate-300 text-slate-500 cursor-not-allowed border border-slate-300';
+                b.textContent = 'कोई स्लॉट चयनित नहीं';
+                btn.className = 'w-full sm:w-auto px-5 py-2 rounded font-semibold text-xs bg-slate-300 text-slate-500 cursor-not-allowed';
             }
         }
 
-        function switchTab(tabId) {
+        function switchTab(id) {
             document.querySelectorAll('.portal-section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.nav-tab-btn').forEach(b => {
                 b.classList.remove('active', 'portal-border-accent', 'text-white', 'font-bold');
                 b.classList.add('border-transparent', 'text-slate-200');
             });
-            const sec = document.getElementById('section-' + tabId);
-            const btn = document.getElementById('tab-btn-' + tabId);
+            const sec = document.getElementById('section-' + id);
+            const btn = document.getElementById('tab-btn-' + id);
             if (sec) sec.classList.remove('hidden');
             if (btn) {
                 btn.classList.add('active', 'portal-border-accent', 'text-white', 'font-bold');
                 btn.classList.remove('border-transparent', 'text-slate-200');
             }
 
-            if (tabId === 'my-reqs') renderMyReqs();
-            if (tabId === 'requests') renderAdminQueue();
-            if (tabId === 'ledger') renderLedger();
+            if (id === 'my-reqs') renderMyReqs();
+            if (id === 'tech-dashboard') renderTech();
+            if (id === 'requests') renderAdminQueue();
+            if (id === 'halls') renderAdminHalls();
+            if (id === 'users') renderAdminUsers();
+            if (id === 'ledger') renderLedger();
             if (window.lucide) window.lucide.createIcons();
         }
 
         function renderMyReqs() {
-            const tbody = document.getElementById('my-reqs-table-body');
-            tbody.innerHTML = '';
-            const allReqs = getDB('reqs', []).filter(r => r.officer_email === currentUser?.email);
-            if (allReqs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-500">कोई मांग-पत्र नहीं मिला।</td></tr>';
-                return;
-            }
-            allReqs.forEach(r => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
-                tr.innerHTML = `
-                    <td class="p-3 pl-4 font-mono font-bold portal-text-primary">${r.id}</td>
-                    <td class="p-3">${r.booking_date} (${r.hours.map(h => `${h}:00`).join(', ')})</td>
-                    <td class="p-3">${r.subject}</td>
-                    <td class="p-3">${r.chairing_officer}</td>
-                    <td class="p-3 text-center"><span class="px-2 py-0.5 rounded font-bold text-[10px] ${r.status === 'Approved' ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}">${r.status}</span></td>
-                    <td class="p-3 text-right pr-4"><button type="button" class="px-2.5 py-1 rounded portal-bg-primary text-white text-[11px] font-bold" onclick="showSlip('${r.id}')">पर्ची</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
+            const tb = document.getElementById('my-reqs-tbody');
+            const list = getDB('reqs', []).filter(r => r.officer_email === currentUser?.email);
+            tb.innerHTML = list.length ? list.map(r => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono font-bold">${r.id}</td><td class="p-3">${r.booking_date} (${r.hours.join('h, ')}h)</td>
+                    <td class="p-3">${r.subject}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status==='Approved'?'bg-emerald-50 text-emerald-800':'bg-amber-50 text-amber-800'}">${r.status}</span></td>
+                    <td class="p-3 text-right"><button onclick="viewSlip('${r.id}')" class="px-2 py-1 portal-bg-primary text-white rounded font-bold">पर्ची</button></td>
+                </tr>`).join('') : '<tr><td colspan="5" class="p-4 text-center text-slate-500">कोई मांग नहीं मिली</td></tr>';
+        }
+
+        function renderTech() {
+            const reqs = getDB('reqs', []);
+            let vc = 0, ppt = 0;
+            reqs.forEach(r => { if (r.status === 'Approved') { if (r.vc) vc++; if (r.ppt) ppt++; } });
+            document.getElementById('stat-tech-vc').textContent = vc;
+            document.getElementById('stat-tech-ppt').textContent = ppt;
+            document.getElementById('tech-tbody').innerHTML = reqs.map(r => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono font-bold">${r.id}</td><td class="p-3">${r.booking_date}</td><td class="p-3">${r.subject}</td>
+                    <td class="p-3 text-center">${r.vc ? 'हाँ' : 'नहीं'}</td><td class="p-3 text-center">${r.ppt ? 'हाँ' : 'नहीं'}</td>
+                    <td class="p-3 text-center font-bold">${r.status}</td>
+                </tr>`).join('');
         }
 
         function renderAdminQueue() {
-            const tbody = document.getElementById('admin-requests-table-body');
-            tbody.innerHTML = '';
-            const allReqs = getDB('reqs', []);
-            let pendingCount = 0;
-            allReqs.forEach(r => {
-                if (r.status === 'Pending') pendingCount++;
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
-                tr.innerHTML = `
-                    <td class="p-3 pl-4 font-mono font-bold">${r.id}</td>
-                    <td class="p-3">${r.booking_date} (${r.hours.map(h => `${h}:00`).join(', ')})</td>
-                    <td class="p-3">${r.subject}</td>
-                    <td class="p-3 text-center font-bold">${r.priority}</td>
-                    <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status === 'Approved' ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}">${r.status}</span></td>
+            const reqs = getDB('reqs', []);
+            document.getElementById('badge-pending-count').textContent = reqs.filter(r => r.status === 'Pending').length;
+            document.getElementById('admin-reqs-tbody').innerHTML = reqs.map(r => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono font-bold">${r.id}</td><td class="p-3">${r.booking_date}</td><td class="p-3">${r.subject}</td>
+                    <td class="p-3 text-center font-bold">${r.status}</td>
                     <td class="p-3 text-center">
-                        <select onchange="changeStatus('${r.id}', this.value)" class="text-xs border rounded p-1">
-                            <option value="Pending" ${r.status === 'Pending' ? 'selected' : ''}>समीक्षाधीन</option>
-                            <option value="Approved" ${r.status === 'Approved' ? 'selected' : ''}>स्वीकृत</option>
-                            <option value="Rejected" ${r.status === 'Rejected' ? 'selected' : ''}>अस्वीकृत</option>
+                        <select onchange="changeStatus('${r.id}', this.value)" class="border rounded p-1 text-xs">
+                            <option value="Pending" ${r.status==='Pending'?'selected':''}>समीक्षाधीन</option>
+                            <option value="Approved" ${r.status==='Approved'?'selected':''}>स्वीकृत</option>
+                            <option value="Rejected" ${r.status==='Rejected'?'selected':''}>अस्वीकृत</option>
                         </select>
                     </td>
-                    <td class="p-3 text-right pr-4"><button type="button" class="px-2.5 py-1 portal-bg-primary text-white text-[11px] font-bold rounded" onclick="showSlip('${r.id}')">पर्ची</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-            document.getElementById('badge-pending-count').textContent = pendingCount;
+                    <td class="p-3 text-right"><button onclick="viewSlip('${r.id}')" class="px-2 py-1 portal-bg-primary text-white rounded font-bold">पर्ची</button></td>
+                </tr>`).join('');
+        }
+
+        function renderAdminHalls() {
+            document.getElementById('halls-tbody').innerHTML = getDB('halls', DEFAULT_HALLS).map(h => `
+                <tr class="hover:bg-slate-50"><td class="p-3 font-bold">${h.name_hi}</td><td class="p-3">${h.wings || 'समाहरणालय'}</td><td class="p-3 text-center">${h.capacity}</td><td class="p-3">${h.in_charge}</td><td class="p-3 text-right"><button onclick="deleteHall('${h.id}')" class="text-rose-600 font-bold">हटाएं</button></td></tr>
+            `).join('');
+        }
+
+        function renderAdminUsers() {
+            document.getElementById('users-tbody').innerHTML = getDB('users', DEFAULT_USERS).map(u => `
+                <tr class="hover:bg-slate-50"><td class="p-3 font-bold">${u.name}</td><td class="p-3">${u.department}</td><td class="p-3 font-mono">${u.email}</td><td class="p-3 text-center font-bold uppercase">${u.role}</td></tr>
+            `).join('');
         }
 
         function renderLedger() {
-            const tbody = document.getElementById('admin-ledger-table-body');
-            tbody.innerHTML = '';
-            const allReqs = getDB('reqs', []);
-            allReqs.forEach(r => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
-                tr.innerHTML = `
-                    <td class="p-3 pl-4 font-mono font-bold">${r.id}</td>
-                    <td class="p-3">${r.booking_date} (${r.hours.map(h => `${h}:00`).join(', ')})</td>
-                    <td class="p-3">${r.chairing_officer}</td>
-                    <td class="p-3">${r.subject} (${r.department})</td>
-                    <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status === 'Approved' ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}">${r.status}</span></td>
-                    <td class="p-3 text-right pr-4"><button type="button" class="px-2.5 py-1 portal-bg-primary text-white text-[11px] font-bold rounded" onclick="showSlip('${r.id}')">पर्ची</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
+            document.getElementById('ledger-tbody').innerHTML = getDB('reqs', []).map(r => `
+                <tr class="hover:bg-slate-50"><td class="p-3 font-mono">${r.id}</td><td class="p-3">${r.hall_id}</td><td class="p-3">${r.booking_date}</td><td class="p-3">${r.subject}</td><td class="p-3 text-center font-bold">${r.status}</td></tr>
+            `).join('');
         }
 
-        window.changeStatus = function(id, newStatus) {
-            const allReqs = getDB('reqs', []);
-            const req = allReqs.find(r => r.id === id);
-            if (req) {
-                req.status = newStatus;
-                setDB('reqs', allReqs);
-                showToast(`मांग संदर्भ ${id} को "${newStatus}" किया गया`);
+        function renderNotifications() {
+            const notifs = getDB('notifs', []);
+            document.getElementById('notif-unread-badge').textContent = notifs.length;
+            document.getElementById('notif-unread-badge').classList.toggle('hidden', !notifs.length);
+            document.getElementById('notif-list-container').innerHTML = notifs.length ? notifs.map(n => `<div class="p-2.5">${n}</div>`).join('') : '<p class="p-3 text-slate-400">कोई सूचना नहीं</p>';
+        }
+
+        window.changeStatus = function(id, st) {
+            const list = getDB('reqs', []);
+            const item = list.find(r => r.id === id);
+            if (item) {
+                item.status = st;
+                setDB('reqs', list);
+                const n = getDB('notifs', []);
+                n.unshift(`मांग संदर्भ ${id} की स्थिति बदल कर "${st}" कर दी गई।`);
+                setDB('notifs', n);
+                showToast(`स्थिति अद्यतित: ${st}`);
                 renderAdminQueue();
-                renderSlotsGrid();
+                renderNotifications();
             }
         };
 
-        window.showSlip = function(id) {
-            const req = getDB('reqs', []).find(r => r.id === id);
-            if (!req) return;
-            document.getElementById('slip-meta-ref').textContent = `संदर्भ: ${req.id} | पत्रांक: ${req.memo_no || 'N/A'}`;
-            document.getElementById('slip-time').textContent = `${req.booking_date} (${req.hours.map(h => `${h}:00`).join(', ')})`;
-            document.getElementById('slip-chair').textContent = req.chairing_officer;
-            document.getElementById('slip-department').textContent = req.department;
-            document.getElementById('slip-subject').textContent = req.subject;
-            document.getElementById('slip-vc').textContent = req.vc_required ? 'हाँ (VC)' : 'नहीं';
-            document.getElementById('slip-dynamic-status').textContent = `स्थिति: ${req.status}`;
+        window.viewSlip = function(id) {
+            const r = getDB('reqs', []).find(x => x.id === id);
+            if (!r) return;
+            document.getElementById('slip-meta-ref').textContent = `संदर्भ: ${r.id} | पत्रांक: ${r.memo || 'N/A'}`;
+            document.getElementById('slip-venue').textContent = selectedHall.name_hi;
+            document.getElementById('slip-time').textContent = `${r.booking_date} (${r.hours.join(':00, ')}:00)`;
+            document.getElementById('slip-chair').textContent = r.chair;
+            document.getElementById('slip-dept').textContent = r.department;
+            document.getElementById('slip-sub').textContent = r.subject;
+            document.getElementById('slip-vc').textContent = r.vc ? 'हाँ' : 'नहीं';
+            document.getElementById('slip-status').textContent = `स्थिति: ${r.status}`;
             document.getElementById('modal-slip').classList.remove('hidden');
         };
 
-        // Event Listeners
-        document.getElementById('calendar-date-picker').value = selectedDate;
-        document.getElementById('calendar-date-picker').onchange = (e) => {
-            selectedDate = e.target.value;
-            selectedHours = [];
-            updateSelectionBar();
-            renderSlotsGrid();
-            document.getElementById('display-date-label').textContent = selectedDate;
-        };
-        document.getElementById('display-date-label').textContent = selectedDate;
-
-        document.getElementById('today-btn').onclick = () => {
-            selectedDate = todayStr;
-            document.getElementById('calendar-date-picker').value = todayStr;
-            document.getElementById('display-date-label').textContent = todayStr;
-            renderSlotsGrid();
-        };
-
+        // Navigation
         document.getElementById('tab-btn-schedule').onclick = () => switchTab('schedule');
-        document.getElementById('tab-btn-new-req').onclick = () => {
-            document.getElementById('summary-date').textContent = selectedDate;
-            document.getElementById('summary-hours').textContent = selectedHours.map(h => `${h}:00`).join(', ');
-            switchTab('new-req');
-        };
+        document.getElementById('tab-btn-new-req').onclick = () => switchTab('new-req');
         document.getElementById('tab-btn-my-reqs').onclick = () => switchTab('my-reqs');
+        document.getElementById('tab-btn-tech-dashboard').onclick = () => switchTab('tech-dashboard');
         document.getElementById('tab-btn-requests').onclick = () => switchTab('requests');
+        document.getElementById('tab-btn-halls').onclick = () => switchTab('halls');
+        document.getElementById('tab-btn-users').onclick = () => switchTab('users');
         document.getElementById('tab-btn-ledger').onclick = () => switchTab('ledger');
 
-        document.getElementById('proceed-requisition-btn').onclick = () => {
-            if (!currentUser) {
-                document.getElementById('modal-login').classList.remove('hidden');
-                return;
-            }
-            if (selectedHours.length === 0) {
-                showToast('कम से कम एक स्लॉट चुनें', 'error');
-                return;
-            }
-            document.getElementById('summary-date').textContent = selectedDate;
-            document.getElementById('summary-hours').textContent = selectedHours.map(h => `${h}:00`).join(', ');
-            switchTab('new-req');
+        // Date Picker Handlers
+        const dateInput = document.getElementById('calendar-date-picker');
+        dateInput.value = selectedDate;
+        document.getElementById('display-date-label').textContent = selectedDate;
+        dateInput.onchange = (e) => { selectedDate = e.target.value; selectedHours = []; document.getElementById('display-date-label').textContent = selectedDate; renderSlots(); };
+        document.getElementById('today-btn').onclick = () => { selectedDate = todayStr; dateInput.value = todayStr; document.getElementById('display-date-label').textContent = todayStr; renderSlots(); };
+        document.getElementById('prev-day-btn').onclick = () => {
+            const d = new Date(selectedDate); d.setDate(d.getDate() - 1);
+            selectedDate = d.toISOString().split('T')[0]; dateInput.value = selectedDate; document.getElementById('display-date-label').textContent = selectedDate; renderSlots();
+        };
+        document.getElementById('next-day-btn').onclick = () => {
+            const d = new Date(selectedDate); d.setDate(d.getDate() + 1);
+            selectedDate = d.toISOString().split('T')[0]; dateInput.value = selectedDate; document.getElementById('display-date-label').textContent = selectedDate; renderSlots();
         };
 
-        document.getElementById('cancel-req-btn').onclick = () => switchTab('schedule');
-        document.getElementById('cancel-req-btn-2').onclick = () => switchTab('schedule');
+        // Proceed and Form
+        document.getElementById('proceed-requisition-btn').onclick = () => {
+            if (!currentUser) { document.getElementById('modal-login').classList.remove('hidden'); return; }
+            if (!selectedHours.length) { showToast('स्लॉट का चयन करें', 'error'); return; }
+            switchTab('new-req');
+        };
 
         document.getElementById('requisition-form').onsubmit = (e) => {
             e.preventDefault();
-            const allReqs = getDB('reqs', []);
-            const isDirect = (currentUser.role === 'admin' || currentUser.role === 'nazarat');
-            const newReq = {
-                id: 'SPL-REQ-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
+            const list = getDB('reqs', []);
+            const isDirect = currentUser.role === 'admin' || currentUser.role === 'nazarat';
+            list.unshift({
+                id: 'SPL-REQ-' + Math.floor(1000 + Math.random() * 9000),
                 hall_id: selectedHall.id,
                 booking_date: selectedDate,
                 hours: [...selectedHours],
                 subject: document.getElementById('req-subject').value.trim(),
-                agenda: document.getElementById('req-agenda').value.trim(),
-                chairing_officer: document.getElementById('req-chair').value.trim(),
-                memo_no: document.getElementById('req-memo').value.trim(),
+                chair: document.getElementById('req-chair').value.trim(),
+                memo: document.getElementById('req-memo').value.trim(),
                 priority: document.getElementById('req-priority').value,
                 attendees: document.getElementById('req-attendees').value,
-                vc_required: document.getElementById('req-vc').checked,
-                ppt_required: document.getElementById('req-ppt').checked,
-                department: currentUser.department,
+                vc: document.getElementById('req-vc').checked,
+                ppt: document.getElementById('req-ppt').checked,
                 officer_email: currentUser.email,
+                department: currentUser.department,
                 status: isDirect ? 'Approved' : 'Pending'
-            };
-            allReqs.unshift(newReq);
-            setDB('reqs', allReqs);
-            showToast(isDirect ? 'सभागार सीधा आवंटित किया गया' : 'मांग-पत्र प्रस्तुत किया गया');
+            });
+            setDB('reqs', list);
             selectedHours = [];
-            updateSelectionBar();
-            renderSlotsGrid();
+            showToast(isDirect ? 'सभागार सीधा आवंटित किया गया' : 'मांग-पत्र प्रस्तुत किया गया');
             document.getElementById('requisition-form').reset();
             switchTab(isDirect ? 'requests' : 'my-reqs');
         };
 
-        // Auth handling
-        document.getElementById('open-login-btn').onclick = () => document.getElementById('modal-login').classList.remove('hidden');
+        // Modals & Auth
+        document.getElementById('open-login-btn').onclick = () => {
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-pwd').value = '';
+            document.getElementById('login-error-msg').classList.add('hidden');
+            document.getElementById('modal-login').classList.remove('hidden');
+        };
+
         document.querySelectorAll('.modal-close-btn').forEach(b => b.onclick = () => {
             document.querySelectorAll('#modal-login, #modal-slip').forEach(m => m.classList.add('hidden'));
         });
+
+        // Toggle Password Visibility Logic
+        const togglePwdBtn = document.getElementById('toggle-password-btn');
+        const pwdInput = document.getElementById('login-pwd');
+        const pwdIcon = document.getElementById('toggle-password-icon');
+
+        togglePwdBtn.onclick = () => {
+            const isPassword = pwdInput.type === 'password';
+            pwdInput.type = isPassword ? 'text' : 'password';
+            pwdIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        document.getElementById('notif-toggle-btn').onclick = () => document.getElementById('notif-dropdown').classList.toggle('hidden');
+        document.getElementById('notif-clear-btn').onclick = () => { setDB('notifs', []); renderNotifications(); };
 
         document.getElementById('login-form').onsubmit = (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
             const pwd = document.getElementById('login-pwd').value;
             const users = getDB('users', DEFAULT_USERS);
-            const match = users.find(u => u.email === email && u.password === pwd);
-            if (match) {
-                currentUser = match;
+            const u = users.find(x => x.email.toLowerCase() === email.toLowerCase() && x.password === pwd);
+            if (u) {
+                currentUser = u;
                 document.getElementById('modal-login').classList.add('hidden');
-                updateUIForAuth();
-                renderSlotsGrid();
+                updateUI();
                 showToast('सफलतापूर्वक लॉगिन किया गया');
             } else {
                 const err = document.getElementById('login-error-msg');
@@ -989,31 +765,22 @@
 
         document.getElementById('portal-logout-btn').onclick = () => {
             currentUser = null;
-            updateUIForAuth();
+            updateUI();
             switchTab('schedule');
             showToast('लॉगआउट संपन्न');
         };
 
         document.getElementById('export-csv-btn').onclick = () => {
-            const reqs = getDB('reqs', []);
-            if (!reqs.length) { showToast('कोई डेटा उपलब्ध नहीं', 'error'); return; }
-            let csv = "ID,Date,Hours,Subject,Department,Status\n";
-            reqs.forEach(r => {
-                csv += `"${r.id}","${r.booking_date}","${r.hours.join(',')}","${r.subject}","${r.department}","${r.status}"\n`;
-            });
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const list = getDB('reqs', []);
+            if (!list.length) { showToast('कोई डेटा उपलब्ध नहीं', 'error'); return; }
+            let csv = "ID,Date,Subject,Status\n" + list.map(r => `"${r.id}","${r.booking_date}","${r.subject}","${r.status}"`).join('\n');
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `Supaul_Requisitions_${todayStr}.csv`;
+            a.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: 'text/csv' }));
+            a.download = `Supaul_Ledger_${todayStr}.csv`;
             a.click();
         };
 
-        document.getElementById('slip-print-btn').onclick = () => window.print();
-
-        // Boot
-        renderVenueCards();
-        renderSlotsGrid();
-        updateUIForAuth();
+        updateUI();
     </script>
 </body>
 </html>
