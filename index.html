@@ -149,7 +149,6 @@
                     </button>
 
                     <div id="header-user-menu" class="hidden flex items-center gap-2">
-                        <!-- Notifications Trigger -->
                         <div class="relative">
                             <button type="button" id="notif-toggle-btn" class="p-2 rounded-lg bg-black/25 border border-white/15 hover:bg-black/40 portal-text-accent relative transition" title="सूचनाएं / Notifications">
                                 <i data-lucide="bell" class="w-4 h-4"></i>
@@ -502,7 +501,7 @@
                 </form>
             </div>
 
-            <!-- SECTION 3: MY REQUISITIONS (Officer / ITM) -->
+            <!-- SECTION 3: MY REQUISITIONS -->
             <div id="section-my-reqs" class="portal-section hidden space-y-4">
                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
@@ -590,7 +589,7 @@
                 </div>
             </div>
 
-            <!-- SECTION 4: DASHBOARD (Nazarat / NDC & Admin) -->
+            <!-- SECTION 4: DASHBOARD -->
             <div id="section-dashboard" class="portal-section hidden space-y-6">
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="admin-stats-container">
                     <div class="bg-white rounded-lg p-4 border-l-4 border-amber-500 border border-slate-200 shadow-sm">
@@ -603,27 +602,24 @@
                     </div>
                     <div class="bg-white rounded-lg p-4 border-l-4 portal-border-primary border border-slate-200 shadow-sm">
                         <span class="text-xs text-slate-500 font-bold block uppercase">उपलब्ध सभागार</span>
-                        <p id="stat-halls-count" class="text-2xl font-extrabold portal-text-primary m-0 mt-1">1</p>
+                        <p id="stat-halls-count" class="text-2xl font-extrabold portal-text-primary m-0 mt-1">0</p>
                     </div>
                     <div class="bg-white rounded-lg p-4 border-l-4 border-indigo-600 border border-slate-200 shadow-sm">
                         <span class="text-xs text-slate-500 font-bold block uppercase">पंजीकृत अधिकारी</span>
-                        <p id="stat-users" class="text-2xl font-extrabold text-indigo-900 m-0 mt-1">4</p>
+                        <p id="stat-users" class="text-2xl font-extrabold text-indigo-900 m-0 mt-1">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 5: MANAGE HALLS (Admin Only) -->
+            <!-- SECTION 5: MANAGE HALLS -->
             <div id="section-halls" class="portal-section hidden space-y-4">
                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-sm font-bold portal-text-primary flex items-center gap-2 m-0">
-                            <i data-lucide="building-2" class="w-4 h-4 portal-text-primary"></i>
-                            सभागार एवं कक्ष प्रबंधन (Admin Exclusive)
-                        </h2>
-                    </div>
+                    <h2 class="text-sm font-bold portal-text-primary flex items-center gap-2 m-0">
+                        <i data-lucide="building-2" class="w-4 h-4 portal-text-primary"></i>
+                        सभागार एवं कक्ष प्रबंधन (Admin Exclusive)
+                    </h2>
                     <button type="button" id="open-new-hall-modal-btn" class="px-4 py-2 portal-bg-primary hover:opacity-90 text-white font-bold text-xs rounded flex items-center gap-1.5 shadow">
-                        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                        नया सभागार जोड़ें
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> नया सभागार जोड़ें
                     </button>
                 </div>
 
@@ -644,7 +640,7 @@
                 </div>
             </div>
 
-            <!-- SECTION 6: REVIEW QUEUE & STATUS CONTROLS (Nazarat & Admin) -->
+            <!-- SECTION 6: REVIEW QUEUE & STATUS CONTROLS -->
             <div id="section-requests" class="portal-section hidden space-y-4">
                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
@@ -684,8 +680,7 @@
                         </h2>
                     </div>
                     <button type="button" id="open-new-user-modal-btn" class="px-4 py-2 portal-bg-primary hover:opacity-90 text-white font-bold text-xs rounded flex items-center gap-1.5 shadow">
-                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                        नया खाता बनाएं
+                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> नया खाता बनाएं
                     </button>
                 </div>
 
@@ -766,7 +761,7 @@
                 <form id="ajax-login-form" class="space-y-3.5 text-xs">
                     <div>
                         <label class="block text-slate-700 font-bold mb-1">सरकारी ईमेल आईडी</label>
-                        <input type="text" id="login-username" required placeholder="उदा. dio-spl@nic.in" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary">
+                        <input type="text" id="login-username" required placeholder="name@nic.in" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary">
                     </div>
                     <div>
                         <label class="block text-slate-700 font-bold mb-1">पासवर्ड</label>
@@ -829,7 +824,7 @@
             </div>
         </div>
 
-        <!-- MODAL: QUICK EDIT NODAL IN-CHARGE (ADMIN ONLY) -->
+        <!-- MODAL: QUICK EDIT NODAL IN-CHARGE -->
         <div id="modal-quick-incharge" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
             <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-5 shadow-2xl relative">
                 <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1">
@@ -863,7 +858,7 @@
             </div>
         </div>
 
-        <!-- MODAL: HALL CREATE & EDIT (ADMIN ONLY) -->
+        <!-- MODAL: HALL CREATE & EDIT -->
         <div id="modal-hall-edit" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
             <div class="bg-white border-2 portal-border-primary rounded-lg max-w-xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
                 <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1">
@@ -875,7 +870,7 @@
                     </div>
                     <div>
                         <h2 id="modal-hall-title" class="text-base font-bold portal-text-primary m-0">सभागार विवरण संपादित करें</h2>
-                        <p class="text-xs text-slate-500 m-0">District Administration Conference Facility Settings (Admin Exclusive)</p>
+                        <p class="text-xs text-slate-500 m-0">District Administration Conference Facility Settings</p>
                     </div>
                 </div>
 
@@ -998,7 +993,7 @@
             </div>
         </div>
 
-        <!-- MODAL: EDIT USER (ADMIN ONLY) -->
+        <!-- MODAL: EDIT USER -->
         <div id="modal-edit-user" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
             <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
                 <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1">
@@ -1095,7 +1090,7 @@
             </div>
         </div>
 
-        <!-- MODAL: SANCTION ORDER SLIP (PRINT READY WITH DYNAMIC STATUS & TITLE) -->
+        <!-- MODAL: SANCTION ORDER SLIP -->
         <div id="modal-slip" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
             <div class="bg-white text-slate-900 rounded-lg max-w-xl w-full p-5 sm:p-6 shadow-2xl relative border-4 portal-border-primary">
                 <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1 print:hidden">
@@ -1143,7 +1138,6 @@
                     </div>
                 </div>
 
-                <!-- DYNAMIC STATUS & SIGNATURE BLOCK -->
                 <div class="pt-3 border-t-2 border-slate-900 flex items-center justify-between text-xs text-slate-700">
                     <div>
                         <span id="slip-dynamic-status" class="font-bold block">स्थिति: समीक्षाधीन (PENDING APPROVAL)</span>
@@ -1187,7 +1181,7 @@
             { hour: 19, label: '07:00 PM - 08:00 PM' }
         ];
 
-        // Seed Default State matching original PHP database seeding
+        // Seeded Demo Data exactly from PHP
         const SEED_HALLS = [
             {
                 id: 'hall-lahtan-choudhary-sabhagar',
@@ -1269,7 +1263,6 @@
         if (!localStorage.getItem('supaul_reqs')) setDB('reqs', []);
         if (!localStorage.getItem('supaul_notifs')) setDB('notifs', []);
 
-        // State variables
         let currentUser = getDB('session_user', null);
         let hallsData = getDB('halls', SEED_HALLS);
         let selectedHallId = hallsData.length > 0 ? hallsData[0].id : 'hall-lahtan-choudhary-sabhagar';
@@ -1340,17 +1333,15 @@
                     roleBadge.className = 'text-[10px] bg-cyan-500/20 px-2 py-0.5 rounded text-cyan-200 border border-cyan-400/40 font-bold';
                 } else {
                     roleBadge.textContent = 'विभागीय नोडल लॉगिन';
-                    roleBadge.className = 'text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-200 border border-emerald-400/40 font-bold';
+                    roleBadge.className = 'text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-200 border border-emerald-400 font-bold';
                 }
 
-                // Proceed Button Text
                 const proceedBtnText = document.getElementById('proceed-btn-text');
                 const submitBtnText = document.getElementById('submit-req-btn-text');
                 const isSanctioner = (role === 'admin' || role === 'nazarat');
                 if (proceedBtnText) proceedBtnText.textContent = isSanctioner ? 'प्रशासनिक सीधा आवंटन' : 'आरक्षण प्रपत्र भरें';
                 if (submitBtnText) submitBtnText.textContent = isSanctioner ? 'सीधा आवंटन आदेश जारी करें' : 'मांग-पत्र प्रस्तुत करें';
 
-                // Admin Controls Visibility
                 document.getElementById('quick-add-hall-btn').classList.toggle('hidden', role !== 'admin');
                 document.getElementById('edit-current-hall-btn').classList.toggle('hidden', role !== 'admin');
                 document.getElementById('quick-edit-incharge-btn').classList.toggle('hidden', role !== 'admin');
@@ -1368,7 +1359,6 @@
                 document.getElementById('quick-edit-incharge-btn').classList.add('hidden');
             }
 
-            // Tab Visibility per Role
             const userRole = currentUser ? currentUser.role : 'public';
             document.getElementById('tab-btn-new-req').classList.toggle('hidden', !isAuth || userRole === 'technical');
             document.getElementById('tab-btn-my-reqs').classList.toggle('hidden', userRole !== 'officer' && userRole !== 'itm');
@@ -1379,7 +1369,6 @@
             document.getElementById('tab-btn-users').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
             document.getElementById('tab-btn-ledger').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
 
-            // User Tab Titles & Table Headers by Role
             const usersPageTitle = document.getElementById('users-page-title');
             const tabTextUsers = document.getElementById('tab-text-users');
             const tabTextNewReq = document.getElementById('tab-text-new-req');
@@ -1705,7 +1694,6 @@
             btn.addEventListener('click', () => switchTab(btn.id.replace('tab-btn-', '')));
         });
 
-        // Requisition submission logic matching supaul_ajax_submit_requisition
         const reqForm = document.getElementById('requisition-form');
         if (reqForm) {
             reqForm.addEventListener('submit', (e) => {
@@ -1780,7 +1768,6 @@
                 allReqs.unshift(newBooking);
                 setDB('reqs', allReqs);
 
-                // Notifications
                 const notifs = getDB('notifs', []);
                 notifs.unshift({
                     id: Date.now(),
@@ -1930,7 +1917,6 @@
             if (isRoleTech) renderTechDutyBoard(allReqs);
             if (isRoleAdmin) renderAdminHallsTable();
 
-            // Review Queue Table
             const reqTbody = document.getElementById('admin-requests-table-body');
             if (reqTbody) {
                 reqTbody.innerHTML = '';
@@ -1974,7 +1960,6 @@
                 });
             }
 
-            // Users Table
             const userTbody = document.getElementById('admin-users-table-body');
             if (userTbody) {
                 userTbody.innerHTML = '';
@@ -2275,7 +2260,6 @@
             });
         }
 
-        // User Management CRUD
         const openNewUserBtn = document.getElementById('open-new-user-modal-btn');
         if (openNewUserBtn) {
             openNewUserBtn.addEventListener('click', () => {
@@ -2848,7 +2832,6 @@
             if (btn) btn.addEventListener('click', () => {
                 document.getElementById('ajax-login-form').reset();
                 if (loginErr) loginErr.classList.add('hidden');
-                // Ensure password type is hidden on open
                 document.getElementById('login-password').type = 'password';
                 document.getElementById('toggle-login-pwd-icon').setAttribute('data-lucide', 'eye');
                 loginModal.classList.remove('hidden');
@@ -2856,7 +2839,6 @@
             });
         });
 
-        // Eye Toggle Password Visibility Button Logic
         const toggleLoginPwdBtn = document.getElementById('toggle-login-pwd-btn');
         const loginPwdInput = document.getElementById('login-password');
         const toggleLoginPwdIcon = document.getElementById('toggle-login-pwd-icon');
@@ -2870,7 +2852,6 @@
             });
         }
 
-        // Login Logic matching supaul_ajax_login
         const ajaxLoginForm = document.getElementById('ajax-login-form');
         if (ajaxLoginForm) {
             ajaxLoginForm.addEventListener('submit', (e) => {
@@ -2907,7 +2888,6 @@
             });
         }
 
-        // Password Change Modal & Logic matching supaul_ajax_change_portal_password
         const openChangePwdBtn = document.getElementById('open-change-pwd-btn');
         const changePwdModal = document.getElementById('modal-change-pwd');
         const changePwdForm = document.getElementById('change-pwd-form');
@@ -2958,7 +2938,6 @@
             });
         }
 
-        // Logout
         const logoutBtn = document.getElementById('portal-logout-btn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
@@ -2970,7 +2949,6 @@
             });
         }
 
-        // Boot system
         setDate(todayStr);
         updateAuthUI();
     })();
