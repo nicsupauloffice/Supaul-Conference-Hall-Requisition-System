@@ -303,19 +303,16 @@
                             <div class="space-y-2.5" id="venue-list-container"></div>
                         </div>
 
-                        <div class="bg-amber-50/80 border border-amber-200 rounded-lg p-3.5 text-xs text-slate-700 space-y-1.5 relative">
-                            <div class="flex items-center justify-between gap-2 font-bold text-amber-900 pb-1">
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
-                                    <span>आरक्षण नियम एवं दिशा-निर्देश</span>
-                                </div>
-                                <button type="button" id="edit-rules-btn" class="hidden text-[10px] bg-amber-200 hover:bg-amber-300 text-amber-900 px-2 py-0.5 rounded font-bold border border-amber-400 transition flex items-center gap-1">
-                                    <i data-lucide="edit-3" class="w-3 h-3"></i> संपादन
-                                </button>
+                        <div class="bg-amber-50/80 border border-amber-200 rounded-lg p-3.5 text-xs text-slate-700 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-amber-900">
+                                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
+                                <span>आरक्षण नियम एवं दिशा-निर्देश</span>
                             </div>
-                            <div id="rules-content-container" class="text-[11px] text-slate-700 leading-relaxed space-y-1 pl-1 whitespace-pre-line">
-                                <!-- Dynamic Rules Content -->
-                            </div>
+                            <ul class="text-[11px] text-slate-700 leading-relaxed space-y-1 list-disc list-inside m-0 pl-1">
+                                <li><strong>समय सीमा:</strong> किसी भी स्लॉट का आरक्षण बैठक शुरू होने से कम से कम 1 घंटे पूर्व किया जाना अनिवार्य है।</li>
+                                <li><strong>पिछला समय निषेध:</strong> आज के बीते हुए समय अथवा पूर्व तिथि (Back Date/Time) का स्लॉट आरक्षित नहीं किया जा सकता।</li>
+                                <li><strong>प्राथमिकता:</strong> विधि-व्यवस्था, निर्वाचन व डीएम समीक्षा बैठकों को सर्वोच्च प्राथमिकता।</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -536,7 +533,7 @@
                                 <option value="Executive Tea & Biscuits">टी एवं बिस्कुट</option>
                                 <option value="Formal Green Tea & Light Snacks">टी एवं अल्पाहार</option>
                                 <option value="Working Lunch & Tea Protocol">टी एवं भोजन</option>
-                                <option value="No Refreshments Required" selected>स्वल्पाहार की आवश्यकता नहीं</option>
+                                <option value="No Refreshments Required">स्वल्पाहार की आवश्यकता नहीं</option>
                             </select>
                         </div>
                     </div>
@@ -873,37 +870,6 @@
             </div>
         </div>
 
-        <!-- MODAL: EDIT RULES -->
-        <div id="modal-edit-rules" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-            <div class="bg-white border-2 portal-border-primary rounded-lg max-w-xl w-full p-4 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1.5 rounded min-w-[36px] min-h-[36px] flex items-center justify-center">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-                <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
-                    <div class="w-10 h-10 rounded portal-bg-primary text-white flex items-center justify-center flex-shrink-0">
-                        <i data-lucide="file-edit" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-base font-bold portal-text-primary m-0">आरक्षण नियम एवं दिशा-निर्देश संपादित करें</h2>
-                        <p class="text-xs text-slate-500 m-0">Super Admin Authorized Configuration Editor</p>
-                    </div>
-                </div>
-
-                <form id="edit-rules-form" class="space-y-3.5 text-xs">
-                    <div>
-                        <label class="block text-slate-700 font-bold mb-1">दिशा-निर्देश विषयवस्तु (Rules & Guidelines Content) *</label>
-                        <textarea id="rules-textarea" rows="8" required class="w-full bg-white border border-slate-300 rounded p-3 text-xs text-slate-800 font-sans focus:outline-none portal-border-primary leading-relaxed"></textarea>
-                    </div>
-                    <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-200">
-                        <button type="button" class="modal-close-btn min-h-[40px] px-4 py-2 rounded text-slate-600 hover:text-black">रद्द करें</button>
-                        <button type="submit" class="min-h-[40px] px-5 py-2 rounded portal-bg-primary hover:opacity-90 text-white font-bold flex items-center gap-1.5 shadow">
-                            <i data-lucide="save" class="w-3.5 h-3.5"></i> नियम सَهेंजे / Save Online
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
         <!-- MODAL: QUICK EDIT NODAL IN-CHARGE -->
         <div id="modal-quick-incharge" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
             <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-4 sm:p-5 shadow-2xl relative max-h-[95vh] overflow-y-auto">
@@ -1011,19 +977,244 @@
             </div>
         </div>
 
+        <!-- MODAL: CREATE USER -->
+        <div id="modal-new-user" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-4 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1.5 rounded min-w-[36px] min-h-[36px] flex items-center justify-center">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
+                    <div class="w-10 h-10 rounded portal-bg-primary text-white flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 id="modal-new-user-title" class="text-base font-bold portal-text-primary m-0">
+                            नया उपयोगकर्ता खाता बनाएं
+                        </h2>
+                    </div>
+                </div>
+
+                <form id="create-user-form" class="space-y-3 text-xs">
+                    <div id="nu-role-container" class="bg-blue-50/80 p-2.5 rounded border border-blue-200">
+                        <label class="block text-slate-800 font-bold mb-1">खाता स्तर / Role Type *</label>
+                        <select id="nu-role" class="w-full bg-white border border-slate-300 rounded px-3 py-1.5 text-slate-800 font-bold min-h-[38px]">
+                            <option value="officer" selected>1. विभागीय नोडल पदाधिकारी (Department Officer)</option>
+                            <option value="itm">2. तकनीकी नोडल पदाधिकारी (IT Manager / ITM)</option>
+                            <option value="nazarat">3. नजारत उप समाहर्ता (NDC / Nazarat Section)</option>
+                            <option value="technical">4. तकनीकी टीम (Technical Team)</option>
+                            <option value="admin">5. जिला मुख्य प्रशासक (Super Admin / DIO)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">पदाधिकारी का पूरा नाम *</label>
+                        <input type="text" id="nu-name" required placeholder="उदा. आलोक कुमार" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">पदनाम *</label>
+                        <input type="text" id="nu-designation" required placeholder="उदा. अनुमंडल पदाधिकारी" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">विभागीय शाखा *</label>
+                        <input type="text" id="nu-department" required placeholder="उदा. राजस्व शाखा, सुपौल" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">सरकारी ईमेल *</label>
+                        <input type="email" id="nu-email" required placeholder="officer.supaul@bihar.gov.in" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 font-mono min-h-[38px]">
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">लॉगिन पासवर्ड *</label>
+                        <input type="password" id="nu-password" required minlength="6" placeholder="न्यूनतम 6 अक्षर" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                    </div>
+
+                    <div id="user-create-error-msg" class="hidden text-rose-700 text-xs p-2.5 rounded bg-rose-50 border border-rose-300 font-medium"></div>
+
+                    <div class="pt-2 flex items-center justify-end gap-2">
+                        <button type="button" class="modal-close-btn min-h-[40px] px-4 py-2 rounded text-slate-600 hover:text-black">रद्द करें</button>
+                        <button type="submit" id="nu-submit-btn" class="min-h-[40px] px-5 py-2 rounded portal-bg-primary hover:opacity-90 text-white font-bold flex items-center gap-1.5 shadow">
+                            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> खाता पंजीकृत करें
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: EDIT USER -->
+        <div id="modal-edit-user" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-4 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1.5 rounded min-w-[36px] min-h-[36px] flex items-center justify-center">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
+                    <div class="w-10 h-10 rounded portal-bg-primary text-white flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="user-cog" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold portal-text-primary m-0">उपयोगकर्ता खाता संपादित करें</h2>
+                    </div>
+                </div>
+
+                <form id="edit-user-form" class="space-y-3 text-xs">
+                    <input type="hidden" id="eu-id">
+
+                    <div class="bg-blue-50/80 p-2.5 rounded border border-blue-200">
+                        <label class="block text-slate-800 font-bold mb-1">खाता स्तर *</label>
+                        <select id="eu-role" class="w-full bg-white border border-slate-300 rounded px-3 py-1.5 text-slate-800 font-bold min-h-[38px]">
+                            <option value="officer">1. विभागीय नोडल पदाधिकारी</option>
+                            <option value="itm">2. तकनीकी नोडल पदाधिकारी (ITM)</option>
+                            <option value="nazarat">3. नजारत उप समाहर्ता (NDC)</option>
+                            <option value="technical">4. तकनीकी टीम</option>
+                            <option value="admin">5. जिला मुख्य प्रशासक (DIO)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-slate-700 font-bold mb-1">पदाधिकारी का नाम *</label>
+                            <input type="text" id="eu-name" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                        </div>
+                        <div>
+                            <label class="block text-slate-700 font-bold mb-1">खाता स्थिति *</label>
+                            <select id="eu-status" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 font-bold min-h-[38px]">
+                                <option value="active">सक्रिय (Active)</option>
+                                <option value="suspended">निलंबित (Suspended)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">पदनाम *</label>
+                        <input type="text" id="eu-designation" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">विभागीय शाखा *</label>
+                        <input type="text" id="eu-department" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">सरकारी ईमेल *</label>
+                        <input type="email" id="eu-email" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 font-mono min-h-[38px]">
+                    </div>
+
+                    <div class="bg-amber-50/80 p-2.5 rounded border border-amber-200">
+                        <label class="block text-amber-900 font-bold mb-1">
+                            नया पासवर्ड रीसेट करें
+                            <span class="text-slate-500 font-normal block text-[10px]">यदि पासवर्ड नहीं बदलना है तो इसे रिक्त छोड़ें</span>
+                        </label>
+                        <input type="text" id="eu-password" placeholder="नया पासवर्ड दर्ज करें" class="w-full bg-white border border-amber-300 rounded px-3 py-1.5 text-slate-800 font-mono min-h-[38px]">
+                    </div>
+
+                    <div id="user-edit-error-msg" class="hidden text-rose-700 text-xs p-2.5 rounded bg-rose-50 border border-rose-300 font-medium"></div>
+
+                    <div class="pt-2 flex items-center justify-end gap-2">
+                        <button type="button" class="modal-close-btn min-h-[40px] px-4 py-2 rounded text-slate-600 hover:text-black">रद्द करें</button>
+                        <button type="submit" id="eu-submit-btn" class="min-h-[40px] px-5 py-2 rounded portal-bg-primary hover:opacity-90 text-white font-bold flex items-center gap-1.5 shadow">
+                            <i data-lucide="save" class="w-3.5 h-3.5"></i> विवरण सहेजें
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: REJECT -->
+        <div id="modal-reject" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white border-2 border-rose-700 rounded-lg max-w-md w-full p-4 sm:p-5 shadow-2xl relative max-h-[95vh] overflow-y-auto">
+                <h2 class="text-base font-bold text-rose-700 flex items-center gap-2 mb-2 m-0">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0"></i> <span>मांग-पत्र अस्वीकृत करें</span>
+                </h2>
+                <p id="reject-modal-title" class="text-xs text-slate-600 mb-3 break-words"></p>
+                <input type="hidden" id="reject-req-id">
+
+                <label class="block text-xs font-bold text-slate-700 mb-1">अस्वीकृति का प्रशासनिक कारण:</label>
+                <textarea id="reject-reason-input" rows="3" class="w-full bg-white border border-slate-300 rounded p-2.5 text-xs text-slate-800 mb-4 focus:outline-none focus:border-rose-600">जिलाधिकारी महोदय की अति-महत्वपूर्ण बैठक पूर्व से नियत होने के कारण।</textarea>
+
+                <div class="flex items-center justify-end gap-2">
+                    <button type="button" class="modal-close-btn min-h-[40px] px-3.5 py-1.5 rounded text-xs text-slate-600 hover:text-black font-medium">रद्द करें</button>
+                    <button type="button" id="confirm-reject-btn" class="min-h-[40px] px-4 py-1.5 rounded text-xs bg-rose-700 hover:bg-rose-800 text-white font-bold shadow">अस्वीकृत करें</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: SANCTION ORDER SLIP -->
+        <div id="modal-slip" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white text-slate-900 rounded-lg max-w-xl w-full p-4 sm:p-6 shadow-2xl relative border-4 portal-border-primary max-h-[95vh] overflow-y-auto">
+                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1.5 rounded min-w-[36px] min-h-[36px] flex items-center justify-center print:hidden">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+
+                <div class="text-center pb-3 border-b-2 border-slate-900">
+                    <span class="text-[10px] sm:text-[11px] font-bold text-slate-600 uppercase tracking-widest block leading-tight">समाहरणालय सुपौल | जिला प्रशासन, सुपौल (बिहार)</span>
+                    <h2 id="slip-heading-title" class="text-sm sm:text-base font-black uppercase portal-text-primary mt-0.5 m-0 leading-tight">सभागार आवंटन आदेश</h2>
+                    <p id="slip-meta-ref" class="text-[10px] sm:text-[11px] font-mono font-bold text-slate-700 mt-0.5 m-0 break-words"></p>
+                </div>
+
+                <div class="py-3 space-y-2 text-xs">
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">आवंटित सभागार:</span>
+                        <span id="slip-venue" class="font-bold portal-text-primary text-right break-words">लहटन चौधरी सभागार</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">तिथि एवं समयावधि:</span>
+                        <span id="slip-time" class="font-bold text-slate-900 text-right break-words"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">अध्यक्षता:</span>
+                        <span id="slip-chair" class="font-bold text-slate-900 text-right break-words"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">मांगकर्ता विभाग:</span>
+                        <span id="slip-department" class="font-medium text-slate-800 text-right break-words"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">बैठक का विषय:</span>
+                        <span id="slip-subject" class="font-medium text-slate-900 text-right max-w-[280px] break-words"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">वी.सी. लिंक:</span>
+                        <span id="slip-vc" class="font-bold portal-text-primary text-right"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">स्वल्पाहार:</span>
+                        <span id="slip-refreshments" class="font-medium text-slate-800 text-right break-words"></span>
+                    </div>
+                    <div class="flex justify-between pt-0.5 gap-2" id="slip-authority-row">
+                        <span class="font-bold text-slate-600 flex-shrink-0">स्वीकृति प्राधिकार:</span>
+                        <span id="slip-authority" class="font-bold text-emerald-800 text-right break-words"></span>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t-2 border-slate-900 flex items-center justify-between text-xs text-slate-700 gap-2">
+                    <div class="min-w-0">
+                        <span id="slip-dynamic-status" class="font-bold block break-words">स्थिति: समीक्षाधीन (PENDING APPROVAL)</span>
+                        <span class="text-[10px] text-slate-500 block">समाहरणालय, सुपौल (बिहार)</span>
+                    </div>
+                    <div class="text-right flex-shrink-0" id="slip-signature-block">
+                        <span class="font-bold text-slate-900 block">ह०/- (Sd/-)</span>
+                        <span id="slip-signer-name" class="font-bold text-slate-900 block"></span>
+                        <span id="slip-signer-desig" class="text-[11px] font-semibold text-slate-800 block leading-tight">नजारत उप समाहर्ता</span>
+                        <span class="text-[10px] text-slate-500 block leading-tight">सुपौल</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex items-center justify-end gap-2 print:hidden border-t border-slate-200 pt-2.5">
+                    <button type="button" class="modal-close-btn min-h-[40px] px-4 py-2 rounded text-xs font-semibold bg-slate-200 text-slate-800 hover:bg-slate-300">बंद करें</button>
+                    <button type="button" id="slip-print-btn" class="min-h-[40px] px-5 py-2 rounded text-xs font-bold portal-bg-primary hover:opacity-90 text-white flex items-center gap-1.5 shadow">
+                        <i data-lucide="printer" class="w-4 h-4"></i> पर्ची प्रिंट करें
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- GOVERNMENT TOAST ALERT -->
         <div id="toast-box" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 max-w-[calc(100vw-32px)]"></div>
     </div>
 
-    <!-- INSTITUTIONAL FOOTER -->
-    <footer class="w-full max-w-7xl mx-auto py-3 px-3 sm:px-6 text-center text-xs text-slate-600 border-t border-b border-slate-300/80 bg-slate-50/50 mt-auto">
-        <div class="w-full border-t border-slate-200 mb-2"></div>
-        <div class="space-y-0.5 font-medium leading-tight">
-            <div>District Administration Supaul</div>
-            <div>| ©2026 |</div>
-            <div>National Informatics Centre Supaul</div>
-        </div>
-        <div class="w-full border-b border-slate-200 mt-2"></div>
+    <!-- APPLICATION FOOTER -->
+    <footer class="w-full max-w-7xl mx-auto py-4 px-3 sm:px-6 text-center text-xs text-slate-600 border-t border-slate-200/80 mt-auto">
+        <p class="m-0 leading-relaxed font-medium">
+            ©2026 | District Administration Supaul | Developed by National Informatics Centre, Supaul
+        </p>
     </footer>
 
     <script>
@@ -1045,9 +1236,10 @@
             { hour: 19, label: '07:00 PM - 08:00 PM' }
         ];
 
+        // Centralized Online Application Cache (InMemory)
         let currentUser = null;
         try {
-            const sess = sessionStorage.getItem('supaul_active_session');
+            const sess = sessionStorage.getItem('supaul_active_session') || localStorage.getItem('supaul_active_session');
             if (sess) currentUser = JSON.parse(sess);
         } catch(e) {}
 
@@ -1055,7 +1247,6 @@
         let allRequisitionsCache = [];
         let notificationsCache = [];
         let onlineUsersRoster = [];
-        let reservationRulesContent = '';
 
         let selectedHallId = '';
         let todayStr = new Date().toISOString().split('T')[0];
@@ -1063,8 +1254,6 @@
         let selectedHours = [];
         let currentViewingReqId = '';
         let originalPageTitle = document.title;
-        let bootstrapRequestInProgress = false;
-        let usersFetchInProgress = false;
 
         function initIcons() {
             if (window.lucide) window.lucide.createIcons();
@@ -1082,32 +1271,6 @@
             setTimeout(() => toast.classList.add('hidden'), 4500);
         }
 
-        function formatDisplayDate(dateStr) {
-            if (!dateStr) return '';
-            const clean = String(dateStr).split('T')[0];
-            const parts = clean.split('-');
-            if (parts.length === 3) {
-                if (parts[0].length === 4) {
-                    return `${parts[2]}-${parts[1]}-${parts[0]}`;
-                }
-                return clean;
-            }
-            return clean;
-        }
-
-        function formatDisplayTime(hourNum) {
-            if (typeof hourNum === 'string' && (hourNum.includes('AM') || hourNum.includes('PM'))) {
-                return hourNum;
-            }
-            const h = parseInt(hourNum, 10);
-            if (isNaN(h)) return hourNum;
-            if (h === 0) return '12:00 AM';
-            if (h < 12) return (h < 10 ? '0' + h : h) + ':00 AM';
-            if (h === 12) return '12:00 PM';
-            const pmh = h - 12;
-            return (pmh < 10 ? '0' + pmh : pmh) + ':00 PM';
-        }
-
         function isSlotExpired(slotHour, dateStr) {
             const now = new Date();
             const chosenDate = new Date(dateStr + 'T00:00:00');
@@ -1120,6 +1283,7 @@
             return (slotHour <= currentHour);
         }
 
+        // Central API Caller (JSON POST)
         async function apiPost(payload) {
             try {
                 const res = await fetch(APPS_SCRIPT_URL, {
@@ -1135,9 +1299,9 @@
             }
         }
 
-        async function syncFromOnlineDatabase(force = false) {
-            if (!APPS_SCRIPT_URL || bootstrapRequestInProgress) return;
-            bootstrapRequestInProgress = true;
+        // Real-Time Online Backend Polling Engine (Single Source of Truth)
+        async function syncFromOnlineDatabase() {
+            if (!APPS_SCRIPT_URL) return;
             try {
                 const res = await fetch(APPS_SCRIPT_URL + "?action=bootstrap");
                 const data = await res.json();
@@ -1157,25 +1321,6 @@
                         notificationsCache = data.notifications;
                     }
 
-                    if (typeof data.rules === 'string') {
-                        reservationRulesContent = data.rules;
-                        renderRulesContent();
-                    }
-
-                    if (Array.isArray(data.users) && currentUser) {
-                        const onlineMatch = data.users.find(u => String(u.email).toLowerCase() === String(currentUser.email).toLowerCase());
-                        if (!onlineMatch || onlineMatch.status !== 'active') {
-                            currentUser = null;
-                            sessionStorage.removeItem('supaul_active_session');
-                            updateAuthUI();
-                            switchTab('schedule');
-                            showToast('आपका सत्र समाप्त हो गया है या खाता निष्क्रिय कर दिया गया है।', 'error');
-                        } else {
-                            currentUser = { ...currentUser, ...onlineMatch };
-                            sessionStorage.setItem('supaul_active_session', JSON.stringify(currentUser));
-                        }
-                    }
-
                     renderVenuesList();
                     loadSchedule();
                     loadNotifications();
@@ -1190,14 +1335,11 @@
                 }
             } catch (err) {
                 console.warn("Online sync offline check:", err);
-            } finally {
-                bootstrapRequestInProgress = false;
             }
         }
 
         async function fetchOnlineUsersRoster() {
-            if (!currentUser || !['admin', 'nazarat'].includes(currentUser.role) || usersFetchInProgress) return;
-            usersFetchInProgress = true;
+            if (!currentUser || !['admin', 'nazarat'].includes(currentUser.role)) return;
             try {
                 const res = await fetch(APPS_SCRIPT_URL + "?action=fetch_users");
                 const data = await res.json();
@@ -1207,62 +1349,10 @@
                 }
             } catch (e) {
                 console.error("Failed to load user roster from online database:", e);
-            } finally {
-                usersFetchInProgress = false;
             }
         }
 
-        function renderRulesContent() {
-            const container = document.getElementById('rules-content-container');
-            if (container) {
-                container.textContent = reservationRulesContent || 'कोई नियम उपलब्ध नहीं है।';
-            }
-            const editBtn = document.getElementById('edit-rules-btn');
-            if (editBtn) {
-                const isSuperAdmin = currentUser && currentUser.role === 'admin';
-                editBtn.classList.toggle('hidden', !isSuperAdmin);
-            }
-            initIcons();
-        }
-
-        const editRulesBtn = document.getElementById('edit-rules-btn');
-        if (editRulesBtn) {
-            editRulesBtn.addEventListener('click', () => {
-                if (!currentUser || currentUser.role !== 'admin') {
-                    showToast('केवल सुपर एडमिन (Super Admin) को यह संपादित करने की अनुमति है।', 'error');
-                    return;
-                }
-                document.getElementById('rules-textarea').value = reservationRulesContent;
-                document.getElementById('modal-edit-rules').classList.remove('hidden');
-                initIcons();
-            });
-        }
-
-        const editRulesForm = document.getElementById('edit-rules-form');
-        if (editRulesForm) {
-            editRulesForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!currentUser || currentUser.role !== 'admin') {
-                    showToast('अनधिकृत प्रयास।', 'error');
-                    return;
-                }
-                const updatedText = document.getElementById('rules-textarea').value;
-                const res = await apiPost({
-                    action: 'update_rules',
-                    role: currentUser.role,
-                    email: currentUser.email,
-                    rules: updatedText
-                });
-                if (res && res.success) {
-                    showToast('आरक्षण नियम एवं दिशा-निर्देश ऑनलाइन सफलतापूर्वक सहेजे गए।');
-                    reservationRulesContent = updatedText;
-                    renderRulesContent();
-                    document.getElementById('modal-edit-rules').classList.add('hidden');
-                } else {
-                    showToast(res.message || 'नियम सहेजने में विफल।', 'error');
-                }
-            });
-        }
+        setInterval(syncFromOnlineDatabase, 10000);
 
         function updateAuthUI() {
             const isAuth = !!currentUser;
@@ -1351,7 +1441,6 @@
                 if (tabTextNewReq) tabTextNewReq.textContent = 'मांग-पत्र भरें / Book Hall';
             }
 
-            renderRulesContent();
             renderVenuesList();
             loadSchedule();
             loadNotifications();
@@ -1536,7 +1625,7 @@
 
             if (selectedHours.length > 0) {
                 countLabel.textContent = `${selectedHours.length} घंटे का स्लॉट चयनित`;
-                badgesContainer.innerHTML = `<span class="text-xs font-mono font-bold portal-text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${selectedHours.map(h => formatDisplayTime(h)).join(', ')}</span>`;
+                badgesContainer.innerHTML = `<span class="text-xs font-mono font-bold portal-text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${selectedHours.map(h => `${h}:00`).join(', ')}</span>`;
                 clearBtn.classList.remove('hidden');
                 if (proceedBtn) {
                     proceedBtn.disabled = false;
@@ -1565,8 +1654,7 @@
             if (datePicker) datePicker.value = newDateStr;
             const d = new Date(newDateStr + 'T00:00:00');
             if (displayDateLabel) {
-                const formattedDate = formatDisplayDate(newDateStr);
-                displayDateLabel.innerHTML = `<i data-lucide="calendar" class="w-4 h-4 portal-text-primary flex-shrink-0"></i> <span>${formattedDate} (${d.toLocaleDateString('hi-IN', { weekday: 'short' })})</span>`;
+                displayDateLabel.innerHTML = `<i data-lucide="calendar" class="w-4 h-4 portal-text-primary flex-shrink-0"></i> <span>${d.toLocaleDateString('hi-IN', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>`;
             }
             selectedHours = [];
             updateSelectionBar();
@@ -1614,8 +1702,8 @@
                     showToast('कृपया कम से कम एक खुला स्लॉट चुनें।', 'error');
                     return;
                 }
-                document.getElementById('summary-date').textContent = formatDisplayDate(selectedDate);
-                document.getElementById('summary-hours').textContent = selectedHours.map(h => formatDisplayTime(h)).join(', ');
+                document.getElementById('summary-date').textContent = selectedDate;
+                document.getElementById('summary-hours').textContent = selectedHours.map(h => `${h}:00`).join(', ');
                 switchTab('new-req');
             });
         }
@@ -1641,10 +1729,8 @@
                 activeBtn.classList.remove('border-transparent', 'text-slate-200');
             }
 
-            if (['dashboard', 'requests', 'ledger', 'halls', 'tech-dashboard'].includes(tabId)) {
+            if (['dashboard', 'requests', 'ledger', 'users', 'halls', 'tech-dashboard'].includes(tabId)) {
                 loadAdminData();
-            } else if (tabId === 'users') {
-                fetchOnlineUsersRoster();
             } else if (tabId === 'my-reqs') {
                 loadMyRequisitions();
             }
@@ -1832,13 +1918,12 @@
             }
 
             myReqs.forEach(r => {
-                const hrs = r.hours.map(h => formatDisplayTime(h)).join(', ');
-                const formattedDate = formatDisplayDate(r.booking_date);
+                const hrs = r.hours.map(h => `${h}:00`).join(', ');
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
                 tr.innerHTML = `
                     <td class="p-3 pl-4 font-mono font-bold portal-text-primary whitespace-nowrap">${r.id}</td>
-                    <td class="p-3 whitespace-nowrap">${formattedDate} (${hrs})</td>
+                    <td class="p-3 whitespace-nowrap">${r.booking_date} (${hrs})</td>
                     <td class="p-3 break-words max-w-xs">${r.subject}</td>
                     <td class="p-3 break-words">${r.chairing_officer}</td>
                     <td class="p-3 text-center whitespace-nowrap">
@@ -1876,26 +1961,18 @@
             if (reqTbody) {
                 reqTbody.innerHTML = '';
                 allRequisitionsCache.forEach(r => {
-                    const hrs = r.hours.map(h => formatDisplayTime(h)).join(', ');
-                    const formattedDate = formatDisplayDate(r.booking_date);
-                    const refVal = (r.refreshments || '').trim();
-                    const hasRefreshment = refVal && refVal !== 'No Refreshments Required';
-
+                    const hrs = r.hours.map(h => `${h}:00`).join(', ');
                     const tr = document.createElement('tr');
-                    tr.className = `hover:bg-slate-50 transition ${hasRefreshment ? 'bg-amber-50/40' : ''}`;
+                    tr.className = 'hover:bg-slate-50 transition';
                     tr.innerHTML = `
                         <td class="p-3 pl-4">
                             <span class="font-mono font-bold portal-text-primary block whitespace-nowrap">${r.id}</span>
                             <span class="text-[11px] text-slate-700 block">${r.department}</span>
                         </td>
-                        <td class="p-3 whitespace-nowrap">
-                            <span class="font-bold block">${r.hall_name || 'सभागार'}</span>
-                            <span class="text-[11px] text-slate-600 block">${formattedDate} (${hrs})</span>
-                        </td>
+                        <td class="p-3 whitespace-nowrap">${r.booking_date} (${hrs})</td>
                         <td class="p-3">
                             <span class="font-semibold block truncate max-w-xs">${r.subject}</span>
                             <span class="text-[11px] portal-text-primary">अध्यक्षता: ${r.chairing_officer}</span>
-                            ${hasRefreshment ? '<span class="mt-1 inline-block text-[9px] bg-amber-100 text-amber-900 border border-amber-300 font-bold px-1.5 py-0.5 rounded">[स्वल्पाहार आवश्यक]</span>' : ''}
                         </td>
                         <td class="p-3 text-center font-bold text-xs whitespace-nowrap">${r.priority}</td>
                         <td class="p-3 text-center whitespace-nowrap">
@@ -1923,6 +2000,7 @@
                 });
             }
 
+            fetchOnlineUsersRoster();
             renderLedgerTable(allRequisitionsCache);
             bindStatusChangeEvents();
             bindDeleteBookingEvents();
@@ -1930,9 +2008,784 @@
             initIcons();
         }
 
+        function renderUsersTable() {
+            const userTbody = document.getElementById('admin-users-table-body');
+            if (!userTbody) return;
+            userTbody.innerHTML = '';
+
+            const isRoleAdmin = currentUser && currentUser.role === 'admin';
+            const visibleUsers = isRoleAdmin ? onlineUsersRoster : onlineUsersRoster.filter(u => ['officer', 'itm'].includes(u.role));
+            if (document.getElementById('stat-users')) document.getElementById('stat-users').textContent = visibleUsers.length;
+
+            visibleUsers.forEach(u => {
+                const roleLabel = u.role === 'nazarat' ? 'नजारत उप समाहर्ता (NDC)' :
+                                  u.role === 'technical' ? 'तकनीकी टीम (Technical)' :
+                                  u.role === 'itm' ? 'तकनीकी नोडल पदाधिकारी (ITM)' :
+                                  u.role === 'admin' ? 'जिला मुख्य प्रशासक (DIO)' : 'विभागीय नोडल पदाधिकारी';
+                const roleBadgeClass = u.role === 'nazarat' ? 'bg-amber-50 text-amber-900 border-amber-300' :
+                                       u.role === 'technical' ? 'bg-cyan-50 text-cyan-900 border-cyan-300' :
+                                       u.role === 'itm' ? 'bg-purple-50 text-purple-900 border-purple-300' :
+                                       u.role === 'admin' ? 'bg-rose-50 text-rose-900 border-rose-300' :
+                                       'bg-blue-50 text-blue-900 border-blue-200';
+
+                const isSuspended = (u.status === 'suspended');
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+
+                let actionsCellHtml = '';
+                if (isRoleAdmin) {
+                    actionsCellHtml = `
+                        <td class="p-3 text-right pr-4 whitespace-nowrap">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button type="button" class="edit-user-btn min-h-[32px] px-2.5 py-1 rounded portal-bg-primary hover:opacity-90 text-white text-[11px] font-bold inline-flex items-center gap-1 shadow-xs" data-user='${JSON.stringify(u)}'>
+                                    <i data-lucide="pencil" class="w-3 h-3"></i> संपादन
+                                </button>
+                                <button type="button" class="delete-user-btn min-h-[32px] px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-[11px] font-bold inline-flex items-center justify-center" data-id="${u.id}" data-name="${u.name}" title="खाता हटाएं">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-3 pl-4">
+                        <span class="font-bold text-slate-800 block">${u.name}</span>
+                        <span class="text-[11px] portal-text-primary font-semibold block">${u.designation || 'नोडल पदाधिकारी'}</span>
+                    </td>
+                    <td class="p-3 text-slate-700 font-medium">${u.department || 'सामान्य प्रशासन'}</td>
+                    <td class="p-3 font-mono text-slate-800 whitespace-nowrap">${u.email}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] border font-bold ${roleBadgeClass}">
+                            ${roleLabel}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] ${isSuspended ? 'bg-rose-50 text-rose-800 border border-rose-300' : 'bg-emerald-50 text-emerald-800 border border-emerald-300'} font-bold">
+                            ${isSuspended ? 'निलंबित' : 'सक्रिय'}
+                        </span>
+                    </td>
+                    ${actionsCellHtml}
+                `;
+                userTbody.appendChild(tr);
+            });
+            bindUserTableActions();
+            initIcons();
+        }
+
+        function renderAdminHallsTable() {
+            const tbody = document.getElementById('admin-halls-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            hallsData.forEach(hall => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                const feats = Array.isArray(hall.features) ? hall.features.slice(0, 3).join(', ') : '';
+
+                tr.innerHTML = `
+                    <td class="p-3 pl-4">
+                        <span class="font-bold portal-text-primary block text-xs">${hall.name_hi || hall.name}</span>
+                        <span class="text-[11px] text-slate-600 font-semibold block">${hall.name}</span>
+                        <span class="text-[9px] font-mono text-slate-500">ID: ${hall.id}</span>
+                    </td>
+                    <td class="p-3 text-slate-700 text-xs">
+                        <span class="font-semibold block">${hall.badge}</span>
+                        <span class="text-[11px] text-slate-500 block truncate max-w-xs">${hall.wings}</span>
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <span class="font-bold text-xs portal-text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${hall.capacity} Seats</span>
+                    </td>
+                    <td class="p-3 text-slate-800 font-medium text-xs">
+                        ${hall.in_charge}
+                    </td>
+                    <td class="p-3 text-slate-600 text-[11px] max-w-xs truncate">
+                        ${feats}
+                    </td>
+                    <td class="p-3 text-right pr-4 whitespace-nowrap">
+                        <div class="flex items-center justify-end gap-1.5">
+                            <button type="button" class="edit-hall-btn min-h-[32px] px-2.5 py-1 portal-bg-primary hover:opacity-90 text-white rounded text-[11px] font-bold inline-flex items-center gap-1 shadow-xs" data-hall-id="${hall.id}">
+                                <i data-lucide="pencil" class="w-3 h-3"></i> संपादन
+                            </button>
+                            ${hallsData.length > 1 ? `
+                                <button type="button" class="delete-hall-btn min-h-[32px] px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded text-[11px] font-bold inline-flex items-center justify-center" data-hall-id="${hall.id}" title="हटाएं">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            bindHallManagementEvents();
+            initIcons();
+        }
+
+        function openHallModal(hall = null) {
+            const modal = document.getElementById('modal-hall-edit');
+            const errBox = document.getElementById('hall-edit-error-msg');
+            if (errBox) errBox.classList.add('hidden');
+            if (!modal) return;
+
+            if (hall) {
+                document.getElementById('modal-hall-title').textContent = 'सभागार विवरण संपादित करें (Edit Hall)';
+                document.getElementById('edit-hall-id').value = hall.id;
+                document.getElementById('edit-hall-name').value = hall.name || '';
+                document.getElementById('edit-hall-name-hi').value = hall.name_hi || '';
+                document.getElementById('edit-hall-capacity').value = hall.capacity || 100;
+                document.getElementById('edit-hall-badge').value = hall.badge || 'समाहरणालय परिसर';
+                document.getElementById('edit-hall-wings').value = hall.wings || '';
+                document.getElementById('edit-hall-incharge').value = hall.in_charge || '';
+                document.getElementById('edit-hall-desc').value = hall.description || '';
+                document.getElementById('edit-hall-features').value = Array.isArray(hall.features) ? hall.features.join(', ') : '';
+            } else {
+                document.getElementById('modal-hall-title').textContent = 'नया सभागार जोड़ें (Add New Facility)';
+                document.getElementById('edit-hall-id').value = '';
+                document.getElementById('edit-hall-name').value = '';
+                document.getElementById('edit-hall-name-hi').value = '';
+                document.getElementById('edit-hall-capacity').value = 80;
+                document.getElementById('edit-hall-badge').value = 'समाहरणालय';
+                document.getElementById('edit-hall-wings').value = 'समाहरणालय परिसर, सुपौल';
+                document.getElementById('edit-hall-incharge').value = 'नजारत उप समाहर्ता, सुपौल';
+                document.getElementById('edit-hall-desc').value = '';
+                document.getElementById('edit-hall-features').value = 'Polycom VC Link, Smart Display Screen, PA System, Dedicated UPS Backup';
+            }
+
+            modal.classList.remove('hidden');
+            initIcons();
+        }
+
+        function bindHallManagementEvents() {
+            document.querySelectorAll('.edit-hall-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const hId = btn.dataset.hallId;
+                    const hall = hallsData.find(h => h.id === hId);
+                    if (hall) openHallModal(hall);
+                });
+            });
+
+            document.querySelectorAll('.delete-hall-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const hId = btn.dataset.hallId;
+                    const hall = hallsData.find(h => h.id === hId);
+                    if (!hall) return;
+
+                    if (hallsData.length <= 1) {
+                        showToast('कम से कम एक सभागार का होना अनिवार्य है। इसे हटाया नहीं जा सकता।', 'error');
+                        return;
+                    }
+
+                    if (!confirm(`क्या आप वाकई सभागार "${hall.name_hi || hall.name}" को हटाना चाहते हैं?`)) {
+                        return;
+                    }
+
+                    const res = await apiPost({ action: 'delete_hall', id: hId });
+                    if (res && res.success) {
+                        showToast('सभागार सफलतापूर्वक हटाया गया।');
+                        await syncFromOnlineDatabase();
+                    } else {
+                        showToast(res.message || 'सभागार हटाने में त्रुटि', 'error');
+                    }
+                });
+            });
+        }
+
+        const quickAddBtn = document.getElementById('quick-add-hall-btn');
+        const openNewHallBtn = document.getElementById('open-new-hall-modal-btn');
+        if (quickAddBtn) quickAddBtn.addEventListener('click', () => openHallModal(null));
+        if (openNewHallBtn) openNewHallBtn.addEventListener('click', () => openHallModal(null));
+
+        const editCurrentHallBtn = document.getElementById('edit-current-hall-btn');
+        if (editCurrentHallBtn) {
+            editCurrentHallBtn.addEventListener('click', () => {
+                const hall = hallsData.find(h => h.id === selectedHallId);
+                if (hall) openHallModal(hall);
+            });
+        }
+
+        const hallEditForm = document.getElementById('hall-edit-form');
+        if (hallEditForm) {
+            hallEditForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                let name = document.getElementById('edit-hall-name').value.trim();
+                let name_hi = document.getElementById('edit-hall-name-hi').value.trim();
+
+                if (!name && !name_hi) {
+                    showToast('सभागार का नाम भरना अनिवार्य है।', 'error');
+                    return;
+                }
+                if (!name) name = name_hi;
+                if (!name_hi) name_hi = name;
+
+                const editId = document.getElementById('edit-hall-id').value;
+                const rawFeatures = document.getElementById('edit-hall-features').value;
+                const featuresArray = rawFeatures.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+                const hallPayload = {
+                    id: editId || ('hall-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(100 + Math.random() * 900)),
+                    name: name,
+                    name_hi: name_hi,
+                    capacity: parseInt(document.getElementById('edit-hall-capacity').value) || 100,
+                    badge: document.getElementById('edit-hall-badge').value.trim() || 'समाहरणालय',
+                    wings: document.getElementById('edit-hall-wings').value.trim(),
+                    in_charge: document.getElementById('edit-hall-incharge').value.trim(),
+                    description: document.getElementById('edit-hall-desc').value.trim(),
+                    features: featuresArray
+                };
+
+                const res = await apiPost({ action: 'save_hall', data: hallPayload });
+                if (res && res.success) {
+                    showToast(`सभागार "${name_hi}" का विवरण सफलतापूर्वक सहेजा गया।`);
+                    document.getElementById('modal-hall-edit').classList.add('hidden');
+                    await syncFromOnlineDatabase();
+                } else {
+                    showToast(res.message || 'सभागार सहेजने में विफल।', 'error');
+                }
+            });
+        }
+
+        const quickInchargeBtn = document.getElementById('quick-edit-incharge-btn');
+        if (quickInchargeBtn) {
+            quickInchargeBtn.addEventListener('click', () => {
+                const hall = hallsData.find(h => h.id === selectedHallId);
+                if (!hall) return;
+                document.getElementById('qi-hall-id').value = hall.id;
+                document.getElementById('qi-hall-name').textContent = hall.name_hi || hall.name;
+                document.getElementById('qi-incharge-input').value = hall.in_charge || '';
+                document.getElementById('modal-quick-incharge').classList.remove('hidden');
+                initIcons();
+            });
+        }
+
+        const quickInchargeForm = document.getElementById('quick-incharge-form');
+        if (quickInchargeForm) {
+            quickInchargeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const hallId = document.getElementById('qi-hall-id').value;
+                const inCharge = document.getElementById('qi-incharge-input').value.trim();
+                const hall = hallsData.find(h => h.id === hallId);
+                if (hall) {
+                    const updated = { ...hall, in_charge: inCharge };
+                    const res = await apiPost({ action: 'save_hall', data: updated });
+                    if (res && res.success) {
+                        showToast('नोडल प्राधिकारी का विवरण सफलतापूर्वक अद्यतित किया गया।');
+                        document.getElementById('modal-quick-incharge').classList.add('hidden');
+                        await syncFromOnlineDatabase();
+                    } else {
+                        showToast(res.message || 'अद्यतन विफल।', 'error');
+                    }
+                }
+            });
+        }
+
+        const openNewUserBtn = document.getElementById('open-new-user-modal-btn');
+        if (openNewUserBtn) {
+            openNewUserBtn.addEventListener('click', () => {
+                const modal = document.getElementById('modal-new-user');
+                const errBox = document.getElementById('user-create-error-msg');
+                if (errBox) errBox.classList.add('hidden');
+                document.getElementById('create-user-form').reset();
+
+                const roleContainer = document.getElementById('nu-role-container');
+                const title = document.getElementById('modal-new-user-title');
+                if (currentUser && currentUser.role === 'admin') {
+                    title.textContent = 'नया उपयोगकर्ता खाता बनाएं';
+                    roleContainer.innerHTML = `
+                        <label class="block text-slate-800 font-bold mb-1">खाता स्तर / Role Type *</label>
+                        <select id="nu-role" class="w-full bg-white border border-slate-300 rounded px-3 py-1.5 text-slate-800 font-bold min-h-[38px]">
+                            <option value="officer" selected>1. विभागीय नोडल पदाधिकारी (Department Officer)</option>
+                            <option value="itm">2. तकनीकी नोडल पदाधिकारी (IT Manager / ITM)</option>
+                            <option value="nazarat">3. नजारत उप समाहर्ता (NDC / Nazarat Section)</option>
+                            <option value="technical">4. तकनीकी टीम (Technical Team)</option>
+                            <option value="admin">5. जिला मुख्य प्रशासक (Super Admin / DIO)</option>
+                        </select>
+                    `;
+                } else {
+                    title.textContent = 'नया विभागीय खाता जोड़ें';
+                    roleContainer.innerHTML = `
+                        <input type="hidden" id="nu-role" value="officer">
+                        <div class="bg-slate-100 p-2 rounded text-[11px] text-slate-700 font-semibold">
+                            खाता प्रकार: <span class="portal-text-primary">विभागीय नोडल पदाधिकारी (Department Officer)</span>
+                        </div>
+                    `;
+                }
+
+                if (modal) modal.classList.remove('hidden');
+                initIcons();
+            });
+        }
+
+        const createUserForm = document.getElementById('create-user-form');
+        if (createUserForm) {
+            createUserForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('nu-email').value.trim().toLowerCase();
+                const password = document.getElementById('nu-password').value;
+                const roleField = document.getElementById('nu-role');
+                const role = roleField ? roleField.value : 'officer';
+
+                const newUser = {
+                    name: document.getElementById('nu-name').value.trim(),
+                    designation: document.getElementById('nu-designation').value.trim() || 'विभागीय नोडल पदाधिकारी',
+                    department: document.getElementById('nu-department').value.trim() || 'सामान्य प्रशासन',
+                    email: email,
+                    password: password,
+                    role: role
+                };
+
+                const res = await apiPost({ action: 'create_user', ...newUser });
+                if (res && res.success) {
+                    showToast(`उपयोगकर्ता खाता (${newUser.name}) ऑनलाइन सफलतापूर्वक पंजीकृत किया गया।`);
+                    document.getElementById('modal-new-user').classList.add('hidden');
+                    await fetchOnlineUsersRoster();
+                } else {
+                    showToast(res.message || 'खाता बनाने में विफल।', 'error');
+                }
+            });
+        }
+
+        function bindUserTableActions() {
+            document.querySelectorAll('.edit-user-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const u = JSON.parse(btn.dataset.user);
+                    const modal = document.getElementById('modal-edit-user');
+                    document.getElementById('eu-id').value = u.id;
+                    document.getElementById('eu-name').value = u.name || '';
+                    document.getElementById('eu-designation').value = u.designation || '';
+                    document.getElementById('eu-department').value = u.department || '';
+                    document.getElementById('eu-email').value = u.email || '';
+                    document.getElementById('eu-role').value = u.role || 'officer';
+                    document.getElementById('eu-status').value = u.status || 'active';
+                    document.getElementById('eu-password').value = '';
+
+                    if (modal) modal.classList.remove('hidden');
+                    initIcons();
+                });
+            });
+
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const uId = btn.dataset.id;
+                    const uName = btn.dataset.name;
+
+                    if (currentUser && String(currentUser.id) === String(uId)) {
+                        showToast('आप अपने स्वयं के सक्रिय प्रशासक खाते को नहीं हटा सकते हैं।', 'error');
+                        return;
+                    }
+
+                    if (!confirm(`क्या आप वाकई उपयोगकर्ता "${uName}" का खाता हटाना चाहते हैं?`)) {
+                        return;
+                    }
+
+                    const res = await apiPost({ action: 'delete_user', id: uId });
+                    if (res && res.success) {
+                        showToast('उपयोगकर्ता खाता ऑनलाइन हटा दिया गया।');
+                        await fetchOnlineUsersRoster();
+                    } else {
+                        showToast(res.message || 'हटाने में त्रुटि', 'error');
+                    }
+                });
+            });
+        }
+
+        const editUserForm = document.getElementById('edit-user-form');
+        if (editUserForm) {
+            editUserForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const uId = document.getElementById('eu-id').value;
+                const payload = {
+                    id: uId,
+                    name: document.getElementById('eu-name').value.trim(),
+                    designation: document.getElementById('eu-designation').value.trim(),
+                    department: document.getElementById('eu-department').value.trim(),
+                    email: document.getElementById('eu-email').value.trim().toLowerCase(),
+                    role: document.getElementById('eu-role').value,
+                    status: document.getElementById('eu-status').value,
+                    password: document.getElementById('eu-password').value.trim()
+                };
+
+                const res = await apiPost({ action: 'update_user', ...payload });
+                if (res && res.success) {
+                    showToast(`उपयोगकर्ता खाता ऑनलाइन सफलतापूर्वक अद्यतित किया गया।`);
+                    document.getElementById('modal-edit-user').classList.add('hidden');
+                    await fetchOnlineUsersRoster();
+                } else {
+                    showToast(res.message || 'अद्यतन करने में विफल।', 'error');
+                }
+            });
+        }
+
+        function renderTechDutyBoard(items) {
+            const tbody = document.getElementById('tech-duty-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let vcCount = 0;
+            let pptCount = 0;
+            let approvedCount = 0;
+
+            items.forEach(r => {
+                if (r.status === 'Approved') {
+                    approvedCount++;
+                    if (r.vc_required == 1) vcCount++;
+                    if (r.ppt_required == 1) pptCount++;
+                }
+
+                const hrs = r.hours.map(h => `${h}:00`).join(', ');
+                const hasTechReq = (r.vc_required == 1 || r.ppt_required == 1);
+                const statusBadge = (r.status === 'Approved') ? '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">स्वीकृत</span>' :
+                                  (r.status === 'Pending') ? '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-amber-50 text-amber-800 border border-amber-300">समीक्षाधीन</span>' :
+                                  '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-rose-50 text-rose-800 border border-rose-300">अस्वीकृत</span>';
+
+                const tr = document.createElement('tr');
+                tr.className = `hover:bg-slate-50 transition ${hasTechReq ? 'bg-cyan-50/30' : ''}`;
+                tr.innerHTML = `
+                    <td class="p-3 pl-4 whitespace-nowrap">
+                        <span class="font-mono font-bold portal-text-primary block">${r.id}</span>
+                        <span class="text-[11px] font-mono text-slate-500 block">${r.memo_no || 'N/A'}</span>
+                    </td>
+                    <td class="p-3 whitespace-nowrap">
+                        <span class="font-bold text-slate-800 block">${r.hall_name || 'सभागार'}</span>
+                        <span class="text-[11px] portal-text-primary font-mono block">${r.booking_date} (${hrs})</span>
+                    </td>
+                    <td class="p-3">
+                        <span class="font-bold text-slate-900 block truncate max-w-xs">${r.subject}</span>
+                        <span class="text-[11px] text-slate-600 block">अध्यक्षता: ${r.chairing_officer}</span>
+                    </td>
+                    <td class="p-3 text-slate-700">
+                        <span class="font-semibold block">${r.department}</span>
+                        <span class="text-[10px] text-slate-500 block">मांगकर्ता: ${r.requisitioning_officer}</span>
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        ${r.vc_required == 1 ? '<span class="px-2 py-0.5 rounded bg-cyan-100 text-cyan-900 border border-cyan-300 font-bold text-[10px]">हाँ (VC)</span>' : '<span class="text-slate-400 text-[10px]">नहीं</span>'}
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        ${r.ppt_required == 1 ? '<span class="px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-300 font-bold text-[10px]">हाँ (PPT)</span>' : '<span class="text-slate-400 text-[10px]">नहीं</span>'}
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">${statusBadge}</td>
+                    <td class="p-3 text-right pr-4 whitespace-nowrap">
+                        <button type="button" class="view-slip-btn min-h-[32px] px-2.5 py-1 text-white portal-bg-primary rounded text-[11px] font-bold" data-req='${JSON.stringify(r)}'>विवरण पर्ची</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (document.getElementById('stat-tech-vc')) document.getElementById('stat-tech-vc').textContent = vcCount;
+            if (document.getElementById('badge-tech-vc-count')) document.getElementById('badge-tech-vc-count').textContent = vcCount;
+            if (document.getElementById('stat-tech-ppt')) document.getElementById('stat-tech-ppt').textContent = pptCount;
+            if (document.getElementById('stat-tech-total-approved')) document.getElementById('stat-tech-total-approved').textContent = approvedCount;
+
+            bindSlipButtons();
+            initIcons();
+        }
+
+        function renderLedgerTable(items) {
+            const tbody = document.getElementById('admin-ledger-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-500">मास्टर पंजी में कोई अभिलेख नहीं मिला।</td></tr>';
+                return;
+            }
+
+            const isRoleAdmin = currentUser && currentUser.role === 'admin';
+
+            items.forEach(r => {
+                const hrs = r.hours.map(h => `${h}:00`).join(', ');
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="p-3 pl-4 font-mono font-bold portal-text-primary whitespace-nowrap">${r.id}</td>
+                    <td class="p-3 whitespace-nowrap">${r.booking_date} (${hrs})</td>
+                    <td class="p-3 break-words">${r.chairing_officer}</td>
+                    <td class="p-3 break-words max-w-xs">${r.subject} (${r.department})</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold ${
+                            r.status === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' :
+                            r.status === 'Pending' ? 'bg-amber-50 text-amber-800 border border-amber-300' :
+                            'bg-rose-50 text-rose-800 border border-rose-300'
+                        }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}</span>
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <select class="change-status-select text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium min-h-[32px]" data-id="${r.id}">
+                            <option value="Pending" ${r.status === 'Pending' ? 'selected' : ''}>समीक्षाधीन</option>
+                            <option value="Approved" ${r.status === 'Approved' ? 'selected' : ''}>स्वीकृत</option>
+                            <option value="Rejected" ${r.status === 'Rejected' ? 'selected' : ''}>अस्वीकृत</option>
+                        </select>
+                    </td>
+                    <td class="p-3 text-right pr-4 whitespace-nowrap">
+                        <div class="flex items-center justify-end gap-1.5">
+                            <button type="button" class="view-slip-btn min-h-[32px] px-2.5 py-1 text-white portal-bg-primary rounded text-[11px] font-bold" data-req='${JSON.stringify(r)}'>पर्ची</button>
+                            ${isRoleAdmin ? `<button type="button" class="delete-booking-btn min-h-[32px] min-w-[32px] flex items-center justify-center px-2 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-[11px] font-bold" data-id="${r.id}" title="बुकिंग हटाएं"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            bindStatusChangeEvents();
+            bindDeleteBookingEvents();
+            bindSlipButtons();
+            initIcons();
+        }
+
+        const ledgerSearchInput = document.getElementById('ledger-search-input');
+        if (ledgerSearchInput) {
+            ledgerSearchInput.addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase().trim();
+                const filtered = allRequisitionsCache.filter(r => 
+                    r.subject.toLowerCase().includes(q) ||
+                    (r.memo_no && r.memo_no.toLowerCase().includes(q)) ||
+                    r.chairing_officer.toLowerCase().includes(q) ||
+                    (r.hall_name && r.hall_name.toLowerCase().includes(q)) ||
+                    r.department.toLowerCase().includes(q)
+                );
+                renderLedgerTable(filtered);
+            });
+        }
+
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        if (exportCsvBtn) {
+            exportCsvBtn.addEventListener('click', () => {
+                if (!allRequisitionsCache || allRequisitionsCache.length === 0) {
+                    showToast('निर्यात करने हेतु कोई डेटा उपलब्ध नहीं है।', 'error');
+                    return;
+                }
+
+                const headers = [
+                    "मांग संदर्भ (Requisition ID)",
+                    "विभागीय पत्रांक (Memo No)",
+                    "सभागार का नाम (Venue)",
+                    "तिथि (Booking Date)",
+                    "आवंटित समय (Sanctioned Hours)",
+                    "अध्यक्षता (Chairing Officer)",
+                    "मांगकर्ता पदाधिकारी (Requisitioning Officer)",
+                    "विभाग / शाखा (Department)",
+                    "बैठक का विषय (Subject)",
+                    "प्राथमिकता (Priority)",
+                    "प्रतिभागी संख्या (Attendees)",
+                    "वी.सी. लिंक (VC Required)",
+                    "स्वल्पाहार प्रोटोकॉल (Refreshments)",
+                    "वर्तमान स्थिति (Status)",
+                    "स्वीकृति प्राधिकार (Approved By)"
+                ];
+
+                const rows = allRequisitionsCache.map(r => {
+                    const hrs = r.hours.map(h => `${h}:00`).join('; ');
+                    return [
+                        `"${(r.id || '').replace(/"/g, '""')}"`,
+                        `"${(r.memo_no || '').replace(/"/g, '""')}"`,
+                        `"${(r.hall_name || 'सभागार').replace(/"/g, '""')}"`,
+                        `"${(r.booking_date || '').replace(/"/g, '""')}"`,
+                        `"${hrs.replace(/"/g, '""')}"`,
+                        `"${(r.chairing_officer || '').replace(/"/g, '""')}"`,
+                        `"${(r.requisitioning_officer || '').replace(/"/g, '""')}"`,
+                        `"${(r.department || '').replace(/"/g, '""')}"`,
+                        `"${(r.subject || '').replace(/"/g, '""')}"`,
+                        `"${(r.priority || '').replace(/"/g, '""')}"`,
+                        `"${r.attendees || 0}"`,
+                        `"${r.vc_required == 1 ? 'हाँ' : 'नहीं'}"`,
+                        `"${(r.refreshments || '').replace(/"/g, '""')}"`,
+                        `"${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}"`,
+                        `"${(r.approved_by || '').replace(/"/g, '""')}"`
+                    ];
+                });
+
+                const csvString = "\uFEFF" + [headers.join(','), ...rows.map(row => row.join(','))].join('\r\n');
+                const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                const downloadUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `Supaul_Conference_Halls_Ledger_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(downloadUrl);
+                showToast('मास्टर पंजी CSV फाइल सफलतापूर्वक डाउनलोड हुई।');
+            });
+        }
+
+        function bindStatusChangeEvents() {
+            document.querySelectorAll('.change-status-select').forEach(sel => {
+                sel.addEventListener('change', (e) => {
+                    const reqId = e.target.dataset.id;
+                    const newStatus = e.target.value;
+
+                    if (newStatus === 'Rejected') {
+                        document.getElementById('reject-req-id').value = reqId;
+                        document.getElementById('reject-modal-title').textContent = `मांग संदर्भ: ${reqId}`;
+                        document.getElementById('modal-reject').classList.remove('hidden');
+                        return;
+                    }
+
+                    applyStatusChange(reqId, newStatus, '');
+                });
+            });
+        }
+
+        async function applyStatusChange(reqId, newStatus, rejectionReason = '') {
+            const booking = allRequisitionsCache.find(r => r.id === reqId);
+            if (!booking) return;
+
+            const authority = currentUser.role === 'admin' ? 'जिला प्रशासन (Super Admin - DIO)' : 'नजारत उप समाहर्ता / NDC, सुपौल';
+            const status_label_hi = (newStatus === 'Approved') ? 'स्वीकृत (Approved)' : ((newStatus === 'Pending') ? 'समीक्षाधीन (Pending)' : 'अस्वीकृत (Rejected)');
+
+            const res = await apiPost({
+                action: 'update_status',
+                id: reqId,
+                status: newStatus,
+                reason: rejectionReason,
+                approved_by: newStatus === 'Approved' ? authority : '',
+                approved_by_name: newStatus === 'Approved' ? currentUser.name : '',
+                approved_by_designation: newStatus === 'Approved' ? currentUser.designation : ''
+            });
+
+            if (res && res.success) {
+                showToast(`मांग संदर्भ ${reqId} की स्थिति "${status_label_hi}" कर दी गई है।`);
+                await syncFromOnlineDatabase();
+            } else {
+                showToast(res.message || "स्थिति अद्यतन विफल।", "error");
+            }
+        }
+
+        const confirmRejectBtn = document.getElementById('confirm-reject-btn');
+        if (confirmRejectBtn) {
+            confirmRejectBtn.addEventListener('click', () => {
+                const reqId = document.getElementById('reject-req-id').value;
+                const reason = document.getElementById('reject-reason-input').value.trim();
+                applyStatusChange(reqId, 'Rejected', reason);
+                document.getElementById('modal-reject').classList.add('hidden');
+            });
+        }
+
+        function bindDeleteBookingEvents() {
+            document.querySelectorAll('.delete-booking-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const reqId = btn.dataset.id;
+                    if (!confirm(`क्या आप वाकई बुकिंग "${reqId}" को स्थायी रूप से हटाना चाहते हैं? यह स्लॉट पुनः रिक्त हो जाएगा और मास्टर पंजी से हट जाएगा।`)) {
+                        return;
+                    }
+
+                    const res = await apiPost({ action: 'delete', id: reqId });
+                    if (res && res.success) {
+                        showToast(`बुकिंग संदर्भ ${reqId} को पूर्णतः हटा दिया गया है।`);
+                        await syncFromOnlineDatabase();
+                    } else {
+                        showToast(res.message || "बुकिंग हटाने में विफल।", "error");
+                    }
+                });
+            });
+        }
+
+        function openSlipModal(r) {
+            const modal = document.getElementById('modal-slip');
+            if (!modal) return;
+            const hrs = r.hours.map(h => `${h}:00`).join(', ');
+
+            currentViewingReqId = r.id || 'Supaul_Hall_Booking';
+
+            document.getElementById('slip-meta-ref').textContent = `मांग संदर्भ: ${r.id} | पत्रांक: ${r.memo_no || 'N/A'}`;
+            document.getElementById('slip-venue').textContent = r.hall_name || 'लहटन चौधरी सभागार';
+            document.getElementById('slip-time').textContent = `${r.booking_date} (${hrs})`;
+            document.getElementById('slip-chair').textContent = r.chairing_officer || '';
+            document.getElementById('slip-department').textContent = r.department || '';
+            document.getElementById('slip-subject').textContent = r.subject || '';
+            document.getElementById('slip-vc').textContent = (r.vc_required == 1) ? 'हाँ (वी.सी. बुकिंग आवश्यक)' : 'नहीं';
+            document.getElementById('slip-refreshments').textContent = r.refreshments || 'Executive Tea & Biscuits';
+
+            const statusEl = document.getElementById('slip-dynamic-status');
+            const headTitle = document.getElementById('slip-heading-title');
+            const authorityRow = document.getElementById('slip-authority-row');
+            const signatureBlock = document.getElementById('slip-signature-block');
+
+            if (r.status === 'Approved') {
+                if (headTitle) headTitle.textContent = 'सभागार आवंटन आदेश';
+                if (statusEl) {
+                    statusEl.className = 'font-bold text-emerald-800 block text-xs';
+                    statusEl.textContent = 'स्थिति: स्वीकृत (SANCTIONED)';
+                }
+                if (authorityRow) authorityRow.style.display = 'flex';
+                document.getElementById('slip-authority').textContent = r.approved_by || 'नजारत उप समाहर्ता, सुपौल';
+                
+                if (signatureBlock) {
+                    signatureBlock.style.visibility = 'visible';
+                    document.getElementById('slip-signer-name').textContent = r.approved_by_name || 'प्राधिकृत पदाधिकारी';
+                    document.getElementById('slip-signer-desig').textContent = r.approved_by_designation || 'नजारत उप समाहर्ता';
+                }
+            } else if (r.status === 'Rejected') {
+                if (headTitle) headTitle.textContent = 'सभागार मांग अस्वीकृति पर्ची';
+                if (statusEl) {
+                    statusEl.className = 'font-bold text-rose-700 block text-xs';
+                    statusEl.textContent = 'स्थिति: अस्वीकृत (REJECTED)';
+                }
+                if (authorityRow) authorityRow.style.display = 'flex';
+                document.getElementById('slip-authority').textContent = r.rejection_reason ? `अस्वीकृत (कारण: ${r.rejection_reason})` : 'सक्षम प्राधिकार द्वारा निरस्त';
+
+                if (signatureBlock) {
+                    signatureBlock.style.visibility = 'hidden';
+                }
+            } else {
+                if (headTitle) headTitle.textContent = 'सभागार आरक्षण मांग-पत्र (अस्थायी)';
+                if (statusEl) {
+                    statusEl.className = 'font-bold text-amber-700 block text-xs';
+                    statusEl.textContent = 'स्थिति: समीक्षाधीन (PENDING APPROVAL)';
+                }
+                if (authorityRow) authorityRow.style.display = 'flex';
+                document.getElementById('slip-authority').textContent = 'नजारत शाखा / जिला प्रशासन से अनुमोदन प्रतीक्षारत';
+
+                if (signatureBlock) {
+                    signatureBlock.style.visibility = 'hidden';
+                }
+            }
+
+            modal.classList.remove('hidden');
+            initIcons();
+        }
+
+        window.addEventListener('beforeprint', () => {
+            if (currentViewingReqId) {
+                originalPageTitle = document.title;
+                document.title = currentViewingReqId;
+            }
+        });
+
+        window.addEventListener('afterprint', () => {
+            if (originalPageTitle) {
+                document.title = originalPageTitle;
+            }
+        });
+
+        const printBtn = document.getElementById('slip-print-btn');
+        if (printBtn) {
+            printBtn.addEventListener('click', () => {
+                if (currentViewingReqId) {
+                    originalPageTitle = document.title;
+                    document.title = currentViewingReqId;
+                }
+                window.print();
+                setTimeout(() => {
+                    if (originalPageTitle) {
+                        document.title = originalPageTitle;
+                    }
+                }, 1000);
+            });
+        }
+
+        function bindSlipButtons() {
+            document.querySelectorAll('.view-slip-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    try {
+                        const req = JSON.parse(btn.dataset.req);
+                        openSlipModal(req);
+                    } catch(e) {}
+                });
+            });
+        }
+
         document.querySelectorAll('.modal-close-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('#modal-login, #modal-new-user, #modal-edit-user, #modal-reject, #modal-slip, #modal-hall-edit, #modal-change-pwd, #modal-quick-incharge, #modal-edit-rules').forEach(m => m.classList.add('hidden'));
+                document.querySelectorAll('#modal-login, #modal-new-user, #modal-edit-user, #modal-reject, #modal-slip, #modal-hall-edit, #modal-change-pwd, #modal-quick-incharge').forEach(m => m.classList.add('hidden'));
             });
         });
 
@@ -1971,22 +2824,10 @@
                 const usernameOrEmail = document.getElementById('login-username').value.trim().toLowerCase();
                 const password = document.getElementById('login-password').value;
 
-                if (loginErr) loginErr.classList.add('hidden');
-
-                const submitBtn = ajaxLoginForm.querySelector('button[type="submit"]');
-                if (submitBtn) submitBtn.disabled = true;
-
                 const res = await apiPost({ action: 'login', email: usernameOrEmail, password: password });
-                
-                if (submitBtn) submitBtn.disabled = false;
-
                 if (!res || !res.success) {
-                    if (loginErr) {
-                        loginErr.textContent = res ? res.message : 'लॉगिन विफल। सर्वर प्रतिक्रिया अनुपलब्ध।';
-                        loginErr.classList.remove('hidden');
-                    } else {
-                        showToast(res ? res.message : 'लॉगिन विफल।', 'error');
-                    }
+                    loginErr.textContent = res ? res.message : 'लॉगिन विफल। सर्वर प्रतिक्रिया अनुपलब्ध।';
+                    loginErr.classList.remove('hidden');
                     return;
                 }
 
@@ -1995,20 +2836,7 @@
                 loginModal.classList.add('hidden');
                 showToast('पोर्टल पर सफलतापूर्वक लॉगिन किया गया।');
                 updateAuthUI();
-                await syncFromOnlineDatabase(true);
                 switchTab(currentUser.role === 'technical' ? 'tech-dashboard' : (currentUser.role === 'admin' || currentUser.role === 'nazarat' ? 'dashboard' : 'schedule'));
-            });
-        }
-
-        const logoutBtn = document.getElementById('portal-logout-btn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                currentUser = null;
-                sessionStorage.removeItem('supaul_active_session');
-                localStorage.removeItem('supaul_active_session');
-                updateAuthUI();
-                switchTab('schedule');
-                showToast('सफलतापूर्वक लॉगआउट किया गया।');
             });
         }
 
@@ -2053,6 +2881,18 @@
                     cpErr.textContent = res ? res.message : 'पासवर्ड परिवर्तन विफल।';
                     cpErr.classList.remove('hidden');
                 }
+            });
+        }
+
+        const logoutBtn = document.getElementById('portal-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                currentUser = null;
+                sessionStorage.removeItem('supaul_active_session');
+                localStorage.removeItem('supaul_active_session');
+                updateAuthUI();
+                switchTab('schedule');
+                showToast('सफलतापूर्वक लॉगआउट किया गया।');
             });
         }
 
