@@ -938,7 +938,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-slate-700 font-bold mb-1">सीट क्षमता (Seating Capacity) *</label>
-                            <input type="number" id="edit-hall-capacity" required min5" max="1000" placeholder="120" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                            <input type="number" id="edit-hall-capacity" required min="5" max="1000" placeholder="120" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
                         </div>
                         <div>
                             <label class="block text-slate-700 font-bold mb-1">परिसर बैज / श्रेणी *</label>
@@ -1861,19 +1861,23 @@
                 allRequisitionsCache.unshift(newBooking);
                 setDB('reqs', allRequisitionsCache);
 
-                // Notifications
+                // Notifications (with duplicate prevention)
                 const notifs = getDB('notifs', []);
-                notifs.unshift({
-                    id: Date.now(),
-                    req_id: req_id,
-                    recipient_email: currentUser.email,
-                    recipient_role: 'admin,nazarat,technical',
-                    message: `नया मांग-पत्र दर्ज: ${req_id} (${subject}) तिथि: ${selectedDate}`,
-                    status_change: status,
-                    is_read: 0,
-                    created_at: new Date().toLocaleTimeString()
-                });
-                setDB('notifs', notifs);
+                const notifMsg = `नया मांग-पत्र दर्ज: ${req_id} (${subject}) तिथि: ${selectedDate}`;
+                const alreadyExists = notifs.some(n => n.req_id === req_id && n.message === notifMsg);
+                if (!alreadyExists) {
+                    notifs.unshift({
+                        id: Date.now(),
+                        req_id: req_id,
+                        recipient_email: currentUser.email,
+                        recipient_role: 'admin,nazarat,technical',
+                        message: notifMsg,
+                        status_change: status,
+                        is_read: 0,
+                        created_at: new Date().toLocaleTimeString()
+                    });
+                    setDB('notifs', notifs);
+                }
 
                 // Post directly to Google Sheet
                 showToast(isDirect 
@@ -1906,7 +1910,19 @@
         function loadNotifications() {
             if (!currentUser) return;
             const notifs = getDB('notifs', []);
-            const userNotifs = notifs.filter(n => n.recipient_email === currentUser.email || n.recipient_role.includes(currentUser.role));
+
+            // Safe in-memory deduplication of existing notifications (preserves order, differentiates events)
+            const seenKeys = new Set();
+            const deduplicatedNotifs = [];
+            for (const n of notifs) {
+                const key = (n.req_id || '') + ':::' + (n.message || '');
+                if (!seenKeys.has(key)) {
+                    seenKeys.add(key);
+                    deduplicatedNotifs.push(n);
+                }
+            }
+
+            const userNotifs = deduplicatedNotifs.filter(n => n.recipient_email === currentUser.email || (n.recipient_role && n.recipient_role.includes(currentUser.role)));
             const unread = userNotifs.filter(n => n.is_read === 0).length;
 
             const badge = document.getElementById('notif-unread-badge');
@@ -2766,17 +2782,22 @@
 
             const status_label_hi = (newStatus === 'Approved') ? 'स्वीकृत (Approved)' : ((newStatus === 'Pending') ? 'समीक्षाधीन (Pending)' : 'अस्वीकृत (Rejected)');
             const notifs = getDB('notifs', []);
-            notifs.unshift({
-                id: Date.now(),
-                req_id: reqId,
-                recipient_email: booking.officer_email,
-                recipient_role: 'admin,nazarat,technical',
-                message: `मांग संदर्भ ${reqId} (${booking.subject}) की स्थिति नजारत/प्रशासक द्वारा बदलकर "${status_label_hi}" कर दी गई है।`,
-                status_change: newStatus,
-                is_read: 0,
-                created_at: new Date().toLocaleTimeString()
-            });
-            setDB('notifs', notifs);
+            const statusMsg = `मांग संदर्भ ${reqId} (${booking.subject}) की स्थिति नजारत/प्रशासक द्वारा बदलकर "${status_label_hi}" कर दी गई है।`;
+            const alreadyExists = notifs.some(n => n.req_id === reqId && n.message === statusMsg);
+
+            if (!alreadyExists) {
+                notifs.unshift({
+                    id: Date.now(),
+                    req_id: reqId,
+                    recipient_email: booking.officer_email,
+                    recipient_role: 'admin,nazarat,technical',
+                    message: statusMsg,
+                    status_change: newStatus,
+                    is_read: 0,
+                    created_at: new Date().toLocaleTimeString()
+                });
+                setDB('notifs', notifs);
+            }
 
             showToast(`मांग संदर्भ ${reqId} की स्थिति "${status_label_hi}" कर दी गई है।`);
 
