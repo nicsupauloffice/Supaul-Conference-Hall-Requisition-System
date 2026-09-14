@@ -1047,7 +1047,7 @@
 
         let currentUser = null;
         try {
-            const sess = sessionStorage.getItem('supaul_active_session') || localStorage.getItem('supaul_active_session');
+            const sess = sessionStorage.getItem('supaul_active_session');
             if (sess) currentUser = JSON.parse(sess);
         } catch(e) {}
 
@@ -1157,6 +1157,20 @@
                     if (typeof data.rules === 'string') {
                         reservationRulesContent = data.rules;
                         renderRulesContent();
+                    }
+
+                    if (Array.isArray(data.users) && currentUser) {
+                        const onlineMatch = data.users.find(u => String(u.email).toLowerCase() === String(currentUser.email).toLowerCase());
+                        if (!onlineMatch || onlineMatch.status !== 'active') {
+                            currentUser = null;
+                            sessionStorage.removeItem('supaul_active_session');
+                            updateAuthUI();
+                            switchTab('schedule');
+                            showToast('आपका सत्र समाप्त हो गया है या खाता निष्क्रिय कर दिया गया है।', 'error');
+                        } else {
+                            currentUser = { ...currentUser, ...onlineMatch };
+                            sessionStorage.setItem('supaul_active_session', JSON.stringify(currentUser));
+                        }
                     }
 
                     renderVenuesList();
