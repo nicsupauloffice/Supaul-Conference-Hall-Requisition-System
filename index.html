@@ -738,7 +738,6 @@
                                 <th class="p-3 pl-4">पदाधिकारी का नाम एवं पदनाम</th>
                                 <th class="p-3">विभाग / शाखा</th>
                                 <th class="p-3">सरकारी ईमेल</th>
-                                <th id="th-user-pwd" class="p-3 text-center">पासवर्ड</th>
                                 <th class="p-3 text-center">खाता स्तर</th>
                                 <th class="p-3 text-center">स्थिति</th>
                                 <th id="th-user-actions" class="p-3 text-right pr-4">कार्यवाही</th>
@@ -1220,7 +1219,6 @@
 
     <script>
     (function() {
-        // Google Apps Script Integration URL
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJaO20ZgTuvkrwYraRAgiiGHL6GGbleHZBpIpZDVI14eXP70m6PTjxPoT9VfychGb1/exec";
 
         const TIME_SLOTS = [
@@ -1238,103 +1236,22 @@
             { hour: 19, label: '07:00 PM - 08:00 PM' }
         ];
 
-        const SEED_HALLS = [
-            {
-                id: 'hall-lahtan-choudhary-sabhagar',
-                name: 'Lahtan Choudhary Sabhagar',
-                name_hi: 'लहटन चौधरी सभागार',
-                wings: 'समाहरणालय मुख्य परिसर, सुपौल - 852131',
-                capacity: 120,
-                in_charge: 'नजारत उप समाहर्ता, सुपौल',
-                badge: 'समाहरणालय मुख्य परिसर',
-                description: 'जिला समाहरणालय सुपौल का प्रधान सभागार - जिलाधिकारी (DM) महोदय की समीक्षा बैठकों, कैबिनेट/मुख्य सचिव वीडियो कॉन्फ्रेंसिंग एवं जिला समन्वय बैठकों हेतु।',
-                features: [
-                    'Polycom Studio HD VC Link',
-                    'Dual 85" Smart Interactive Screens',
-                    'Gooseneck Delegate Mics (x45)',
-                    'High Power PA Console & Acoustic Hall',
-                    '10 kVA Dedicated Online UPS Backup'
-                ]
-            }
-        ];
+        // Centralized Online Application Cache (InMemory)
+        let currentUser = null;
+        try {
+            const sess = sessionStorage.getItem('supaul_active_session') || localStorage.getItem('supaul_active_session');
+            if (sess) currentUser = JSON.parse(sess);
+        } catch(e) {}
 
-        const SEED_USERS = [
-            {
-                id: 1,
-                email: 'itmanager@nic.in',
-                name: 'आईटी मैनेजर / IT Manager',
-                designation: 'IT Manager / तकनीकी नोडल पदाधिकारी (ITM)',
-                department: 'IT Department / आईटी विभाग',
-                role: 'itm',
-                password: 'admin@12345',
-                plain_password: 'admin@12345',
-                status: 'active'
-            },
-            {
-                id: 2,
-                email: 'ndcsupaul@nic.in',
-                name: 'नजारत उप समाहर्ता (NDC) / Nazarat Deputy Collector (NDC) / Admin',
-                designation: 'Nazarat Deputy Collector (NDC) / Admin',
-                department: 'Nazarat Section / नजारत शाखा',
-                role: 'nazarat',
-                password: 'admin@12345',
-                plain_password: 'admin@12345',
-                status: 'active'
-            },
-            {
-                id: 3,
-                email: 'techteam@nic.in',
-                name: 'तकनीकी टीम (Technical Team) / Network Engineer',
-                designation: 'Network Engineer / तकनीकी टीम',
-                department: 'BSWAN / बिस्वान',
-                role: 'technical',
-                password: 'admin@12345',
-                plain_password: 'admin@12345',
-                status: 'active'
-            },
-            {
-                id: 4,
-                email: 'dio-spl@nic.in',
-                name: 'जिला सूचना विज्ञान पदाधिकारी (DIO) / District Informatics Officer / Super Admin',
-                designation: 'District Informatics Officer / Super Admin',
-                department: 'National Informatics Centre / राष्ट्रीय सूचना-विज्ञान केंद्र',
-                role: 'admin',
-                password: 'admin@12345',
-                plain_password: 'admin@12345',
-                status: 'active'
-            }
-        ];
+        let hallsData = [];
+        let allRequisitionsCache = [];
+        let notificationsCache = [];
+        let onlineUsersRoster = [];
 
-        function getDB(k, fallback) {
-            const val = localStorage.getItem('supaul_' + k);
-            return val ? JSON.parse(val) : fallback;
-        }
-
-        function setDB(k, val) {
-            localStorage.setItem('supaul_' + k, JSON.stringify(val));
-        }
-
-        if (!localStorage.getItem('supaul_halls')) setDB('halls', SEED_HALLS);
-        if (!localStorage.getItem('supaul_users')) {
-            setDB('users', SEED_USERS);
-        } else {
-            const existingUsers = getDB('users', SEED_USERS).map(u => ({
-                ...u,
-                status: u.status || 'active',
-                plain_password: u.plain_password || u.password
-            }));
-            setDB('users', existingUsers);
-        }
-        if (!localStorage.getItem('supaul_reqs')) setDB('reqs', []);
-        if (!localStorage.getItem('supaul_notifs')) setDB('notifs', []);
-
-        let currentUser = getDB('session_user', null);
-        let hallsData = getDB('halls', SEED_HALLS);
-        let selectedHallId = hallsData.length > 0 ? hallsData[0].id : 'hall-lahtan-choudhary-sabhagar';
+        let selectedHallId = '';
         let todayStr = new Date().toISOString().split('T')[0];
         let selectedDate = todayStr;
         let selectedHours = [];
-        let allRequisitionsCache = getDB('reqs', []);
         let currentViewingReqId = '';
         let originalPageTitle = document.title;
 
@@ -1366,19 +1283,48 @@
             return (slotHour <= currentHour);
         }
 
-        // Real-Time Google Sheets Background Polling Engine
-        async function syncFromGoogleSheet() {
+        // Central API Caller (JSON POST)
+        async function apiPost(payload) {
+            try {
+                const res = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                return await res.json();
+            } catch (err) {
+                console.error("API POST error:", err);
+                showToast("ऑनलाइन डेटाबेस अनुपलब्ध है। कृपया अपना इंटरनेट कनेक्शन जांचें।", "error");
+                return { success: false, message: "Network connection failed" };
+            }
+        }
+
+        // Real-Time Online Backend Polling Engine (Single Source of Truth)
+        async function syncFromOnlineDatabase() {
             if (!APPS_SCRIPT_URL) return;
             try {
-                const response = await fetch(APPS_SCRIPT_URL);
-                const json = await response.json();
-                if (json && json.success && Array.isArray(json.data)) {
-                    allRequisitionsCache = json.data.map(r => ({
-                        ...r,
-                        hours: Array.isArray(r.hours) ? r.hours : (typeof r.hours === 'string' ? JSON.parse(r.hours || '[]') : [])
-                    }));
-                    setDB('reqs', allRequisitionsCache);
+                const res = await fetch(APPS_SCRIPT_URL + "?action=bootstrap");
+                const data = await res.json();
+                if (data && data.success) {
+                    if (Array.isArray(data.halls)) {
+                        hallsData = data.halls;
+                        if (!selectedHallId && hallsData.length > 0) {
+                            selectedHallId = hallsData[0].id;
+                        }
+                    }
+
+                    if (Array.isArray(data.requisitions)) {
+                        allRequisitionsCache = data.requisitions;
+                    }
+
+                    if (Array.isArray(data.notifications)) {
+                        notificationsCache = data.notifications;
+                    }
+
+                    renderVenuesList();
                     loadSchedule();
+                    loadNotifications();
+
                     if (currentUser) {
                         if (currentUser.role === 'officer' || currentUser.role === 'itm') {
                             loadMyRequisitions();
@@ -1388,11 +1334,25 @@
                     }
                 }
             } catch (err) {
-                console.error("Cloud Sheet sync error:", err);
+                console.warn("Online sync offline check:", err);
             }
         }
 
-        setInterval(syncFromGoogleSheet, 10000);
+        async function fetchOnlineUsersRoster() {
+            if (!currentUser || !['admin', 'nazarat'].includes(currentUser.role)) return;
+            try {
+                const res = await fetch(APPS_SCRIPT_URL + "?action=fetch_users");
+                const data = await res.json();
+                if (data && data.success && Array.isArray(data.users)) {
+                    onlineUsersRoster = data.users;
+                    renderUsersTable();
+                }
+            } catch (e) {
+                console.error("Failed to load user roster from online database:", e);
+            }
+        }
+
+        setInterval(syncFromOnlineDatabase, 10000);
 
         function updateAuthUI() {
             const isAuth = !!currentUser;
@@ -1465,20 +1425,17 @@
             const usersPageTitle = document.getElementById('users-page-title');
             const tabTextUsers = document.getElementById('tab-text-users');
             const tabTextNewReq = document.getElementById('tab-text-new-req');
-            const thUserPwd = document.getElementById('th-user-pwd');
             const thUserActions = document.getElementById('th-user-actions');
 
             if (userRole === 'admin') {
                 if (tabTextUsers) tabTextUsers.textContent = 'उपयोगकर्ता प्रबंधन / Users';
                 if (usersPageTitle) usersPageTitle.innerHTML = '<i data-lucide="users" class="w-4 h-4 portal-text-primary"></i> उपयोगकर्ता प्रबंधन (Super Admin - All Users)';
                 if (tabTextNewReq) tabTextNewReq.textContent = 'सीधा आवंटन / Direct Sanction';
-                if (thUserPwd) thUserPwd.classList.remove('hidden');
                 if (thUserActions) thUserActions.classList.remove('hidden');
             } else if (userRole === 'nazarat') {
                 if (tabTextUsers) tabTextUsers.textContent = 'विभागीय उपयोगकर्ता / Register Dept User';
                 if (usersPageTitle) usersPageTitle.innerHTML = '<i data-lucide="users" class="w-4 h-4 portal-text-primary"></i> विभागीय नोडल खाता प्रबंधन';
                 if (tabTextNewReq) tabTextNewReq.textContent = 'सीधा आवंटन / Sanction Slot';
-                if (thUserPwd) thUserPwd.classList.add('hidden');
                 if (thUserActions) thUserActions.classList.add('hidden');
             } else {
                 if (tabTextNewReq) tabTextNewReq.textContent = 'मांग-पत्र भरें / Book Hall';
@@ -1495,10 +1452,8 @@
             if (!container) return;
             container.innerHTML = '';
 
-            hallsData = getDB('halls', SEED_HALLS);
-
             if (hallsData.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-500">कोई सभागार उपलब्ध नहीं है।</p>';
+                container.innerHTML = '<p class="text-xs text-slate-500">सभागार विवरण लोड हो रहा है...</p>';
                 return;
             }
 
@@ -1583,8 +1538,7 @@
         }
 
         function loadSchedule() {
-            const allReqs = allRequisitionsCache.length ? allRequisitionsCache : getDB('reqs', []);
-            const dayBookings = allReqs.filter(r => 
+            const dayBookings = allRequisitionsCache.filter(r => 
                 r.booking_date === selectedDate && 
                 (r.hall_id === selectedHallId || !selectedHallId) &&
                 (r.status === 'Approved' || r.status === 'Pending')
@@ -1789,7 +1743,7 @@
 
         const reqForm = document.getElementById('requisition-form');
         if (reqForm) {
-            reqForm.addEventListener('submit', (e) => {
+            reqForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (!currentUser) {
                     showToast('सभागार आरक्षण हेतु अधिकृत पदाधिकारी के रूप में लॉगिन अनिवार्य है।', 'error');
@@ -1857,64 +1811,33 @@
                     created_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
                 };
 
-                // Save locally first for instant feedback
-                allRequisitionsCache.unshift(newBooking);
-                setDB('reqs', allRequisitionsCache);
+                const res = await apiPost({ action: 'create', data: newBooking });
+                if (res && res.success) {
+                    showToast(isDirect 
+                        ? `सभागार सीधा आवंटित किया गया। संदर्भ: ${req_id}` 
+                        : `मांग-पत्र सफलतापूर्वक दर्ज किया गया। संदर्भ: ${req_id} (नजारत शाखा अनुमोदन प्रतीक्षारत)`);
 
-                // Notifications (with duplicate prevention)
-                const notifs = getDB('notifs', []);
-                const notifMsg = `नया मांग-पत्र दर्ज: ${req_id} (${subject}) तिथि: ${selectedDate}`;
-                const alreadyExists = notifs.some(n => n.req_id === req_id && n.message === notifMsg);
-                if (!alreadyExists) {
-                    notifs.unshift({
-                        id: Date.now(),
-                        req_id: req_id,
-                        recipient_email: currentUser.email,
-                        recipient_role: 'admin,nazarat,technical',
-                        message: notifMsg,
-                        status_change: status,
-                        is_read: 0,
-                        created_at: new Date().toLocaleTimeString()
-                    });
-                    setDB('notifs', notifs);
-                }
+                    reqForm.reset();
+                    selectedHours = [];
+                    updateSelectionBar();
+                    await syncFromOnlineDatabase();
 
-                // Post directly to Google Sheet
-                showToast(isDirect 
-                    ? `सभागार सीधा आवंटित किया गया। संदर्भ: ${req_id}` 
-                    : `मांग-पत्र सफलतापूर्वक दर्ज किया गया। संदर्भ: ${req_id} (नजारत शाखा अनुमोदन प्रतीक्षारत)`);
-
-                fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'create', data: newBooking })
-                }).then(() => {
-                    setTimeout(syncFromGoogleSheet, 1500);
-                }).catch(err => console.error(err));
-
-                reqForm.reset();
-                selectedHours = [];
-                updateSelectionBar();
-                loadSchedule();
-                loadNotifications();
-
-                if (isDirect) {
-                    switchTab('requests');
+                    if (isDirect) {
+                        switchTab('requests');
+                    } else {
+                        switchTab('my-reqs');
+                    }
                 } else {
-                    switchTab('my-reqs');
+                    showToast("मांग-पत्र दर्ज करने में विफल: " + (res.message || "ऑनलाइन त्रुटि"), "error");
                 }
             });
         }
 
         function loadNotifications() {
             if (!currentUser) return;
-            const notifs = getDB('notifs', []);
-
-            // Safe in-memory deduplication of existing notifications (preserves order, differentiates events)
             const seenKeys = new Set();
             const deduplicatedNotifs = [];
-            for (const n of notifs) {
+            for (const n of notificationsCache) {
                 const key = (n.req_id || '') + ':::' + (n.message || '');
                 if (!seenKeys.has(key)) {
                     seenKeys.add(key);
@@ -1968,22 +1891,23 @@
 
         const notifMarkReadBtn = document.getElementById('notif-mark-read-btn');
         if (notifMarkReadBtn) {
-            notifMarkReadBtn.addEventListener('click', () => {
-                const notifs = getDB('notifs', []);
-                notifs.forEach(n => {
-                    if (currentUser && (n.recipient_email === currentUser.email || n.recipient_role.includes(currentUser.role))) {
-                        n.is_read = 1;
-                    }
-                });
-                setDB('notifs', notifs);
-                loadNotifications();
+            notifMarkReadBtn.addEventListener('click', async () => {
+                if (!currentUser) return;
+                const res = await apiPost({ action: 'mark_notifications_read', email: currentUser.email, role: currentUser.role });
+                if (res && res.success) {
+                    notificationsCache.forEach(n => {
+                        if (n.recipient_email === currentUser.email || (n.recipient_role && n.recipient_role.includes(currentUser.role))) {
+                            n.is_read = 1;
+                        }
+                    });
+                    loadNotifications();
+                }
             });
         }
 
         function loadMyRequisitions() {
             if (!currentUser) return;
-            const allReqs = allRequisitionsCache.length ? allRequisitionsCache : getDB('reqs', []);
-            const myReqs = allReqs.filter(r => r.officer_email === currentUser.email);
+            const myReqs = allRequisitionsCache.filter(r => r.officer_email === currentUser.email);
             const tbody = document.getElementById('my-reqs-table-body');
             if (!tbody) return;
             tbody.innerHTML = '';
@@ -2019,30 +1943,24 @@
         }
 
         function loadAdminData() {
-            const allReqs = allRequisitionsCache.length ? allRequisitionsCache : getDB('reqs', []);
-            const allUsers = getDB('users', SEED_USERS);
-            hallsData = getDB('halls', SEED_HALLS);
-
             const isRoleAdmin = currentUser && currentUser.role === 'admin';
             const isRoleTech = currentUser && currentUser.role === 'technical';
 
-            const pending = allReqs.filter(r => r.status === 'Pending').length;
-            const approved = allReqs.filter(r => r.status === 'Approved').length;
-            const visibleUsers = isRoleAdmin ? allUsers : allUsers.filter(u => ['officer', 'itm'].includes(u.role));
+            const pending = allRequisitionsCache.filter(r => r.status === 'Pending').length;
+            const approved = allRequisitionsCache.filter(r => r.status === 'Approved').length;
 
             if (document.getElementById('stat-pending')) document.getElementById('stat-pending').textContent = pending;
             if (document.getElementById('stat-approved')) document.getElementById('stat-approved').textContent = approved;
-            if (document.getElementById('stat-users')) document.getElementById('stat-users').textContent = visibleUsers.length;
             if (document.getElementById('badge-pending-count')) document.getElementById('badge-pending-count').textContent = pending;
             if (document.getElementById('stat-halls-count')) document.getElementById('stat-halls-count').textContent = hallsData.length;
 
-            if (isRoleTech) renderTechDutyBoard(allReqs);
+            if (isRoleTech) renderTechDutyBoard(allRequisitionsCache);
             if (isRoleAdmin) renderAdminHallsTable();
 
             const reqTbody = document.getElementById('admin-requests-table-body');
             if (reqTbody) {
                 reqTbody.innerHTML = '';
-                allReqs.forEach(r => {
+                allRequisitionsCache.forEach(r => {
                     const hrs = r.hours.map(h => `${h}:00`).join(', ');
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition';
@@ -2082,87 +2000,76 @@
                 });
             }
 
-            const userTbody = document.getElementById('admin-users-table-body');
-            if (userTbody) {
-                userTbody.innerHTML = '';
-                visibleUsers.forEach(u => {
-                    const roleLabel = u.role === 'nazarat' ? 'नजारत उप समाहर्ता (NDC)' :
-                                      u.role === 'technical' ? 'तकनीकी टीम (Technical)' :
-                                      u.role === 'itm' ? 'तकनीकी नोडल पदाधिकारी (ITM)' :
-                                      u.role === 'admin' ? 'जिला मुख्य प्रशासक (DIO)' : 'विभागीय नोडल पदाधिकारी';
-                    const roleBadgeClass = u.role === 'nazarat' ? 'bg-amber-50 text-amber-900 border-amber-300' :
-                                           u.role === 'technical' ? 'bg-cyan-50 text-cyan-900 border-cyan-300' :
-                                           u.role === 'itm' ? 'bg-purple-50 text-purple-900 border-purple-300' :
-                                           u.role === 'admin' ? 'bg-rose-50 text-rose-900 border-rose-300' :
-                                           'bg-blue-50 text-blue-900 border-blue-200';
-
-                    const isSuspended = (u.status === 'suspended');
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50 transition';
-
-                    let credCellHtml = '';
-                    if (isRoleAdmin) {
-                        const plainPwd = u.plain_password || '******';
-                        credCellHtml = `
-                            <td class="p-3 text-center whitespace-nowrap">
-                                <div class="inline-flex items-center gap-1 bg-slate-100 border border-slate-300 px-2 py-1 rounded text-[11px] font-mono">
-                                    <span class="cred-text" data-password="${plainPwd}">••••••••</span>
-                                    <button type="button" class="toggle-pwd-view text-slate-500 hover:text-black p-1 min-w-[28px] min-h-[28px] flex items-center justify-center" title="पासवर्ड देखें / छुपाएं">
-                                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                    <button type="button" class="copy-pwd-btn text-slate-500 hover:text-emerald-700 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center" data-pwd="${plainPwd}" title="पासवर्ड कॉपी करें">
-                                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        `;
-                    }
-
-                    let actionsCellHtml = '';
-                    if (isRoleAdmin) {
-                        actionsCellHtml = `
-                            <td class="p-3 text-right pr-4 whitespace-nowrap">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <button type="button" class="edit-user-btn min-h-[32px] px-2.5 py-1 rounded portal-bg-primary hover:opacity-90 text-white text-[11px] font-bold inline-flex items-center gap-1 shadow-xs" data-user='${JSON.stringify(u)}'>
-                                        <i data-lucide="pencil" class="w-3 h-3"></i> संपादन
-                                    </button>
-                                    <button type="button" class="delete-user-btn min-h-[32px] px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-[11px] font-bold inline-flex items-center justify-center" data-id="${u.id}" data-name="${u.name}" title="खाता हटाएं">
-                                        <i data-lucide="trash-2" class="w-3 h-3"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        `;
-                    }
-
-                    tr.innerHTML = `
-                        <td class="p-3 pl-4">
-                            <span class="font-bold text-slate-800 block">${u.name}</span>
-                            <span class="text-[11px] portal-text-primary font-semibold block">${u.designation || 'नोडल पदाधिकारी'}</span>
-                        </td>
-                        <td class="p-3 text-slate-700 font-medium">${u.department || 'सामान्य प्रशासन'}</td>
-                        <td class="p-3 font-mono text-slate-800 whitespace-nowrap">${u.email}</td>
-                        ${credCellHtml}
-                        <td class="p-3 text-center whitespace-nowrap">
-                            <span class="inline-block px-2 py-0.5 rounded text-[10px] border font-bold ${roleBadgeClass}">
-                                ${roleLabel}
-                            </span>
-                        </td>
-                        <td class="p-3 text-center whitespace-nowrap">
-                            <span class="inline-block px-2 py-0.5 rounded text-[10px] ${isSuspended ? 'bg-rose-50 text-rose-800 border border-rose-300' : 'bg-emerald-50 text-emerald-800 border border-emerald-300'} font-bold">
-                                ${isSuspended ? 'निलंबित' : 'सक्रिय'}
-                            </span>
-                        </td>
-                        ${actionsCellHtml}
-                    `;
-                    userTbody.appendChild(tr);
-                });
-                bindUserTableActions();
-            }
-
-            renderLedgerTable(allReqs);
+            fetchOnlineUsersRoster();
+            renderLedgerTable(allRequisitionsCache);
             bindStatusChangeEvents();
             bindDeleteBookingEvents();
             bindSlipButtons();
+            initIcons();
+        }
+
+        function renderUsersTable() {
+            const userTbody = document.getElementById('admin-users-table-body');
+            if (!userTbody) return;
+            userTbody.innerHTML = '';
+
+            const isRoleAdmin = currentUser && currentUser.role === 'admin';
+            const visibleUsers = isRoleAdmin ? onlineUsersRoster : onlineUsersRoster.filter(u => ['officer', 'itm'].includes(u.role));
+            if (document.getElementById('stat-users')) document.getElementById('stat-users').textContent = visibleUsers.length;
+
+            visibleUsers.forEach(u => {
+                const roleLabel = u.role === 'nazarat' ? 'नजारत उप समाहर्ता (NDC)' :
+                                  u.role === 'technical' ? 'तकनीकी टीम (Technical)' :
+                                  u.role === 'itm' ? 'तकनीकी नोडल पदाधिकारी (ITM)' :
+                                  u.role === 'admin' ? 'जिला मुख्य प्रशासक (DIO)' : 'विभागीय नोडल पदाधिकारी';
+                const roleBadgeClass = u.role === 'nazarat' ? 'bg-amber-50 text-amber-900 border-amber-300' :
+                                       u.role === 'technical' ? 'bg-cyan-50 text-cyan-900 border-cyan-300' :
+                                       u.role === 'itm' ? 'bg-purple-50 text-purple-900 border-purple-300' :
+                                       u.role === 'admin' ? 'bg-rose-50 text-rose-900 border-rose-300' :
+                                       'bg-blue-50 text-blue-900 border-blue-200';
+
+                const isSuspended = (u.status === 'suspended');
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+
+                let actionsCellHtml = '';
+                if (isRoleAdmin) {
+                    actionsCellHtml = `
+                        <td class="p-3 text-right pr-4 whitespace-nowrap">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button type="button" class="edit-user-btn min-h-[32px] px-2.5 py-1 rounded portal-bg-primary hover:opacity-90 text-white text-[11px] font-bold inline-flex items-center gap-1 shadow-xs" data-user='${JSON.stringify(u)}'>
+                                    <i data-lucide="pencil" class="w-3 h-3"></i> संपादन
+                                </button>
+                                <button type="button" class="delete-user-btn min-h-[32px] px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-[11px] font-bold inline-flex items-center justify-center" data-id="${u.id}" data-name="${u.name}" title="खाता हटाएं">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-3 pl-4">
+                        <span class="font-bold text-slate-800 block">${u.name}</span>
+                        <span class="text-[11px] portal-text-primary font-semibold block">${u.designation || 'नोडल पदाधिकारी'}</span>
+                    </td>
+                    <td class="p-3 text-slate-700 font-medium">${u.department || 'सामान्य प्रशासन'}</td>
+                    <td class="p-3 font-mono text-slate-800 whitespace-nowrap">${u.email}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] border font-bold ${roleBadgeClass}">
+                            ${roleLabel}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] ${isSuspended ? 'bg-rose-50 text-rose-800 border border-rose-300' : 'bg-emerald-50 text-emerald-800 border border-emerald-300'} font-bold">
+                            ${isSuspended ? 'निलंबित' : 'सक्रिय'}
+                        </span>
+                    </td>
+                    ${actionsCellHtml}
+                `;
+                userTbody.appendChild(tr);
+            });
+            bindUserTableActions();
             initIcons();
         }
 
@@ -2259,7 +2166,7 @@
             });
 
             document.querySelectorAll('.delete-hall-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const hId = btn.dataset.hallId;
                     const hall = hallsData.find(h => h.id === hId);
                     if (!hall) return;
@@ -2273,11 +2180,13 @@
                         return;
                     }
 
-                    hallsData = hallsData.filter(h => h.id !== hId);
-                    setDB('halls', hallsData);
-                    showToast('सभागार सफलतापूर्वक हटाया गया।');
-                    loadAdminData();
-                    loadSchedule();
+                    const res = await apiPost({ action: 'delete_hall', id: hId });
+                    if (res && res.success) {
+                        showToast('सभागार सफलतापूर्वक हटाया गया।');
+                        await syncFromOnlineDatabase();
+                    } else {
+                        showToast(res.message || 'सभागार हटाने में त्रुटि', 'error');
+                    }
                 });
             });
         }
@@ -2297,7 +2206,7 @@
 
         const hallEditForm = document.getElementById('hall-edit-form');
         if (hallEditForm) {
-            hallEditForm.addEventListener('submit', (e) => {
+            hallEditForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 let name = document.getElementById('edit-hall-name').value.trim();
                 let name_hi = document.getElementById('edit-hall-name-hi').value.trim();
@@ -2313,41 +2222,26 @@
                 const rawFeatures = document.getElementById('edit-hall-features').value;
                 const featuresArray = rawFeatures.split(',').map(s => s.trim()).filter(s => s.length > 0);
 
-                if (editId) {
-                    const hall = hallsData.find(h => h.id === editId);
-                    if (hall) {
-                        hall.name = name;
-                        hall.name_hi = name_hi;
-                        hall.capacity = parseInt(document.getElementById('edit-hall-capacity').value) || 100;
-                        hall.badge = document.getElementById('edit-hall-badge').value.trim() || 'समाहरणालय';
-                        hall.wings = document.getElementById('edit-hall-wings').value.trim();
-                        hall.in_charge = document.getElementById('edit-hall-incharge').value.trim();
-                        hall.description = document.getElementById('edit-hall-desc').value.trim();
-                        hall.features = featuresArray;
-                        setDB('halls', hallsData);
-                        showToast(`सभागार "${name_hi}" का विवरण सफलतापूर्वक अद्यतित किया गया।`);
-                    }
-                } else {
-                    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                    const newId = 'hall-' + slug + '-' + Math.floor(100 + Math.random() * 900);
-                    hallsData.push({
-                        id: newId,
-                        name: name,
-                        name_hi: name_hi,
-                        capacity: parseInt(document.getElementById('edit-hall-capacity').value) || 100,
-                        badge: document.getElementById('edit-hall-badge').value.trim() || 'समाहरणालय',
-                        wings: document.getElementById('edit-hall-wings').value.trim(),
-                        in_charge: document.getElementById('edit-hall-incharge').value.trim(),
-                        description: document.getElementById('edit-hall-desc').value.trim(),
-                        features: featuresArray
-                    });
-                    setDB('halls', hallsData);
-                    showToast(`नया सभागार "${name_hi}" सफलतापूर्वक पंजीकृत किया गया।`);
-                }
+                const hallPayload = {
+                    id: editId || ('hall-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(100 + Math.random() * 900)),
+                    name: name,
+                    name_hi: name_hi,
+                    capacity: parseInt(document.getElementById('edit-hall-capacity').value) || 100,
+                    badge: document.getElementById('edit-hall-badge').value.trim() || 'समाहरणालय',
+                    wings: document.getElementById('edit-hall-wings').value.trim(),
+                    in_charge: document.getElementById('edit-hall-incharge').value.trim(),
+                    description: document.getElementById('edit-hall-desc').value.trim(),
+                    features: featuresArray
+                };
 
-                document.getElementById('modal-hall-edit').classList.add('hidden');
-                loadAdminData();
-                loadSchedule();
+                const res = await apiPost({ action: 'save_hall', data: hallPayload });
+                if (res && res.success) {
+                    showToast(`सभागार "${name_hi}" का विवरण सफलतापूर्वक सहेजा गया।`);
+                    document.getElementById('modal-hall-edit').classList.add('hidden');
+                    await syncFromOnlineDatabase();
+                } else {
+                    showToast(res.message || 'सभागार सहेजने में विफल।', 'error');
+                }
             });
         }
 
@@ -2366,18 +2260,21 @@
 
         const quickInchargeForm = document.getElementById('quick-incharge-form');
         if (quickInchargeForm) {
-            quickInchargeForm.addEventListener('submit', (e) => {
+            quickInchargeForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const hallId = document.getElementById('qi-hall-id').value;
                 const inCharge = document.getElementById('qi-incharge-input').value.trim();
                 const hall = hallsData.find(h => h.id === hallId);
                 if (hall) {
-                    hall.in_charge = inCharge;
-                    setDB('halls', hallsData);
-                    showToast('नोडल प्राधिकारी का विवरण सफलतापूर्वक अद्यतित किया गया।');
-                    document.getElementById('modal-quick-incharge').classList.add('hidden');
-                    loadAdminData();
-                    renderVenuesList();
+                    const updated = { ...hall, in_charge: inCharge };
+                    const res = await apiPost({ action: 'save_hall', data: updated });
+                    if (res && res.success) {
+                        showToast('नोडल प्राधिकारी का विवरण सफलतापूर्वक अद्यतित किया गया।');
+                        document.getElementById('modal-quick-incharge').classList.add('hidden');
+                        await syncFromOnlineDatabase();
+                    } else {
+                        showToast(res.message || 'अद्यतन विफल।', 'error');
+                    }
                 }
             });
         }
@@ -2421,69 +2318,34 @@
 
         const createUserForm = document.getElementById('create-user-form');
         if (createUserForm) {
-            createUserForm.addEventListener('submit', (e) => {
+            createUserForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const users = getDB('users', SEED_USERS);
                 const email = document.getElementById('nu-email').value.trim().toLowerCase();
                 const password = document.getElementById('nu-password').value;
-
-                if (users.some(u => u.email.toLowerCase() === email)) {
-                    showToast(`यह ईमेल पूर्व से पंजीकृत है: ${email}`, 'error');
-                    return;
-                }
-
                 const roleField = document.getElementById('nu-role');
                 const role = roleField ? roleField.value : 'officer';
 
                 const newUser = {
-                    id: Date.now(),
                     name: document.getElementById('nu-name').value.trim(),
                     designation: document.getElementById('nu-designation').value.trim() || 'विभागीय नोडल पदाधिकारी',
                     department: document.getElementById('nu-department').value.trim() || 'सामान्य प्रशासन',
                     email: email,
                     password: password,
-                    plain_password: password,
-                    role: role,
-                    status: 'active',
-                    created_at: new Date().toISOString()
+                    role: role
                 };
 
-                users.unshift(newUser);
-                setDB('users', users);
-                showToast(`उपयोगकर्ता खाता (${newUser.name}) सफलतापूर्वक पंजीकृत किया गया।`);
-                document.getElementById('modal-new-user').classList.add('hidden');
-                loadAdminData();
+                const res = await apiPost({ action: 'create_user', ...newUser });
+                if (res && res.success) {
+                    showToast(`उपयोगकर्ता खाता (${newUser.name}) ऑनलाइन सफलतापूर्वक पंजीकृत किया गया।`);
+                    document.getElementById('modal-new-user').classList.add('hidden');
+                    await fetchOnlineUsersRoster();
+                } else {
+                    showToast(res.message || 'खाता बनाने में विफल।', 'error');
+                }
             });
         }
 
         function bindUserTableActions() {
-            document.querySelectorAll('.toggle-pwd-view').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const span = btn.parentElement.querySelector('.cred-text');
-                    if (!span) return;
-                    const pwd = span.dataset.password || '';
-                    if (span.textContent === '••••••••') {
-                        span.textContent = pwd;
-                        btn.innerHTML = '<i data-lucide="eye-off" class="w-3.5 h-3.5"></i>';
-                    } else {
-                        span.textContent = '••••••••';
-                        btn.innerHTML = '<i data-lucide="eye" class="w-3.5 h-3.5"></i>';
-                    }
-                    initIcons();
-                });
-            });
-
-            document.querySelectorAll('.copy-pwd-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const pwd = btn.dataset.pwd || '';
-                    if (navigator.clipboard && pwd) {
-                        navigator.clipboard.writeText(pwd).then(() => {
-                            showToast('पासवर्ड क्लिपबोर्ड पर कॉपी किया गया: ' + pwd);
-                        });
-                    }
-                });
-            });
-
             document.querySelectorAll('.edit-user-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const u = JSON.parse(btn.dataset.user);
@@ -2495,7 +2357,7 @@
                     document.getElementById('eu-email').value = u.email || '';
                     document.getElementById('eu-role').value = u.role || 'officer';
                     document.getElementById('eu-status').value = u.status || 'active';
-                    document.getElementById('eu-password').value = u.plain_password || '';
+                    document.getElementById('eu-password').value = '';
 
                     if (modal) modal.classList.remove('hidden');
                     initIcons();
@@ -2503,11 +2365,11 @@
             });
 
             document.querySelectorAll('.delete-user-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const uId = parseInt(btn.dataset.id);
+                btn.addEventListener('click', async () => {
+                    const uId = btn.dataset.id;
                     const uName = btn.dataset.name;
 
-                    if (currentUser && currentUser.id === uId) {
+                    if (currentUser && String(currentUser.id) === String(uId)) {
                         showToast('आप अपने स्वयं के सक्रिय प्रशासक खाते को नहीं हटा सकते हैं।', 'error');
                         return;
                     }
@@ -2516,45 +2378,40 @@
                         return;
                     }
 
-                    let users = getDB('users', SEED_USERS);
-                    users = users.filter(u => u.id !== uId);
-                    setDB('users', users);
-                    showToast('उपयोगकर्ता खाता हटाया गया।');
-                    loadAdminData();
+                    const res = await apiPost({ action: 'delete_user', id: uId });
+                    if (res && res.success) {
+                        showToast('उपयोगकर्ता खाता ऑनलाइन हटा दिया गया।');
+                        await fetchOnlineUsersRoster();
+                    } else {
+                        showToast(res.message || 'हटाने में त्रुटि', 'error');
+                    }
                 });
             });
         }
 
         const editUserForm = document.getElementById('edit-user-form');
         if (editUserForm) {
-            editUserForm.addEventListener('submit', (e) => {
+            editUserForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const uId = parseInt(document.getElementById('eu-id').value);
-                const email = document.getElementById('eu-email').value.trim().toLowerCase();
-                const users = getDB('users', SEED_USERS);
+                const uId = document.getElementById('eu-id').value;
+                const payload = {
+                    id: uId,
+                    name: document.getElementById('eu-name').value.trim(),
+                    designation: document.getElementById('eu-designation').value.trim(),
+                    department: document.getElementById('eu-department').value.trim(),
+                    email: document.getElementById('eu-email').value.trim().toLowerCase(),
+                    role: document.getElementById('eu-role').value,
+                    status: document.getElementById('eu-status').value,
+                    password: document.getElementById('eu-password').value.trim()
+                };
 
-                if (users.some(u => u.email.toLowerCase() === email && u.id !== uId)) {
-                    showToast(`यह ईमेल किसी अन्य खाते में पूर्व से पंजीकृत है: ${email}`, 'error');
-                    return;
-                }
-
-                const user = users.find(u => u.id === uId);
-                if (user) {
-                    user.name = document.getElementById('eu-name').value.trim();
-                    user.designation = document.getElementById('eu-designation').value.trim();
-                    user.department = document.getElementById('eu-department').value.trim();
-                    user.email = email;
-                    user.role = document.getElementById('eu-role').value;
-                    user.status = document.getElementById('eu-status').value;
-                    const newPwd = document.getElementById('eu-password').value.trim();
-                    if (newPwd) {
-                        user.password = newPwd;
-                        user.plain_password = newPwd;
-                    }
-                    setDB('users', users);
-                    showToast(`उपयोगकर्ता खाता (${user.name}) सफलतापूर्वक अद्यतित किया गया।`);
+                const res = await apiPost({ action: 'update_user', ...payload });
+                if (res && res.success) {
+                    showToast(`उपयोगकर्ता खाता ऑनलाइन सफलतापूर्वक अद्यतित किया गया।`);
                     document.getElementById('modal-edit-user').classList.add('hidden');
-                    loadAdminData();
+                    await fetchOnlineUsersRoster();
+                } else {
+                    showToast(res.message || 'अद्यतन करने में विफल।', 'error');
                 }
             });
         }
@@ -2767,58 +2624,29 @@
             });
         }
 
-        function applyStatusChange(reqId, newStatus, rejectionReason = '') {
+        async function applyStatusChange(reqId, newStatus, rejectionReason = '') {
             const booking = allRequisitionsCache.find(r => r.id === reqId);
             if (!booking) return;
 
             const authority = currentUser.role === 'admin' ? 'जिला प्रशासन (Super Admin - DIO)' : 'नजारत उप समाहर्ता / NDC, सुपौल';
-            booking.status = newStatus;
-            booking.approved_by = newStatus === 'Approved' ? authority : '';
-            booking.approved_by_name = newStatus === 'Approved' ? currentUser.name : '';
-            booking.approved_by_designation = newStatus === 'Approved' ? currentUser.designation : '';
-            booking.rejection_reason = rejectionReason;
-
-            setDB('reqs', allRequisitionsCache);
-
             const status_label_hi = (newStatus === 'Approved') ? 'स्वीकृत (Approved)' : ((newStatus === 'Pending') ? 'समीक्षाधीन (Pending)' : 'अस्वीकृत (Rejected)');
-            const notifs = getDB('notifs', []);
-            const statusMsg = `मांग संदर्भ ${reqId} (${booking.subject}) की स्थिति नजारत/प्रशासक द्वारा बदलकर "${status_label_hi}" कर दी गई है।`;
-            const alreadyExists = notifs.some(n => n.req_id === reqId && n.message === statusMsg);
 
-            if (!alreadyExists) {
-                notifs.unshift({
-                    id: Date.now(),
-                    req_id: reqId,
-                    recipient_email: booking.officer_email,
-                    recipient_role: 'admin,nazarat,technical',
-                    message: statusMsg,
-                    status_change: newStatus,
-                    is_read: 0,
-                    created_at: new Date().toLocaleTimeString()
-                });
-                setDB('notifs', notifs);
+            const res = await apiPost({
+                action: 'update_status',
+                id: reqId,
+                status: newStatus,
+                reason: rejectionReason,
+                approved_by: newStatus === 'Approved' ? authority : '',
+                approved_by_name: newStatus === 'Approved' ? currentUser.name : '',
+                approved_by_designation: newStatus === 'Approved' ? currentUser.designation : ''
+            });
+
+            if (res && res.success) {
+                showToast(`मांग संदर्भ ${reqId} की स्थिति "${status_label_hi}" कर दी गई है।`);
+                await syncFromOnlineDatabase();
+            } else {
+                showToast(res.message || "स्थिति अद्यतन विफल।", "error");
             }
-
-            showToast(`मांग संदर्भ ${reqId} की स्थिति "${status_label_hi}" कर दी गई है।`);
-
-            // Sync update to Google Sheet
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'update_status',
-                    id: reqId,
-                    status: newStatus,
-                    reason: rejectionReason
-                })
-            }).then(() => {
-                setTimeout(syncFromGoogleSheet, 1500);
-            }).catch(err => console.error(err));
-
-            loadAdminData();
-            loadSchedule();
-            loadNotifications();
         }
 
         const confirmRejectBtn = document.getElementById('confirm-reject-btn');
@@ -2833,34 +2661,19 @@
 
         function bindDeleteBookingEvents() {
             document.querySelectorAll('.delete-booking-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const reqId = btn.dataset.id;
                     if (!confirm(`क्या आप वाकई बुकिंग "${reqId}" को स्थायी रूप से हटाना चाहते हैं? यह स्लॉट पुनः रिक्त हो जाएगा और मास्टर पंजी से हट जाएगा।`)) {
                         return;
                     }
 
-                    allRequisitionsCache = allRequisitionsCache.filter(r => r.id !== reqId);
-                    setDB('reqs', allRequisitionsCache);
-
-                    let notifs = getDB('notifs', []);
-                    notifs = notifs.filter(n => n.req_id !== reqId);
-                    setDB('notifs', notifs);
-
-                    showToast(`बुकिंग संदर्भ ${reqId} को पूर्णतः हटा दिया गया है।`);
-
-                    // Delete in Google Sheet
-                    fetch(APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'delete', id: reqId })
-                    }).then(() => {
-                        setTimeout(syncFromGoogleSheet, 1500);
-                    }).catch(err => console.error(err));
-
-                    loadAdminData();
-                    loadSchedule();
-                    loadNotifications();
+                    const res = await apiPost({ action: 'delete', id: reqId });
+                    if (res && res.success) {
+                        showToast(`बुकिंग संदर्भ ${reqId} को पूर्णतः हटा दिया गया है।`);
+                        await syncFromOnlineDatabase();
+                    } else {
+                        showToast(res.message || "बुकिंग हटाने में विफल।", "error");
+                    }
                 });
             });
         }
@@ -3006,37 +2819,24 @@
 
         const ajaxLoginForm = document.getElementById('ajax-login-form');
         if (ajaxLoginForm) {
-            ajaxLoginForm.addEventListener('submit', (e) => {
+            ajaxLoginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const usernameOrEmail = document.getElementById('login-username').value.trim().toLowerCase();
                 const password = document.getElementById('login-password').value;
-                const users = getDB('users', SEED_USERS);
 
-                const user = users.find(u => u.email.toLowerCase() === usernameOrEmail);
-                if (!user) {
-                    loginErr.textContent = 'अमान्य ईमेल आईडी अथवा यह खाता पंजीकृत नहीं है।';
+                const res = await apiPost({ action: 'login', email: usernameOrEmail, password: password });
+                if (!res || !res.success) {
+                    loginErr.textContent = res ? res.message : 'लॉगिन विफल। सर्वर प्रतिक्रिया अनुपलब्ध।';
                     loginErr.classList.remove('hidden');
                     return;
                 }
 
-                if ((user.status || 'active') !== 'active') {
-                    loginErr.textContent = 'यह खाता निष्क्रिय (Suspended) है।';
-                    loginErr.classList.remove('hidden');
-                    return;
-                }
-
-                if (user.password !== password) {
-                    loginErr.textContent = 'अमान्य पासवर्ड।';
-                    loginErr.classList.remove('hidden');
-                    return;
-                }
-
-                currentUser = user;
-                setDB('session_user', user);
+                currentUser = res.user;
+                sessionStorage.setItem('supaul_active_session', JSON.stringify(currentUser));
                 loginModal.classList.add('hidden');
                 showToast('पोर्टल पर सफलतापूर्वक लॉगिन किया गया।');
                 updateAuthUI();
-                switchTab(user.role === 'technical' ? 'tech-dashboard' : (user.role === 'admin' || user.role === 'nazarat' ? 'dashboard' : 'schedule'));
+                switchTab(currentUser.role === 'technical' ? 'tech-dashboard' : (currentUser.role === 'admin' || currentUser.role === 'nazarat' ? 'dashboard' : 'schedule'));
             });
         }
 
@@ -3055,7 +2855,7 @@
         }
 
         if (changePwdForm) {
-            changePwdForm.addEventListener('submit', (e) => {
+            changePwdForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const currPwd = document.getElementById('cp-current-password').value;
                 const newPwd = document.getElementById('cp-new-password').value;
@@ -3067,26 +2867,20 @@
                     return;
                 }
 
-                if (currentUser.password !== currPwd) {
-                    cpErr.textContent = 'वर्तमान पासवर्ड गलत है।';
+                const res = await apiPost({
+                    action: 'change_password',
+                    email: currentUser.email,
+                    current_password: currPwd,
+                    new_password: newPwd
+                });
+
+                if (res && res.success) {
+                    showToast('पासवर्ड ऑनलाइन सफलतापूर्वक बदल दिया गया है।');
+                    changePwdModal.classList.add('hidden');
+                } else {
+                    cpErr.textContent = res ? res.message : 'पासवर्ड परिवर्तन विफल।';
                     cpErr.classList.remove('hidden');
-                    return;
                 }
-
-                currentUser.password = newPwd;
-                currentUser.plain_password = newPwd;
-                setDB('session_user', currentUser);
-
-                const users = getDB('users', SEED_USERS);
-                const u = users.find(x => x.id === currentUser.id);
-                if (u) {
-                    u.password = newPwd;
-                    u.plain_password = newPwd;
-                    setDB('users', users);
-                }
-
-                showToast('पासवर्ड बदल दिया गया है।');
-                changePwdModal.classList.add('hidden');
             });
         }
 
@@ -3094,7 +2888,8 @@
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 currentUser = null;
-                localStorage.removeItem('supaul_session_user');
+                sessionStorage.removeItem('supaul_active_session');
+                localStorage.removeItem('supaul_active_session');
                 updateAuthUI();
                 switchTab('schedule');
                 showToast('सफलतापूर्वक लॉगआउट किया गया।');
@@ -3103,7 +2898,7 @@
 
         setDate(todayStr);
         updateAuthUI();
-        syncFromGoogleSheet();
+        syncFromOnlineDatabase();
     })();
     </script>
 </body>
