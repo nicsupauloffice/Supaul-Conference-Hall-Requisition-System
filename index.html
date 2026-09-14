@@ -201,7 +201,12 @@
                                         <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-amber-600 flex-shrink-0"></i>
                                         <span class="truncate">अद्यतन सूचनाएं (Status Alerts)</span>
                                     </span>
-                                    <button type="button" id="notif-mark-read-btn" class="text-[10px] text-slate-600 hover:text-slate-900 flex-shrink-0 font-medium whitespace-nowrap">सब पढ़ा हुआ चिह्नित करें</button>
+                                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                                        <button type="button" id="notif-mark-read-btn" class="text-[10px] text-slate-600 hover:text-slate-900 font-medium whitespace-nowrap">सब पढ़ा हुआ चिह्नित करें</button>
+                                        <button type="button" id="notif-close-btn" class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition flex items-center justify-center" aria-label="सूचना पटल बंद करें" title="बंद करें / Close">
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div id="notif-list-container" class="max-h-72 overflow-y-auto divide-y divide-slate-100 text-xs">
                                     <p class="p-3 text-center text-slate-500 text-xs">कोई नई सूचना उपलब्ध नहीं है।</p>
@@ -933,7 +938,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-slate-700 font-bold mb-1">सीट क्षमता (Seating Capacity) *</label>
-                            <input type="number" id="edit-hall-capacity" required min="5" max="1000" placeholder="120" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                            <input type="number" id="edit-hall-capacity" required min5" max="1000" placeholder="120" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
                         </div>
                         <div>
                             <label class="block text-slate-700 font-bold mb-1">परिसर बैज / श्रेणी *</label>
@@ -1938,6 +1943,11 @@
         const notifDropdown = document.getElementById('notif-dropdown');
         if (notifToggleBtn && notifDropdown) {
             notifToggleBtn.addEventListener('click', () => notifDropdown.classList.toggle('hidden'));
+        }
+
+        const notifCloseBtn = document.getElementById('notif-close-btn');
+        if (notifCloseBtn && notifDropdown) {
+            notifCloseBtn.addEventListener('click', () => notifDropdown.classList.add('hidden'));
         }
 
         const notifMarkReadBtn = document.getElementById('notif-mark-read-btn');
