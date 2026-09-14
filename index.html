@@ -1641,8 +1641,10 @@
                 activeBtn.classList.remove('border-transparent', 'text-slate-200');
             }
 
-            if (['dashboard', 'requests', 'ledger', 'users', 'halls', 'tech-dashboard'].includes(tabId)) {
+            if (['dashboard', 'requests', 'ledger', 'halls', 'tech-dashboard'].includes(tabId)) {
                 loadAdminData();
+            } else if (tabId === 'users') {
+                fetchOnlineUsersRoster();
             } else if (tabId === 'my-reqs') {
                 loadMyRequisitions();
             }
@@ -1921,7 +1923,6 @@
                 });
             }
 
-            fetchOnlineUsersRoster();
             renderLedgerTable(allRequisitionsCache);
             bindStatusChangeEvents();
             bindDeleteBookingEvents();
