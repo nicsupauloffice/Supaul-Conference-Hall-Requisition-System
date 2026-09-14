@@ -1166,6 +1166,9 @@
 
     <script>
     (function() {
+        // Google Apps Script Integration URL
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJaO20ZgTuvkrwYraRAgiiGHL6GGbleHZBpIpZDVI14eXP70m6PTjxPoT9VfychGb1/exec";
+
         const TIME_SLOTS = [
             { hour: 8, label: '08:00 AM - 09:00 AM' },
             { hour: 9, label: '09:00 AM - 10:00 AM' },
@@ -1181,7 +1184,6 @@
             { hour: 19, label: '07:00 PM - 08:00 PM' }
         ];
 
-        // Seeded Demo Data exactly from PHP
         const SEED_HALLS = [
             {
                 id: 'hall-lahtan-choudhary-sabhagar',
@@ -1259,7 +1261,16 @@
         }
 
         if (!localStorage.getItem('supaul_halls')) setDB('halls', SEED_HALLS);
-        if (!localStorage.getItem('supaul_users')) setDB('users', SEED_USERS);
+        if (!localStorage.getItem('supaul_users')) {
+            setDB('users', SEED_USERS);
+        } else {
+            const existingUsers = getDB('users', SEED_USERS).map(u => ({
+                ...u,
+                status: u.status || 'active',
+                plain_password: u.plain_password || u.password
+            }));
+            setDB('users', existingUsers);
+        }
         if (!localStorage.getItem('supaul_reqs')) setDB('reqs', []);
         if (!localStorage.getItem('supaul_notifs')) setDB('notifs', []);
 
@@ -1269,7 +1280,7 @@
         let todayStr = new Date().toISOString().split('T')[0];
         let selectedDate = todayStr;
         let selectedHours = [];
-        let allRequisitionsCache = [];
+        let allRequisitionsCache = getDB('reqs', []);
         let currentViewingReqId = '';
         let originalPageTitle = document.title;
 
@@ -1300,6 +1311,34 @@
             const currentHour = now.getHours();
             return (slotHour <= currentHour);
         }
+
+        // Real-Time Google Sheets Background Polling Engine
+        async function syncFromGoogleSheet() {
+            if (!APPS_SCRIPT_URL) return;
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const json = await response.json();
+                if (json && json.success && Array.isArray(json.data)) {
+                    allRequisitionsCache = json.data.map(r => ({
+                        ...r,
+                        hours: Array.isArray(r.hours) ? r.hours : (typeof r.hours === 'string' ? JSON.parse(r.hours || '[]') : [])
+                    }));
+                    setDB('reqs', allRequisitionsCache);
+                    loadSchedule();
+                    if (currentUser) {
+                        if (currentUser.role === 'officer' || currentUser.role === 'itm') {
+                            loadMyRequisitions();
+                        } else {
+                            loadAdminData();
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Cloud Sheet sync error:", err);
+            }
+        }
+
+        setInterval(syncFromGoogleSheet, 10000);
 
         function updateAuthUI() {
             const isAuth = !!currentUser;
@@ -1333,7 +1372,7 @@
                     roleBadge.className = 'text-[10px] bg-cyan-500/20 px-2 py-0.5 rounded text-cyan-200 border border-cyan-400/40 font-bold';
                 } else {
                     roleBadge.textContent = 'विभागीय नोडल लॉगिन';
-                    roleBadge.className = 'text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-200 border border-emerald-400 font-bold';
+                    roleBadge.className = 'text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-200 border border-emerald-400/40 font-bold';
                 }
 
                 const proceedBtnText = document.getElementById('proceed-btn-text');
@@ -1490,7 +1529,7 @@
         }
 
         function loadSchedule() {
-            const allReqs = getDB('reqs', []);
+            const allReqs = allRequisitionsCache.length ? allRequisitionsCache : getDB('reqs', []);
             const dayBookings = allReqs.filter(r => 
                 r.booking_date === selectedDate && 
                 (r.hall_id === selectedHallId || !selectedHallId) &&
@@ -1764,10 +1803,11 @@
                     created_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
                 };
 
-                const allReqs = getDB('reqs', []);
-                allReqs.unshift(newBooking);
-                setDB('reqs', allReqs);
+                // Save locally first for instant feedback
+                allRequisitionsCache.unshift(newBooking);
+                setDB('reqs', allRequisitionsCache);
 
+                // Notifications
                 const notifs = getDB('notifs', []);
                 notifs.unshift({
                     id: Date.now(),
@@ -1781,9 +1821,19 @@
                 });
                 setDB('notifs', notifs);
 
+                // Post directly to Google Sheet
                 showToast(isDirect 
                     ? `सभागार सीधा आवंटित किया गया। संदर्भ: ${req_id}` 
                     : `मांग-पत्र सफलतापूर्वक दर्ज किया गया। संदर्भ: ${req_id} (नजारत शाखा अनुमोदन प्रतीक्षारत)`);
+
+                fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'create', data: newBooking })
+                }).then(() => {
+                    setTimeout(syncFromGoogleSheet, 1500);
+                }).catch(err => console.error(err));
 
                 reqForm.reset();
                 selectedHours = [];
@@ -1857,7 +1907,7 @@
 
         function loadMyRequisitions() {
             if (!currentUser) return;
-            const allReqs = getDB('reqs', []);
+            const allReqs = allRequisitionsCache.length ? allRequisitionsCache : getDB('reqs', []);
             const myReqs = allReqs.filter(r => r.officer_email === currentUser.email);
             const tbody = document.getElementById('my-reqs-table-body');
             if (!tbody) return;
@@ -1894,18 +1944,15 @@
         }
 
         function loadAdminData() {
-            const allReqs = getDB('reqs', []);
+            const allReqs = allRequisitionsCache.length ? allRequisitionsCache : getDB('reqs', []);
             const allUsers = getDB('users', SEED_USERS);
             hallsData = getDB('halls', SEED_HALLS);
-            allRequisitionsCache = allReqs;
 
             const isRoleAdmin = currentUser && currentUser.role === 'admin';
-            const isRoleNazarat = currentUser && currentUser.role === 'nazarat';
             const isRoleTech = currentUser && currentUser.role === 'technical';
 
             const pending = allReqs.filter(r => r.status === 'Pending').length;
             const approved = allReqs.filter(r => r.status === 'Approved').length;
-
             const visibleUsers = isRoleAdmin ? allUsers : allUsers.filter(u => ['officer', 'itm'].includes(u.role));
 
             if (document.getElementById('stat-pending')) document.getElementById('stat-pending').textContent = pending;
@@ -2646,8 +2693,7 @@
         }
 
         function applyStatusChange(reqId, newStatus, rejectionReason = '') {
-            const allReqs = getDB('reqs', []);
-            const booking = allReqs.find(r => r.id === reqId);
+            const booking = allRequisitionsCache.find(r => r.id === reqId);
             if (!booking) return;
 
             const authority = currentUser.role === 'admin' ? 'जिला प्रशासन (Super Admin - DIO)' : 'नजारत उप समाहर्ता / NDC, सुपौल';
@@ -2657,7 +2703,7 @@
             booking.approved_by_designation = newStatus === 'Approved' ? currentUser.designation : '';
             booking.rejection_reason = rejectionReason;
 
-            setDB('reqs', allReqs);
+            setDB('reqs', allRequisitionsCache);
 
             const status_label_hi = (newStatus === 'Approved') ? 'स्वीकृत (Approved)' : ((newStatus === 'Pending') ? 'समीक्षाधीन (Pending)' : 'अस्वीकृत (Rejected)');
             const notifs = getDB('notifs', []);
@@ -2674,6 +2720,22 @@
             setDB('notifs', notifs);
 
             showToast(`मांग संदर्भ ${reqId} की स्थिति "${status_label_hi}" कर दी गई है।`);
+
+            // Sync update to Google Sheet
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update_status',
+                    id: reqId,
+                    status: newStatus,
+                    reason: rejectionReason
+                })
+            }).then(() => {
+                setTimeout(syncFromGoogleSheet, 1500);
+            }).catch(err => console.error(err));
+
             loadAdminData();
             loadSchedule();
             loadNotifications();
@@ -2697,15 +2759,25 @@
                         return;
                     }
 
-                    let allReqs = getDB('reqs', []);
-                    allReqs = allReqs.filter(r => r.id !== reqId);
-                    setDB('reqs', allReqs);
+                    allRequisitionsCache = allRequisitionsCache.filter(r => r.id !== reqId);
+                    setDB('reqs', allRequisitionsCache);
 
                     let notifs = getDB('notifs', []);
                     notifs = notifs.filter(n => n.req_id !== reqId);
                     setDB('notifs', notifs);
 
                     showToast(`बुकिंग संदर्भ ${reqId} को पूर्णतः हटा दिया गया है।`);
+
+                    // Delete in Google Sheet
+                    fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete', id: reqId })
+                    }).then(() => {
+                        setTimeout(syncFromGoogleSheet, 1500);
+                    }).catch(err => console.error(err));
+
                     loadAdminData();
                     loadSchedule();
                     loadNotifications();
@@ -2867,7 +2939,7 @@
                     return;
                 }
 
-                if (user.status !== 'active') {
+                if ((user.status || 'active') !== 'active') {
                     loginErr.textContent = 'यह खाता निष्क्रिय (Suspended) है।';
                     loginErr.classList.remove('hidden');
                     return;
@@ -2951,6 +3023,7 @@
 
         setDate(todayStr);
         updateAuthUI();
+        syncFromGoogleSheet();
     })();
     </script>
 </body>
