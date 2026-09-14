@@ -1923,6 +1923,131 @@
             initIcons();
         }
 
+        document.querySelectorAll('.modal-close-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#modal-login, #modal-new-user, #modal-edit-user, #modal-reject, #modal-slip, #modal-hall-edit, #modal-change-pwd, #modal-quick-incharge, #modal-edit-rules').forEach(m => m.classList.add('hidden'));
+            });
+        });
+
+        const openLoginBtn = document.getElementById('open-login-btn');
+        const scheduleLoginBtn = document.getElementById('schedule-login-prompt-btn');
+        const loginModal = document.getElementById('modal-login');
+        const loginErr = document.getElementById('login-error-msg');
+        [openLoginBtn, scheduleLoginBtn].forEach(btn => {
+            if (btn) btn.addEventListener('click', () => {
+                document.getElementById('ajax-login-form').reset();
+                if (loginErr) loginErr.classList.add('hidden');
+                document.getElementById('login-password').type = 'password';
+                document.getElementById('toggle-login-pwd-icon').setAttribute('data-lucide', 'eye');
+                loginModal.classList.remove('hidden');
+                initIcons();
+            });
+        });
+
+        const toggleLoginPwdBtn = document.getElementById('toggle-login-pwd-btn');
+        const loginPwdInput = document.getElementById('login-password');
+        const toggleLoginPwdIcon = document.getElementById('toggle-login-pwd-icon');
+
+        if (toggleLoginPwdBtn && loginPwdInput && toggleLoginPwdIcon) {
+            toggleLoginPwdBtn.addEventListener('click', () => {
+                const isPwd = loginPwdInput.type === 'password';
+                loginPwdInput.type = isPwd ? 'text' : 'password';
+                toggleLoginPwdIcon.setAttribute('data-lucide', isPwd ? 'eye-off' : 'eye');
+                initIcons();
+            });
+        }
+
+        const ajaxLoginForm = document.getElementById('ajax-login-form');
+        if (ajaxLoginForm) {
+            ajaxLoginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const usernameOrEmail = document.getElementById('login-username').value.trim().toLowerCase();
+                const password = document.getElementById('login-password').value;
+
+                if (loginErr) loginErr.classList.add('hidden');
+
+                const submitBtn = ajaxLoginForm.querySelector('button[type="submit"]');
+                if (submitBtn) submitBtn.disabled = true;
+
+                const res = await apiPost({ action: 'login', email: usernameOrEmail, password: password });
+                
+                if (submitBtn) submitBtn.disabled = false;
+
+                if (!res || !res.success) {
+                    if (loginErr) {
+                        loginErr.textContent = res ? res.message : 'लॉगिन विफल। सर्वर प्रतिक्रिया अनुपलब्ध।';
+                        loginErr.classList.remove('hidden');
+                    } else {
+                        showToast(res ? res.message : 'लॉगिन विफल।', 'error');
+                    }
+                    return;
+                }
+
+                currentUser = res.user;
+                sessionStorage.setItem('supaul_active_session', JSON.stringify(currentUser));
+                loginModal.classList.add('hidden');
+                showToast('पोर्टल पर सफलतापूर्वक लॉगिन किया गया।');
+                updateAuthUI();
+                switchTab(currentUser.role === 'technical' ? 'tech-dashboard' : (currentUser.role === 'admin' || currentUser.role === 'nazarat' ? 'dashboard' : 'schedule'));
+            });
+        }
+
+        const logoutBtn = document.getElementById('portal-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                currentUser = null;
+                sessionStorage.removeItem('supaul_active_session');
+                localStorage.removeItem('supaul_active_session');
+                updateAuthUI();
+                switchTab('schedule');
+                showToast('सफलतापूर्वक लॉगआउट किया गया।');
+            });
+        }
+
+        const openChangePwdBtn = document.getElementById('open-change-pwd-btn');
+        const changePwdModal = document.getElementById('modal-change-pwd');
+        const changePwdForm = document.getElementById('change-pwd-form');
+        const cpErr = document.getElementById('cp-error-msg');
+
+        if (openChangePwdBtn) {
+            openChangePwdBtn.addEventListener('click', () => {
+                changePwdForm.reset();
+                if (cpErr) cpErr.classList.add('hidden');
+                changePwdModal.classList.remove('hidden');
+                initIcons();
+            });
+        }
+
+        if (changePwdForm) {
+            changePwdForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const currPwd = document.getElementById('cp-current-password').value;
+                const newPwd = document.getElementById('cp-new-password').value;
+                const confirmPwd = document.getElementById('cp-confirm-password').value;
+
+                if (newPwd !== confirmPwd) {
+                    cpErr.textContent = 'नया पासवर्ड और पुष्टि पासवर्ड मेल नहीं खाते।';
+                    cpErr.classList.remove('hidden');
+                    return;
+                }
+
+                const res = await apiPost({
+                    action: 'change_password',
+                    email: currentUser.email,
+                    current_password: currPwd,
+                    new_password: newPwd
+                });
+
+                if (res && res.success) {
+                    showToast('पासवर्ड ऑनलाइन सफलतापूर्वक बदल दिया गया है।');
+                    changePwdModal.classList.add('hidden');
+                } else {
+                    cpErr.textContent = res ? res.message : 'पासवर्ड परिवर्तन विफल।';
+                    cpErr.classList.remove('hidden');
+                }
+            });
+        }
+
         setDate(todayStr);
         updateAuthUI();
         syncFromOnlineDatabase();
