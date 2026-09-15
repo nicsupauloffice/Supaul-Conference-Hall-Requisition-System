@@ -445,7 +445,11 @@
                             <span class="truncate">सभागार आरक्षण मांग-पत्र (Requisition Slip)</span>
                         </h2>
                     </div>
-                    <button type="button" id="cancel-req-btn" class="text-xs font-semibold portal-text-primary hover:underline flex-shrink-0">&larr; कैलेंडर पर वापस जाएं</button>
+                    <!-- SURGICAL REPLACEMENT: Vacancy Calendar modal opener replaces previous link -->
+                    <button type="button" id="open-vacancy-modal-btn" class="min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold portal-bg-primary text-white hover:opacity-90 shadow-sm flex items-center gap-1.5 flex-shrink-0 transition">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                        <span>Vacancy Calendar</span>
+                    </button>
                 </div>
 
                 <div class="bg-blue-50/70 p-3 sm:p-3.5 rounded border border-blue-200 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
@@ -916,6 +920,78 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- NEW MODAL: DIRECT SANCTION VACANCY CALENDAR POPUP -->
+        <div id="modal-vacancy-calendar" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2.5 sm:p-4">
+            <div class="bg-white border-2 portal-border-primary rounded-xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl relative max-h-[92vh] flex flex-col overflow-hidden">
+                <!-- Popup Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-slate-200 gap-2 flex-shrink-0">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 rounded-lg portal-bg-primary text-white flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="calendar" class="w-5 h-5"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="text-sm sm:text-base font-bold portal-text-primary m-0 truncate">Vacancy Calendar / उपलब्धता कैलेंडर</h2>
+                            <p class="text-[11px] text-slate-500 m-0">सभागार उपलब्धता देखें एवं समय स्लॉट चुनें</p>
+                        </div>
+                    </div>
+                    <button type="button" id="popup-calendar-close-x" class="p-1.5 rounded-lg text-slate-400 hover:text-black hover:bg-slate-100 transition min-w-[36px] min-h-[36px] flex items-center justify-center" title="बंद करें">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Popup Scrollable Content -->
+                <div class="overflow-y-auto py-3.5 space-y-3.5 flex-1 pr-0.5">
+                    <!-- Hall & Date Row -->
+                    <div class="bg-blue-50/70 p-3 rounded-lg border border-blue-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+                        <div class="min-w-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">सभागार:</span>
+                            <span id="popup-hall-name" class="font-bold portal-text-primary text-sm block truncate">लहटन चौधरी सभागार</span>
+                            <span id="popup-hall-capacity" class="text-[11px] text-slate-600 font-medium block mt-0.5">क्षमता: 120 Seats</span>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <label for="popup-calendar-date-picker" class="font-bold text-slate-700 whitespace-nowrap">तारीख चुनें:</label>
+                            <input type="date" id="popup-calendar-date-picker" class="bg-white border border-slate-300 text-slate-800 text-xs px-2.5 py-1.5 rounded-lg focus:outline-none portal-border-primary min-h-[38px] font-medium shadow-2xs">
+                        </div>
+                    </div>
+
+                    <!-- Slots Legend & Title -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-b border-slate-100 pb-2">
+                        <span class="text-xs font-bold portal-text-primary uppercase tracking-wider">उपलब्ध समय स्लॉट</span>
+                        <div class="flex items-center gap-2 sm:gap-2.5 text-[10px] text-slate-600 font-medium flex-wrap">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-white border border-emerald-500 inline-block"></span> रिक्त</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded portal-bg-primary inline-block"></span> चयनित</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-100 border border-amber-400 inline-block"></span> समीक्षाधीन</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-100 border border-rose-400 inline-block"></span> आरक्षित</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-slate-200 border border-slate-300 inline-block"></span> समाप्त</span>
+                        </div>
+                    </div>
+
+                    <!-- Slots Grid -->
+                    <div id="popup-slots-grid-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2"></div>
+
+                    <!-- Selected Slots Preview Box -->
+                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                        <span class="font-semibold text-slate-700">Selected:</span>
+                        <span id="popup-selected-span-label" class="font-bold portal-text-primary text-xs">कोई स्लॉट चयनित नहीं</span>
+                    </div>
+
+                    <!-- Popup Error Alert -->
+                    <div id="popup-calendar-error-msg" class="hidden text-rose-700 text-xs p-2.5 rounded bg-rose-50 border border-rose-300 font-medium"></div>
+                </div>
+
+                <!-- Popup Actions Footer -->
+                <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5 flex-shrink-0">
+                    <button type="button" id="popup-calendar-cancel-btn" class="min-h-[40px] px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-black hover:bg-slate-100 transition">
+                        रद्द करें
+                    </button>
+                    <button type="button" id="popup-calendar-apply-btn" class="min-h-[40px] px-5 py-2 rounded-lg text-xs font-bold text-white portal-bg-primary hover:opacity-90 shadow flex items-center gap-1.5 transition">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>समय चयन लागू करें</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- GOVERNMENT MODAL: LOGIN -->
@@ -1469,6 +1545,10 @@
         let currentViewingReqId = '';
         let originalPageTitle = document.title;
 
+        // Temporary isolated states for Direct Sanction popup modal
+        let temporaryCalendarDate = todayStr;
+        let temporaryCalendarHours = [];
+
         function initIcons() {
             if (window.lucide) window.lucide.createIcons();
         }
@@ -1601,6 +1681,12 @@
                     renderVenuesList();
                     loadSchedule();
                     loadNotifications();
+
+                    // If popup is currently open, refresh availability live
+                    const popupModal = document.getElementById('modal-vacancy-calendar');
+                    if (popupModal && !popupModal.classList.contains('hidden')) {
+                        renderPopupSlotsGrid();
+                    }
 
                     if (currentUser) {
                         if (currentUser.role === 'officer' || currentUser.role === 'itm') {
@@ -1993,10 +2079,207 @@
             });
         }
 
-        const cancelReqBtn = document.getElementById('cancel-req-btn');
         const cancelReqBtn2 = document.getElementById('cancel-req-btn-2');
-        if (cancelReqBtn) cancelReqBtn.addEventListener('click', () => switchTab('schedule'));
         if (cancelReqBtn2) cancelReqBtn2.addEventListener('click', () => switchTab('schedule'));
+
+        // ==============================================================
+        // DIRECT SANCTION POPUP VACANCY CALENDAR MODAL LOGIC
+        // ==============================================================
+        function openVacancyPopupModal() {
+            const modal = document.getElementById('modal-vacancy-calendar');
+            const errBox = document.getElementById('popup-calendar-error-msg');
+            if (errBox) errBox.classList.add('hidden');
+
+            const currentHall = hallsData.find(h => h.id === selectedHallId) || hallsData[0];
+            const popupHallName = document.getElementById('popup-hall-name');
+            const popupHallCapacity = document.getElementById('popup-hall-capacity');
+
+            if (popupHallName && currentHall) popupHallName.textContent = currentHall.name_hi || currentHall.name;
+            if (popupHallCapacity && currentHall) popupHallCapacity.textContent = `क्षमता: ${currentHall.capacity} Seats`;
+
+            // Initialize popup with isolated temporary copies
+            temporaryCalendarDate = selectedDate || todayStr;
+            temporaryCalendarHours = [...selectedHours];
+
+            const popupPicker = document.getElementById('popup-calendar-date-picker');
+            if (popupPicker) {
+                popupPicker.min = todayStr;
+                popupPicker.value = temporaryCalendarDate;
+            }
+
+            renderPopupSlotsGrid();
+            if (modal) modal.classList.remove('hidden');
+            initIcons();
+        }
+
+        function closeVacancyPopupModal() {
+            const modal = document.getElementById('modal-vacancy-calendar');
+            if (modal) modal.classList.add('hidden');
+            // Form contents remain completely untouched and active section is NOT changed
+        }
+
+        function renderPopupSlotsGrid() {
+            const container = document.getElementById('popup-slots-grid-container');
+            const labelSpan = document.getElementById('popup-selected-span-label');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const dayBookings = allRequisitionsCache.filter(r => 
+                r.booking_date === temporaryCalendarDate && 
+                (r.hall_id === selectedHallId || !selectedHallId) &&
+                (r.status === 'Approved' || r.status === 'Pending')
+            );
+
+            const bookedMap = {};
+            dayBookings.forEach(b => {
+                const hrs = Array.isArray(b.hours) ? b.hours : [];
+                hrs.forEach(h => {
+                    if (b.status === 'Approved') bookedMap[h] = { type: 'approved', booking: b };
+                    else if (b.status === 'Pending' && !bookedMap[h]) bookedMap[h] = { type: 'pending', booking: b };
+                });
+            });
+
+            TIME_SLOTS.forEach(slot => {
+                const bookingInfo = bookedMap[slot.hour];
+                const isApproved = bookingInfo && bookingInfo.type === 'approved';
+                const isPending = bookingInfo && bookingInfo.type === 'pending';
+                const isSelected = temporaryCalendarHours.includes(slot.hour);
+                const isExpired = isSlotExpired(slot.hour, temporaryCalendarDate);
+
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.disabled = isApproved || isExpired;
+
+                card.className = `p-2.5 rounded-lg border text-left transition-all flex flex-col justify-between min-h-[82px] ${
+                    isApproved ? 'bg-rose-50 border-rose-300 cursor-not-allowed text-slate-700' :
+                    isExpired ? 'bg-slate-100 border-slate-200 cursor-not-allowed text-slate-400 opacity-60' :
+                    isSelected ? 'bg-blue-100 portal-border-primary ring-2 ring-slate-400' :
+                    isPending ? 'bg-amber-50 border-amber-300 hover:border-amber-400' :
+                    'bg-white hover:bg-slate-50 border-slate-200'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between w-full gap-1">
+                        <span class="text-xs font-mono font-bold ${isSelected ? 'portal-text-primary' : isApproved ? 'text-rose-800' : 'text-slate-800'}">
+                            ${slot.label}
+                        </span>
+                        ${isApproved ? '<span class="text-[9px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 font-bold flex-shrink-0">आरक्षित</span>' :
+                          isExpired ? '<span class="text-[9px] px-2 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold flex-shrink-0">समाप्त</span>' :
+                          isPending ? '<span class="text-[9px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 font-bold flex-shrink-0">समीक्षाधीन</span>' :
+                          isSelected ? '<span class="text-[9px] px-2 py-0.5 rounded portal-bg-primary text-white font-bold flex-shrink-0">चयनित</span>' :
+                          '<span class="text-[9px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold flex-shrink-0">रिक्त</span>'}
+                    </div>
+                    <div class="mt-1 text-[11px] w-full">
+                        ${isApproved ? `<span class="font-bold text-rose-950 block truncate">${bookingInfo.booking.subject}</span>` :
+                          isExpired ? `<span class="text-[10px] text-slate-400">समय समाप्त</span>` :
+                          isPending ? `<span class="text-amber-950 font-semibold block truncate">${bookingInfo.booking.subject}</span>` :
+                          isSelected ? '<span class="portal-text-primary font-bold">स्लॉट चुना गया</span>' :
+                          '<span class="text-slate-500">क्लिक करें</span>'}
+                    </div>
+                `;
+
+                if (!isApproved && !isExpired) {
+                    card.addEventListener('click', () => {
+                        const errBox = document.getElementById('popup-calendar-error-msg');
+                        if (errBox) errBox.classList.add('hidden');
+
+                        if (temporaryCalendarHours.includes(slot.hour)) {
+                            temporaryCalendarHours = temporaryCalendarHours.filter(h => h !== slot.hour);
+                        } else {
+                            temporaryCalendarHours.push(slot.hour);
+                            temporaryCalendarHours.sort((a, b) => a - b);
+                        }
+                        renderPopupSlotsGrid();
+                    });
+                }
+
+                container.appendChild(card);
+            });
+
+            if (labelSpan) {
+                if (temporaryCalendarHours.length > 0) {
+                    labelSpan.textContent = `${formatDisplayDate(temporaryCalendarDate)} | ${formatBookingTimeSpan(temporaryCalendarHours)}`;
+                } else {
+                    labelSpan.textContent = 'कोई स्लॉट चयनित नहीं';
+                }
+            }
+            initIcons();
+        }
+
+        const openVacancyModalBtn = document.getElementById('open-vacancy-modal-btn');
+        if (openVacancyModalBtn) {
+            openVacancyModalBtn.addEventListener('click', openVacancyPopupModal);
+        }
+
+        const popupCloseX = document.getElementById('popup-calendar-close-x');
+        if (popupCloseX) popupCloseX.addEventListener('click', closeVacancyPopupModal);
+
+        const popupCancelBtn = document.getElementById('popup-calendar-cancel-btn');
+        if (popupCancelBtn) popupCancelBtn.addEventListener('click', closeVacancyPopupModal);
+
+        const popupDatePicker = document.getElementById('popup-calendar-date-picker');
+        if (popupDatePicker) {
+            popupDatePicker.addEventListener('change', (e) => {
+                const newDate = e.target.value;
+                if (newDate < todayStr) {
+                    showToast('पूर्व की तिथि (Back Date) का चयन मान्य नहीं है।', 'error');
+                    e.target.value = temporaryCalendarDate;
+                    return;
+                }
+                temporaryCalendarDate = newDate;
+                temporaryCalendarHours = [];
+                renderPopupSlotsGrid();
+            });
+        }
+
+        const popupApplyBtn = document.getElementById('popup-calendar-apply-btn');
+        if (popupApplyBtn) {
+            popupApplyBtn.addEventListener('click', () => {
+                const errBox = document.getElementById('popup-calendar-error-msg');
+                if (temporaryCalendarHours.length === 0) {
+                    if (errBox) {
+                        errBox.textContent = 'कृपया कम से कम एक उपलब्ध स्लॉट चुनें।';
+                        errBox.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                // Check expired validation
+                const currentHour = new Date().getHours();
+                if (temporaryCalendarDate === todayStr) {
+                    for (const h of temporaryCalendarHours) {
+                        if (h <= currentHour) {
+                            if (errBox) {
+                                errBox.textContent = 'बीते हुए समय का स्लॉट आरक्षित नहीं किया जा सकता।';
+                                errBox.classList.remove('hidden');
+                            }
+                            return;
+                        }
+                    }
+                }
+
+                // Commit temporary selection to state
+                selectedDate = temporaryCalendarDate;
+                selectedHours = [...temporaryCalendarHours];
+
+                // Synchronize summary on Direct Sanction form
+                const summaryDateEl = document.getElementById('summary-date');
+                const summaryHoursEl = document.getElementById('summary-hours');
+                if (summaryDateEl) summaryDateEl.textContent = formatDisplayDate(selectedDate);
+                if (summaryHoursEl) summaryHoursEl.textContent = formatBookingTimeSpan(selectedHours);
+
+                // Keep main schedule calendar synchronized in background
+                if (datePicker) datePicker.value = selectedDate;
+                if (displayDateLabel) {
+                    displayDateLabel.innerHTML = `<i data-lucide="calendar" class="w-4 h-4 portal-text-primary flex-shrink-0"></i> <span>${formatDisplayDate(selectedDate)}</span>`;
+                }
+                updateSelectionBar();
+                loadSchedule();
+
+                closeVacancyPopupModal();
+                showToast(`दिनांक ${formatDisplayDate(selectedDate)} एवं समय ${formatBookingTimeSpan(selectedHours)} सफलतापूर्वक लागू किया गया।`);
+            });
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.portal-section').forEach(sec => sec.classList.add('hidden'));
@@ -2416,7 +2699,6 @@
                 tr.className = 'hover:bg-slate-50 transition';
                 const feats = Array.isArray(hall.features) ? hall.features.slice(0, 3).join(', ') : '';
 
-                // Visible strictly and unconditionally for Super Admin
                 const deleteBtnHtml = isSuperAdmin ? `
                     <button type="button" class="delete-hall-btn min-h-[32px] px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded text-[11px] font-bold inline-flex items-center justify-center transition" data-hall-id="${hall.id}" title="सभागार हटाएं">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -2512,7 +2794,6 @@
                         return;
                     }
 
-                    // Explicit validation check on button click
                     if (hallsData.length <= 1) {
                         showToast('सिस्टम में कम से कम एक सक्रिय सभागार का होना अनिवार्य है। इस सभागार को हटाया/निष्क्रिय नहीं किया जा सकता।', 'error');
                         return;
