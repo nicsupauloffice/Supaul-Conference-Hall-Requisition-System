@@ -2416,10 +2416,10 @@
                 tr.className = 'hover:bg-slate-50 transition';
                 const feats = Array.isArray(hall.features) ? hall.features.slice(0, 3).join(', ') : '';
 
-                // Strictly render Delete button ONLY if current user is Super Admin (role === 'admin')
-                const deleteBtnHtml = (isSuperAdmin && hallsData.length > 1) ? `
+                // Visible strictly and unconditionally for Super Admin
+                const deleteBtnHtml = isSuperAdmin ? `
                     <button type="button" class="delete-hall-btn min-h-[32px] px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded text-[11px] font-bold inline-flex items-center justify-center transition" data-hall-id="${hall.id}" title="सभागार हटाएं">
-                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     </button>
                 ` : '';
 
@@ -2507,18 +2507,18 @@
                     const hall = hallsData.find(h => h.id === hId);
                     if (!hall) return;
 
-                    // Strict front-end check before asking confirmation
                     if (!currentUser || currentUser.role !== 'admin') {
                         showToast('अनधिकृत अनुरोध: केवल जिला मुख्य प्रशासक (Super Admin / DIO) ही सभागार हटा सकते हैं।', 'error');
                         return;
                     }
 
+                    // Explicit validation check on button click
                     if (hallsData.length <= 1) {
-                        showToast('कम से कम एक सभागार का होना अनिवार्य है। इसे हटाया नहीं जा सकता।', 'error');
+                        showToast('सिस्टम में कम से कम एक सक्रिय सभागार का होना अनिवार्य है। इस सभागार को हटाया/निष्क्रिय नहीं किया जा सकता।', 'error');
                         return;
                     }
 
-                    const confirmMsg = `क्या आप वाकई इस सभागार "${hall.name_hi || hall.name}" को हटाना चाहते हैं?\n\nसूचना: हटाने के उपरांत यह सभागार नए आरक्षण हेतु उपलब्ध नहीं रहेगा। पूर्व से दर्ज सभी ऐतिहासिक व स्वीकृत मांग-पत्र सुरक्षित रहेंगे।`;
+                    const confirmMsg = `क्या आप वाकई सभागार "${hall.name_hi || hall.name}" को हटाना/अभिलेखित करना चाहते हैं?\n\nसूचना: हटाने के उपरांत यह सभागार नए आरक्षण हेतु उपलब्ध नहीं रहेगा। पूर्व से दर्ज सभी ऐतिहासिक व स्वीकृत मांग-पत्र सुरक्षित रहेंगे।`;
                     if (!confirm(confirmMsg)) return;
 
                     const res = await apiPost({
@@ -2529,7 +2529,7 @@
                     });
 
                     if (res && res.success) {
-                        showToast(res.message || 'सभागार सफलतापूर्वक हटाया गया।');
+                        showToast(res.message || 'सभागार सुरक्षित रूप से अभिलेखित किया गया।');
                         await syncFromOnlineDatabase();
                     } else {
                         showToast(res.message || 'सभागार हटाने में त्रुटि', 'error');
