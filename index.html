@@ -1228,19 +1228,79 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJaO20ZgTuvkrwYraRAgiiGHL6GGbleHZBpIpZDVI14eXP70m6PTjxPoT9VfychGb1/exec";
 
         const TIME_SLOTS = [
-            { hour: 8, label: '08:00 AM - 09:00 AM' },
-            { hour: 9, label: '09:00 AM - 10:00 AM' },
-            { hour: 10, label: '10:00 AM - 11:00 AM' },
-            { hour: 11, label: '11:00 AM - 12:00 PM' },
-            { hour: 12, label: '12:00 PM - 01:00 PM' },
-            { hour: 13, label: '01:00 PM - 02:00 PM' },
-            { hour: 14, label: '02:00 PM - 03:00 PM' },
-            { hour: 15, label: '03:00 PM - 04:00 PM' },
-            { hour: 16, label: '04:00 PM - 05:00 PM' },
-            { hour: 17, label: '05:00 PM - 06:00 PM' },
-            { hour: 18, label: '06:00 PM - 07:00 PM' },
-            { hour: 19, label: '07:00 PM - 08:00 PM' }
+            { hour: 8, label: '08:00 AM – 09:00 AM' },
+            { hour: 9, label: '09:00 AM – 10:00 AM' },
+            { hour: 10, label: '10:00 AM – 11:00 AM' },
+            { hour: 11, label: '11:00 AM – 12:00 PM' },
+            { hour: 12, label: '12:00 PM – 01:00 PM' },
+            { hour: 13, label: '01:00 PM – 02:00 PM' },
+            { hour: 14, label: '02:00 PM – 03:00 PM' },
+            { hour: 15, label: '03:00 PM – 04:00 PM' },
+            { hour: 16, label: '04:00 PM – 05:00 PM' },
+            { hour: 17, label: '05:00 PM – 06:00 PM' },
+            { hour: 18, label: '06:00 PM – 07:00 PM' },
+            { hour: 19, label: '07:00 PM – 08:00 PM' }
         ];
+
+        // Centralized Date & Time Formatters (Frontend Display Only)
+        function formatDisplayDate(dateStr) {
+            if (!dateStr) return '';
+            const match = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (match) {
+                return `${match[3]}-${match[2]}-${match[1]}`;
+            }
+            try {
+                const d = new Date(dateStr);
+                if (!isNaN(d.getTime())) {
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const year = d.getFullYear();
+                    return `${day}-${month}-${year}`;
+                }
+            } catch (e) {}
+            return String(dateStr);
+        }
+
+        function formatDisplayTime(hour) {
+            const h = Number(hour);
+            if (isNaN(h)) return '';
+            const period = h >= 12 ? 'PM' : 'AM';
+            let hour12 = h % 12;
+            if (hour12 === 0) hour12 = 12;
+            return `${String(hour12).padStart(2, '0')}:00 ${period}`;
+        }
+
+        function formatBookingTimeSpan(hours) {
+            if (!hours) return '';
+            let parsed = [];
+            if (Array.isArray(hours)) {
+                parsed = hours.map(Number).filter(n => !isNaN(n));
+            } else if (typeof hours === 'string') {
+                try {
+                    const json = JSON.parse(hours);
+                    if (Array.isArray(json)) parsed = json.map(Number).filter(n => !isNaN(n));
+                } catch (e) {
+                    const matches = hours.match(/\d+/g);
+                    if (matches) parsed = matches.map(Number).filter(n => !isNaN(n));
+                }
+            } else if (typeof hours === 'number') {
+                parsed = [hours];
+            }
+            if (!parsed.length) return '';
+            parsed.sort((a, b) => a - b);
+            const startHour = parsed[0];
+            const endHour = parsed[parsed.length - 1] + 1;
+            return `${formatDisplayTime(startHour)} – ${formatDisplayTime(endHour)}`;
+        }
+
+        function formatBookingPeriod(bookingDate, hours) {
+            const dateText = formatDisplayDate(bookingDate);
+            const timeText = formatBookingTimeSpan(hours);
+            if (dateText && timeText) {
+                return `${dateText} | ${timeText}`;
+            }
+            return dateText || timeText || '';
+        }
 
         // Centralized Online Application Cache (InMemory)
         let currentUser = null;
@@ -1631,7 +1691,7 @@
 
             if (selectedHours.length > 0) {
                 countLabel.textContent = `${selectedHours.length} घंटे का स्लॉट चयनित`;
-                badgesContainer.innerHTML = `<span class="text-xs font-mono font-bold portal-text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${selectedHours.map(h => `${h}:00`).join(', ')}</span>`;
+                badgesContainer.innerHTML = `<span class="text-xs font-mono font-bold portal-text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${formatBookingTimeSpan(selectedHours)}</span>`;
                 clearBtn.classList.remove('hidden');
                 if (proceedBtn) {
                     proceedBtn.disabled = false;
@@ -1658,9 +1718,8 @@
             }
             selectedDate = newDateStr;
             if (datePicker) datePicker.value = newDateStr;
-            const d = new Date(newDateStr + 'T00:00:00');
             if (displayDateLabel) {
-                displayDateLabel.innerHTML = `<i data-lucide="calendar" class="w-4 h-4 portal-text-primary flex-shrink-0"></i> <span>${d.toLocaleDateString('hi-IN', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>`;
+                displayDateLabel.innerHTML = `<i data-lucide="calendar" class="w-4 h-4 portal-text-primary flex-shrink-0"></i> <span>${formatDisplayDate(newDateStr)}</span>`;
             }
             selectedHours = [];
             updateSelectionBar();
@@ -1708,8 +1767,8 @@
                     showToast('कृपया कम से कम एक खुला स्लॉट चुनें।', 'error');
                     return;
                 }
-                document.getElementById('summary-date').textContent = selectedDate;
-                document.getElementById('summary-hours').textContent = selectedHours.map(h => `${h}:00`).join(', ');
+                document.getElementById('summary-date').textContent = formatDisplayDate(selectedDate);
+                document.getElementById('summary-hours').textContent = formatBookingTimeSpan(selectedHours);
                 switchTab('new-req');
             });
         }
@@ -1870,6 +1929,11 @@
             }
         }
 
+        function formatNotificationMessage(msg) {
+            if (!msg) return '';
+            return msg.replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (match, y, m, d) => `${d}-${m}-${y}`);
+        }
+
         function loadNotifications() {
             if (!currentUser) return;
             const seenKeys = new Set();
@@ -1905,8 +1969,9 @@
                     userNotifs.forEach(n => {
                         const item = document.createElement('div');
                         item.className = `p-2.5 px-3 transition cursor-pointer hover:bg-slate-100 ${n.is_read === 0 ? 'bg-amber-50/70 font-semibold' : 'bg-white'}`;
+                        const displayMsg = formatNotificationMessage(n.message);
                         item.innerHTML = `
-                            <p class="text-slate-800 m-0 leading-tight break-words">${n.message}</p>
+                            <p class="text-slate-800 m-0 leading-tight break-words">${displayMsg}</p>
                             <span class="text-[10px] text-slate-400 mt-1 block">${n.created_at}</span>
                         `;
                         item.addEventListener('click', () => {
@@ -1958,12 +2023,14 @@
             }
 
             myReqs.forEach(r => {
-                const hrs = r.hours.map(h => `${h}:00`).join(', ');
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
                 tr.innerHTML = `
                     <td class="p-3 pl-4 font-mono font-bold portal-text-primary whitespace-nowrap">${r.id}</td>
-                    <td class="p-3 whitespace-nowrap">${r.booking_date} (${hrs})</td>
+                    <td class="p-3 whitespace-nowrap">
+                        <span class="font-semibold block">${r.hall_name || 'लहटन चौधरी सभागार'}</span>
+                        <span class="text-[11px] text-slate-600 block">${formatBookingPeriod(r.booking_date, r.hours)}</span>
+                    </td>
                     <td class="p-3 break-words max-w-xs">${r.subject}</td>
                     <td class="p-3 break-words">${r.chairing_officer}</td>
                     <td class="p-3 text-center whitespace-nowrap">
@@ -2001,7 +2068,6 @@
             if (reqTbody) {
                 reqTbody.innerHTML = '';
                 allRequisitionsCache.forEach(r => {
-                    const hrs = r.hours.map(h => `${h}:00`).join(', ');
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition';
                     tr.innerHTML = `
@@ -2011,7 +2077,7 @@
                         </td>
                         <td class="p-3 whitespace-nowrap">
                             <span class="font-semibold block">${r.hall_name || 'लहटन चौधरी सभागार'}</span>
-                            <span class="text-[11px] text-slate-600 block">${r.booking_date} (${hrs})</span>
+                            <span class="text-[11px] text-slate-600 block">${formatBookingPeriod(r.booking_date, r.hours)}</span>
                         </td>
                         <td class="p-3">
                             <span class="font-semibold block truncate max-w-xs">${r.subject}</span>
@@ -2475,7 +2541,6 @@
                     if (r.ppt_required == 1) pptCount++;
                 }
 
-                const hrs = r.hours.map(h => `${h}:00`).join(', ');
                 const hasTechReq = (r.vc_required == 1 || r.ppt_required == 1);
                 const statusBadge = (r.status === 'Approved') ? '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">स्वीकृत</span>' :
                                   (r.status === 'Pending') ? '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-amber-50 text-amber-800 border border-amber-300">समीक्षाधीन</span>' :
@@ -2490,7 +2555,7 @@
                     </td>
                     <td class="p-3 whitespace-nowrap">
                         <span class="font-bold text-slate-800 block">${r.hall_name || 'सभागार'}</span>
-                        <span class="text-[11px] portal-text-primary font-mono block">${r.booking_date} (${hrs})</span>
+                        <span class="text-[11px] portal-text-primary font-mono block">${formatBookingPeriod(r.booking_date, r.hours)}</span>
                     </td>
                     <td class="p-3">
                         <span class="font-bold text-slate-900 block truncate max-w-xs">${r.subject}</span>
@@ -2536,12 +2601,14 @@
             const isRoleAdmin = currentUser && currentUser.role === 'admin';
 
             items.forEach(r => {
-                const hrs = r.hours.map(h => `${h}:00`).join(', ');
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
                 tr.innerHTML = `
                     <td class="p-3 pl-4 font-mono font-bold portal-text-primary whitespace-nowrap">${r.id}</td>
-                    <td class="p-3 whitespace-nowrap">${r.booking_date} (${hrs})</td>
+                    <td class="p-3 whitespace-nowrap">
+                        <span class="font-semibold block">${r.hall_name || 'लहटन चौधरी सभागार'}</span>
+                        <span class="text-[11px] text-slate-600 block">${formatBookingPeriod(r.booking_date, r.hours)}</span>
+                    </td>
                     <td class="p-3 break-words">${r.chairing_officer}</td>
                     <td class="p-3 break-words max-w-xs">${r.subject} (${r.department})</td>
                     <td class="p-3 text-center whitespace-nowrap">
@@ -2615,13 +2682,14 @@
                 ];
 
                 const rows = allRequisitionsCache.map(r => {
-                    const hrs = r.hours.map(h => `${h}:00`).join('; ');
+                    const timeSpan = formatBookingTimeSpan(r.hours);
+                    const formattedDate = formatDisplayDate(r.booking_date);
                     return [
                         `"${(r.id || '').replace(/"/g, '""')}"`,
                         `"${(r.memo_no || '').replace(/"/g, '""')}"`,
                         `"${(r.hall_name || 'सभागार').replace(/"/g, '""')}"`,
-                        `"${(r.booking_date || '').replace(/"/g, '""')}"`,
-                        `"${hrs.replace(/"/g, '""')}"`,
+                        `"${(formattedDate || '').replace(/"/g, '""')}"`,
+                        `"${timeSpan.replace(/"/g, '""')}"`,
                         `"${(r.chairing_officer || '').replace(/"/g, '""')}"`,
                         `"${(r.requisitioning_officer || '').replace(/"/g, '""')}"`,
                         `"${(r.department || '').replace(/"/g, '""')}"`,
@@ -2724,13 +2792,12 @@
         function openSlipModal(r) {
             const modal = document.getElementById('modal-slip');
             if (!modal) return;
-            const hrs = r.hours.map(h => `${h}:00`).join(', ');
 
             currentViewingReqId = r.id || 'Supaul_Hall_Booking';
 
             document.getElementById('slip-meta-ref').textContent = `मांग संदर्भ: ${r.id} | पत्रांक: ${r.memo_no || 'N/A'}`;
             document.getElementById('slip-venue').textContent = r.hall_name || 'लहटन चौधरी सभागार';
-            document.getElementById('slip-time').textContent = `${r.booking_date} (${hrs})`;
+            document.getElementById('slip-time').textContent = formatBookingPeriod(r.booking_date, r.hours);
             document.getElementById('slip-chair').textContent = r.chairing_officer || '';
             document.getElementById('slip-department').textContent = r.department || '';
             document.getElementById('slip-subject').textContent = r.subject || '';
