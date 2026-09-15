@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supaul Conference Hall Requisition System</title>
+    <title id="html-page-title">Supaul Conference Hall Requisition System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -49,7 +49,6 @@
             }
         }
 
-        /* Smooth horizontal navigation scrollbar */
         #portal-nav-bar {
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
@@ -151,33 +150,35 @@
         <div class="portal-bg-primary text-white border-b-4 portal-border-accent">
             <div class="bg-black/25 px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-between gap-y-1 text-[11px] text-slate-300 border-b border-white/10">
                 <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
-                    <span>बिहार सरकार | Government of Bihar</span>
+                    <span id="hdr-gov-text">बिहार सरकार | Government of Bihar</span>
                     <span class="text-slate-500 hidden xs:inline">|</span>
-                    <span class="font-medium portal-text-accent">जिला प्रशासन सुपौल</span>
+                    <span id="hdr-district-text" class="font-medium portal-text-accent">जिला प्रशासन सुपौल</span>
                 </div>
                 <div class="flex items-center gap-3 font-mono">
-                    <span>supaul.nic.in</span>
+                    <span id="hdr-website-text">supaul.nic.in</span>
                 </div>
             </div>
 
             <div class="px-3 sm:px-6 py-3 sm:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
                 <div class="flex items-center gap-3 w-full md:w-auto">
-                    <div class="w-11 h-11 sm:w-12 sm:h-12 bg-white rounded-lg p-1.5 shadow flex items-center justify-center flex-shrink-0 border border-amber-400">
-                        <div class="text-center leading-none portal-text-primary">
+                    <!-- Configurable Logo Container with Automatic Fallback -->
+                    <div id="header-logo-container" class="w-11 h-11 sm:w-12 sm:h-12 bg-white rounded-lg p-1.5 shadow flex items-center justify-center flex-shrink-0 border border-amber-400 overflow-hidden">
+                        <div id="header-default-logo" class="text-center leading-none portal-text-primary">
                             <span class="text-[15px] sm:text-[16px] block font-bold">🏛️</span>
                             <span class="text-[7.5px] sm:text-[8px] font-bold tracking-tighter uppercase block">BIHAR</span>
                         </div>
+                        <img id="header-custom-logo" class="hidden w-full h-full object-contain" alt="Government Logo">
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                            <h1 class="text-base sm:text-xl font-bold tracking-tight text-white m-0 leading-tight">
+                            <h1 id="hdr-app-title" class="text-base sm:text-xl font-bold tracking-tight text-white m-0 leading-tight">
                                 सुपौल | SUPAUL
                             </h1>
                             <span id="header-role-badge" class="text-[9px] sm:text-[10px] bg-white/10 px-2 py-0.5 rounded text-amber-200 border border-white/20 font-medium">
                                 सार्वजनिक पटल (Public View)
                             </span>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-slate-200 m-0 mt-0.5 break-words">
+                        <p id="hdr-app-subtitle" class="text-[11px] sm:text-xs text-slate-200 m-0 mt-0.5 break-words">
                             समाहरणालय सभागार आरक्षण प्रणाली | Conference Hall Management System
                         </p>
                     </div>
@@ -278,6 +279,12 @@
                     <i data-lucide="clipboard-list" class="w-3.5 h-3.5 flex-shrink-0"></i>
                     <span>मास्टर पंजी / Master Ledger</span>
                 </button>
+
+                <!-- NEW: Super Admin Portal Content Settings Tab -->
+                <button type="button" id="tab-btn-site-config" class="nav-tab-btn hidden min-h-[40px] px-3 sm:px-4 py-2.5 border-b-2 border-transparent text-amber-200 hover:text-white flex items-center gap-1.5 flex-shrink-0 font-bold">
+                    <i data-lucide="sliders" class="w-3.5 h-3.5 text-amber-400 flex-shrink-0"></i>
+                    <span>पोर्टल सामग्री एवं सेटिंग्स</span>
+                </button>
             </div>
         </div>
 
@@ -288,7 +295,7 @@
             <div id="section-schedule" class="portal-section space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
                     
-                    <!-- Left Column: Venue List -->
+                    <!-- Left Column: Venue List & Reservation Rules -->
                     <div class="lg:col-span-4 space-y-4">
                         <div class="bg-white rounded-lg p-3.5 sm:p-4 border border-slate-200 shadow-sm">
                             <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3 gap-2">
@@ -303,15 +310,19 @@
                             <div class="space-y-2.5" id="venue-list-container"></div>
                         </div>
 
-                        <div class="bg-amber-50/80 border border-amber-200 rounded-lg p-3.5 text-xs text-slate-700 space-y-1.5">
-                            <div class="flex items-center gap-2 font-bold text-amber-900">
-                                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
-                                <span>आरक्षण नियम एवं दिशा-निर्देश</span>
+                        <!-- DYNAMIC RESERVATION RULES CONTAINER -->
+                        <div class="bg-amber-50/80 border border-amber-200 rounded-lg p-3.5 text-xs text-slate-700 space-y-2">
+                            <div class="flex items-center justify-between font-bold text-amber-900">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
+                                    <span>आरक्षण नियम एवं दिशा-निर्देश</span>
+                                </div>
+                                <button type="button" id="quick-edit-rules-btn" class="hidden text-[10px] text-amber-900 bg-amber-200/80 hover:bg-amber-300 px-2 py-0.5 rounded transition">
+                                    नियम बदलें
+                                </button>
                             </div>
-                            <ul class="text-[11px] text-slate-700 leading-relaxed space-y-1 list-disc list-inside m-0 pl-1">
-                                <li><strong>समय सीमा:</strong> किसी भी स्लॉट का आरक्षण बैठक शुरू होने से कम से कम 1 घंटे पूर्व किया जाना अनिवार्य है।</li>
-                                <li><strong>पिछला समय निषेध:</strong> आज के बीते हुए समय अथवा पूर्व तिथि (Back Date/Time) का स्लॉट आरक्षित नहीं किया जा सकता।</li>
-                                <li><strong>प्राथमिकता:</strong> विधि-व्यवस्था, निर्वाचन व डीएम समीक्षा बैठकों को सर्वोच्च प्राथमिकता।</li>
+                            <ul id="reservation-rules-list" class="text-[11px] text-slate-700 leading-relaxed space-y-1 list-disc list-inside m-0 pl-1">
+                                <!-- Populated dynamically from online configuration -->
                             </ul>
                         </div>
                     </div>
@@ -786,6 +797,141 @@
                 </div>
             </div>
 
+            <!-- SECTION 9: SUPER ADMIN PORTAL CONTENT SETTINGS (Admin Exclusive) -->
+            <div id="section-site-config" class="portal-section hidden space-y-6 max-w-4xl mx-auto">
+                <div class="bg-white rounded-lg p-4 sm:p-6 border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded bg-amber-500 text-white flex items-center justify-center">
+                                <i data-lucide="sliders" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-sm sm:text-base font-bold portal-text-primary m-0">पोर्टल सामग्री एवं मास्टर सेटिंग्स (Super Admin / DIO)</h2>
+                                <p class="text-xs text-slate-500 m-0">शीर्षक, लोगो, पादलेख एवं आरक्षण नियमों का ऑनलाइन नियंत्रण</p>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-300 rounded font-mono font-bold text-xs">
+                            Online Source of Truth
+                        </span>
+                    </div>
+
+                    <form id="portal-config-form" class="space-y-6 text-xs">
+                        
+                        <!-- 1. Header Content -->
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+                            <h3 class="text-xs font-bold portal-text-primary uppercase tracking-wider flex items-center gap-1.5 m-0">
+                                <i data-lucide="layout" class="w-4 h-4 portal-text-primary"></i>
+                                <span>शीर्षक सामग्री (Header Content)</span>
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-slate-700 font-bold mb-1">सरकार / शीर्ष पंक्ति *</label>
+                                    <input type="text" id="cfg-gov-text" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-bold mb-1">जिला प्रशासन पंक्ति *</label>
+                                    <input type="text" id="cfg-district-text" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-slate-700 font-bold mb-1">मुख्य पोर्टल शीर्षक (Main Title) *</label>
+                                    <input type="text" id="cfg-app-title" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 font-bold min-h-[38px]">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-bold mb-1">वेबसाइट / डोमेन विवरण *</label>
+                                    <input type="text" id="cfg-website-text" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 font-mono min-h-[38px]">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-bold mb-1">उपशीर्षक / विवरण (Subtitle / Description) *</label>
+                                <input type="text" id="cfg-app-subtitle" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                            </div>
+                        </div>
+
+                        <!-- 2. Logo Configuration -->
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+                            <h3 class="text-xs font-bold portal-text-primary uppercase tracking-wider flex items-center gap-1.5 m-0">
+                                <i data-lucide="image" class="w-4 h-4 portal-text-primary"></i>
+                                <span>शीर्षक लोगो (Header Logo URL)</span>
+                            </h3>
+                            <div>
+                                <label class="block text-slate-700 font-bold mb-1">
+                                    लोगो इमेज URL (HTTPS Image Link)
+                                    <span class="text-[10px] text-slate-500 font-normal block">रिक्त रखने पर डिफ़ॉल्ट बिहार सरकार लोगो प्रदर्शित होगा</span>
+                                </label>
+                                <div class="flex gap-2">
+                                    <input type="url" id="cfg-logo-url" placeholder="https://example.com/logo.png" class="flex-1 bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 font-mono text-xs min-h-[38px]">
+                                    <button type="button" id="cfg-restore-logo-btn" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold rounded text-xs whitespace-nowrap min-h-[38px]">
+                                        डिफ़ॉल्ट लोगो
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Logo Preview Box -->
+                            <div class="p-3 bg-white border border-slate-300 rounded flex items-center gap-4">
+                                <span class="text-xs text-slate-600 font-semibold">लाइव पूर्वावलोकन (Preview):</span>
+                                <div class="w-12 h-12 border border-amber-400 rounded bg-slate-50 flex items-center justify-center overflow-hidden p-1">
+                                    <div id="cfg-preview-default-logo" class="text-center leading-none portal-text-primary">
+                                        <span class="text-[14px] block font-bold">🏛️</span>
+                                        <span class="text-[7px] font-bold uppercase block">BIHAR</span>
+                                    </div>
+                                    <img id="cfg-preview-custom-logo" class="hidden w-full h-full object-contain" alt="Preview">
+                                </div>
+                                <span id="cfg-logo-status" class="text-[11px] text-slate-500">डिफ़ॉल्ट लोगो सक्रिय</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. Footer Configuration -->
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+                            <h3 class="text-xs font-bold portal-text-primary uppercase tracking-wider flex items-center gap-1.5 m-0">
+                                <i data-lucide="align-center" class="w-4 h-4 portal-text-primary"></i>
+                                <span>पादलेख सामग्री (Footer Lines - 3 Rows Centered)</span>
+                            </h3>
+                            <div>
+                                <label class="block text-slate-700 font-bold mb-1">Footer Line 1 *</label>
+                                <input type="text" id="cfg-footer-1" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-bold mb-1">Footer Line 2 *</label>
+                                <input type="text" id="cfg-footer-2" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-bold mb-1">Footer Line 3 *</label>
+                                <input type="text" id="cfg-footer-3" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 min-h-[38px]">
+                            </div>
+                        </div>
+
+                        <!-- 4. Reservation Rules Editor -->
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-bold portal-text-primary uppercase tracking-wider flex items-center gap-1.5 m-0">
+                                    <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700"></i>
+                                    <span>आरक्षण नियम एवं दिशा-निर्देश (Rules Roster)</span>
+                                </h3>
+                                <button type="button" id="cfg-add-rule-btn" class="min-h-[32px] px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded text-xs inline-flex items-center gap-1 shadow-xs">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> नया नियम जोड़ें
+                                </button>
+                            </div>
+                            <div id="cfg-rules-container" class="space-y-2">
+                                <!-- Dynamic Rules Input List -->
+                            </div>
+                        </div>
+
+                        <!-- Save Actions -->
+                        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+                            <button type="button" id="cfg-reset-form-btn" class="min-h-[40px] px-4 py-2 rounded text-slate-600 hover:text-black font-medium">
+                                रीसेट
+                            </button>
+                            <button type="submit" id="cfg-save-btn" class="min-h-[40px] px-6 py-2.5 rounded font-bold portal-bg-primary hover:opacity-90 text-white shadow flex items-center gap-2 text-xs">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                <span>पोर्टल सेटिंग्स ऑनलाइन सहेजें</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
 
         <!-- GOVERNMENT MODAL: LOGIN -->
@@ -834,7 +980,7 @@
         <div id="modal-change-pwd" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
             <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-4 sm:p-6 shadow-2xl relative max-h-[95vh] overflow-y-auto">
                 <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1.5 rounded min-w-[36px] min-h-[36px] flex items-center justify-center">
-                    <i data-lucide="key" class="w-5 h-5"></i>
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
                 <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
                     <div class="w-10 h-10 rounded portal-bg-primary text-white flex items-center justify-center flex-shrink-0">
@@ -1214,12 +1360,12 @@
         <div id="toast-box" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 max-w-[calc(100vw-32px)]"></div>
     </div>
 
-    <!-- APPLICATION FOOTER -->
+    <!-- APPLICATION FOOTER (Dynamic 3 Lines Centered) -->
     <footer class="w-full max-w-7xl mx-auto py-3 px-3 sm:px-6 text-center text-xs text-slate-600 border-t border-slate-200/80 mt-auto">
         <div class="flex flex-col items-center justify-center space-y-0.5 leading-tight font-medium">
-            <div>District Administration Supaul</div>
-            <div>| ©2026 |</div>
-            <div>National Informatics Centre Supaul</div>
+            <div id="ftr-line-1">District Administration Supaul</div>
+            <div id="ftr-line-2">| ©2026 |</div>
+            <div id="ftr-line-3">National Informatics Centre Supaul</div>
         </div>
     </footer>
 
@@ -1314,6 +1460,24 @@
         let notificationsCache = [];
         let onlineUsersRoster = [];
 
+        // Application Configuration Cache (Source of truth: Google Spreadsheet AppConfig)
+        let appConfigCache = {
+            gov_text: "बिहार सरकार | Government of Bihar",
+            district_text: "जिला प्रशासन सुपौल",
+            app_title: "सुपौल | SUPAUL",
+            app_subtitle: "समाहरणालय सभागार आरक्षण प्रणाली | Conference Hall Management System",
+            website_text: "supaul.nic.in",
+            logo_url: "",
+            footer_line_1: "District Administration Supaul",
+            footer_line_2: "| ©2026 |",
+            footer_line_3: "National Informatics Centre Supaul",
+            reservation_rules: [
+                "समय सीमा: किसी भी स्लॉट का आरक्षण बैठक शुरू होने से कम से कम 1 घंटे पूर्व किया जाना अनिवार्य है।",
+                "पिछला समय निषेध: आज के बीते हुए समय अथवा पूर्व तिथि (Back Date/Time) का स्लॉट आरक्षित नहीं किया जा सकता।",
+                "प्राथमिकता: विधि-व्यवस्था, निर्वाचन व डीएम समीक्षा बैठकों को सर्वोच्च प्राथमिकता।"
+            ]
+        };
+
         let selectedHallId = '';
         let todayStr = new Date().toISOString().split('T')[0];
         let selectedDate = todayStr;
@@ -1365,6 +1529,68 @@
             }
         }
 
+        // Apply Configuration to Frontend (Header, Logo, Footer, Rules)
+        function applyAppConfig(cfg) {
+            if (!cfg) return;
+
+            // Header Elements
+            const govEl = document.getElementById('hdr-gov-text');
+            if (govEl && cfg.gov_text) govEl.textContent = cfg.gov_text;
+
+            const distEl = document.getElementById('hdr-district-text');
+            if (distEl && cfg.district_text) distEl.textContent = cfg.district_text;
+
+            const titleEl = document.getElementById('hdr-app-title');
+            if (titleEl && cfg.app_title) titleEl.textContent = cfg.app_title;
+
+            const subtitleEl = document.getElementById('hdr-app-subtitle');
+            if (subtitleEl && cfg.app_subtitle) subtitleEl.textContent = cfg.app_subtitle;
+
+            const webEl = document.getElementById('hdr-website-text');
+            if (webEl && cfg.website_text) webEl.textContent = cfg.website_text;
+
+            // Logo with Safe Fallback
+            const defLogo = document.getElementById('header-default-logo');
+            const custLogo = document.getElementById('header-custom-logo');
+            if (custLogo && defLogo) {
+                if (cfg.logo_url && cfg.logo_url.trim().length > 5) {
+                    custLogo.src = cfg.logo_url.trim();
+                    custLogo.onload = () => {
+                        custLogo.classList.remove('hidden');
+                        defLogo.classList.add('hidden');
+                    };
+                    custLogo.onerror = () => {
+                        custLogo.classList.add('hidden');
+                        defLogo.classList.remove('hidden');
+                    };
+                } else {
+                    custLogo.classList.add('hidden');
+                    defLogo.classList.remove('hidden');
+                }
+            }
+
+            // Footer Elements
+            const f1 = document.getElementById('ftr-line-1');
+            const f2 = document.getElementById('ftr-line-2');
+            const f3 = document.getElementById('ftr-line-3');
+            if (f1 && cfg.footer_line_1) f1.textContent = cfg.footer_line_1;
+            if (f2 && cfg.footer_line_2) f2.textContent = cfg.footer_line_2;
+            if (f3 && cfg.footer_line_3) f3.textContent = cfg.footer_line_3;
+
+            // Reservation Rules List
+            const rulesUl = document.getElementById('reservation-rules-list');
+            if (rulesUl) {
+                rulesUl.innerHTML = '';
+                const rules = Array.isArray(cfg.reservation_rules) ? cfg.reservation_rules : [];
+                rules.forEach(rule => {
+                    const li = document.createElement('li');
+                    li.className = 'break-words';
+                    li.textContent = rule;
+                    rulesUl.appendChild(li);
+                });
+            }
+        }
+
         // Real-Time Online Backend Polling Engine (Single Source of Truth)
         async function syncFromOnlineDatabase() {
             if (!APPS_SCRIPT_URL) return;
@@ -1385,6 +1611,11 @@
 
                     if (Array.isArray(data.notifications)) {
                         notificationsCache = data.notifications;
+                    }
+
+                    if (data.config) {
+                        appConfigCache = { ...appConfigCache, ...data.config };
+                        applyAppConfig(appConfigCache);
                     }
 
                     renderVenuesList();
@@ -1461,9 +1692,12 @@
                 if (proceedBtnText) proceedBtnText.textContent = isSanctioner ? 'प्रशासनिक सीधा आवंटन' : 'आरक्षण प्रपत्र भरें';
                 if (submitBtnText) submitBtnText.textContent = isSanctioner ? 'सीधा आवंटन आदेश जारी करें' : 'मांग-पत्र प्रस्तुत करें';
 
+                // Strictly Super Admin controls
                 document.getElementById('quick-add-hall-btn').classList.toggle('hidden', role !== 'admin');
                 document.getElementById('edit-current-hall-btn').classList.toggle('hidden', role !== 'admin');
                 document.getElementById('quick-edit-incharge-btn').classList.toggle('hidden', role !== 'admin');
+                const quickRulesBtn = document.getElementById('quick-edit-rules-btn');
+                if (quickRulesBtn) quickRulesBtn.classList.toggle('hidden', role !== 'admin');
             } else {
                 openLoginBtn.classList.remove('hidden');
                 userMenu.classList.add('hidden');
@@ -1476,6 +1710,8 @@
                 document.getElementById('quick-add-hall-btn').classList.add('hidden');
                 document.getElementById('edit-current-hall-btn').classList.add('hidden');
                 document.getElementById('quick-edit-incharge-btn').classList.add('hidden');
+                const quickRulesBtn = document.getElementById('quick-edit-rules-btn');
+                if (quickRulesBtn) quickRulesBtn.classList.add('hidden');
             }
 
             const userRole = currentUser ? currentUser.role : 'public';
@@ -1487,6 +1723,9 @@
             document.getElementById('tab-btn-requests').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
             document.getElementById('tab-btn-users').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
             document.getElementById('tab-btn-ledger').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
+
+            // Super Admin exclusive Portal Content Settings Tab
+            document.getElementById('tab-btn-site-config').classList.toggle('hidden', userRole !== 'admin');
 
             const usersPageTitle = document.getElementById('users-page-title');
             const tabTextUsers = document.getElementById('tab-text-users');
@@ -1510,6 +1749,7 @@
             renderVenuesList();
             loadSchedule();
             loadNotifications();
+            applyAppConfig(appConfigCache);
             initIcons();
         }
 
@@ -1798,6 +2038,8 @@
                 loadAdminData();
             } else if (tabId === 'my-reqs') {
                 loadMyRequisitions();
+            } else if (tabId === 'site-config') {
+                loadSiteConfigEditor();
             }
             initIcons();
         }
@@ -2217,7 +2459,7 @@
                                 <i data-lucide="pencil" class="w-3 h-3"></i> संपादन
                             </button>
                             ${hallsData.length > 1 ? `
-                                <button type="button" class="delete-hall-btn min-h-[32px] px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded text-[11px] font-bold inline-flex items-center justify-center" data-hall-id="${hall.id}" title="हटाएं">
+                                <button type="button" class="delete-hall-btn min-h-[32px] px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded text-[11px] font-bold inline-flex items-center justify-center" data-hall-id="${hall.id}" title="सभागार हटाएं">
                                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                                 </button>
                             ` : ''}
@@ -2280,18 +2522,28 @@
                     const hall = hallsData.find(h => h.id === hId);
                     if (!hall) return;
 
+                    if (!currentUser || currentUser.role !== 'admin') {
+                        showToast('केवल जिला मुख्य प्रशासक (Super Admin) को सभागार हटाने की अनुमति है।', 'error');
+                        return;
+                    }
+
                     if (hallsData.length <= 1) {
                         showToast('कम से कम एक सभागार का होना अनिवार्य है। इसे हटाया नहीं जा सकता।', 'error');
                         return;
                     }
 
-                    if (!confirm(`क्या आप वाकई सभागार "${hall.name_hi || hall.name}" को हटाना चाहते हैं?`)) {
-                        return;
-                    }
+                    const confirmMsg = `क्या आप वाकई इस सभागार "${hall.name_hi || hall.name}" को हटाना चाहते हैं?\n\nसूचना: हटाने के उपरांत यह सभागार नए आरक्षण हेतु उपलब्ध नहीं रहेगा। पूर्व से दर्ज सभी ऐतिहासिक व स्वीकृत मांग-पत्र सुरक्षित रहेंगे।`;
+                    if (!confirm(confirmMsg)) return;
 
-                    const res = await apiPost({ action: 'delete_hall', id: hId });
+                    const res = await apiPost({
+                        action: 'delete_hall',
+                        id: hId,
+                        admin_email: currentUser.email,
+                        admin_id: currentUser.id
+                    });
+
                     if (res && res.success) {
-                        showToast('सभागार सफलतापूर्वक हटाया गया।');
+                        showToast(res.message || 'सभागार सफलतापूर्वक हटाया गया।');
                         await syncFromOnlineDatabase();
                     } else {
                         showToast(res.message || 'सभागार हटाने में त्रुटि', 'error');
@@ -2317,6 +2569,11 @@
         if (hallEditForm) {
             hallEditForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                if (!currentUser || currentUser.role !== 'admin') {
+                    showToast('केवल Super Admin / DIO ही सभागार संपादित कर सकते हैं।', 'error');
+                    return;
+                }
+
                 let name = document.getElementById('edit-hall-name').value.trim();
                 let name_hi = document.getElementById('edit-hall-name-hi').value.trim();
 
@@ -2343,7 +2600,13 @@
                     features: featuresArray
                 };
 
-                const res = await apiPost({ action: 'save_hall', data: hallPayload });
+                const res = await apiPost({
+                    action: 'save_hall',
+                    data: hallPayload,
+                    admin_email: currentUser.email,
+                    admin_id: currentUser.id
+                });
+
                 if (res && res.success) {
                     showToast(`सभागार "${name_hi}" का विवरण सफलतापूर्वक सहेजा गया।`);
                     document.getElementById('modal-hall-edit').classList.add('hidden');
@@ -2371,12 +2634,21 @@
         if (quickInchargeForm) {
             quickInchargeForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                if (!currentUser || currentUser.role !== 'admin') {
+                    showToast('केवल Super Admin / DIO ही प्रभारी बदल सकते हैं।', 'error');
+                    return;
+                }
                 const hallId = document.getElementById('qi-hall-id').value;
                 const inCharge = document.getElementById('qi-incharge-input').value.trim();
                 const hall = hallsData.find(h => h.id === hallId);
                 if (hall) {
                     const updated = { ...hall, in_charge: inCharge };
-                    const res = await apiPost({ action: 'save_hall', data: updated });
+                    const res = await apiPost({
+                        action: 'save_hall',
+                        data: updated,
+                        admin_email: currentUser.email,
+                        admin_id: currentUser.id
+                    });
                     if (res && res.success) {
                         showToast('नोडल प्राधिकारी का विवरण सफलतापूर्वक अद्यतित किया गया।');
                         document.getElementById('modal-quick-incharge').classList.add('hidden');
@@ -2388,6 +2660,180 @@
             });
         }
 
+        // ==============================================================
+        // SUPER ADMIN PORTAL CONTENT SETTINGS LOGIC
+        // ==============================================================
+        function loadSiteConfigEditor() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+
+            document.getElementById('cfg-gov-text').value = appConfigCache.gov_text || '';
+            document.getElementById('cfg-district-text').value = appConfigCache.district_text || '';
+            document.getElementById('cfg-app-title').value = appConfigCache.app_title || '';
+            document.getElementById('cfg-app-subtitle').value = appConfigCache.app_subtitle || '';
+            document.getElementById('cfg-website-text').value = appConfigCache.website_text || '';
+            document.getElementById('cfg-logo-url').value = appConfigCache.logo_url || '';
+            document.getElementById('cfg-footer-1').value = appConfigCache.footer_line_1 || '';
+            document.getElementById('cfg-footer-2').value = appConfigCache.footer_line_2 || '';
+            document.getElementById('cfg-footer-3').value = appConfigCache.footer_line_3 || '';
+
+            updateLogoPreview(appConfigCache.logo_url || '');
+            renderRulesEditorList(appConfigCache.reservation_rules || []);
+            initIcons();
+        }
+
+        function updateLogoPreview(url) {
+            const defPrev = document.getElementById('cfg-preview-default-logo');
+            const custPrev = document.getElementById('cfg-preview-custom-logo');
+            const statusEl = document.getElementById('cfg-logo-status');
+            const cleanUrl = (url || '').trim();
+
+            if (cleanUrl.length > 5) {
+                custPrev.src = cleanUrl;
+                custPrev.onload = () => {
+                    custPrev.classList.remove('hidden');
+                    defPrev.classList.add('hidden');
+                    if (statusEl) statusEl.textContent = 'कस्टम लोगो पूर्वावलोकन मान्य है';
+                };
+                custPrev.onerror = () => {
+                    custPrev.classList.add('hidden');
+                    defPrev.classList.remove('hidden');
+                    if (statusEl) statusEl.textContent = 'अमान्य URL - डिफ़ॉल्ट लोगो सक्रिय रहेगा';
+                };
+            } else {
+                custPrev.classList.add('hidden');
+                defPrev.classList.remove('hidden');
+                if (statusEl) statusEl.textContent = 'डिफ़ॉल्ट लोगो सक्रिय';
+            }
+        }
+
+        const logoInput = document.getElementById('cfg-logo-url');
+        if (logoInput) {
+            logoInput.addEventListener('input', (e) => updateLogoPreview(e.target.value));
+        }
+
+        const restoreLogoBtn = document.getElementById('cfg-restore-logo-btn');
+        if (restoreLogoBtn) {
+            restoreLogoBtn.addEventListener('click', () => {
+                if (logoInput) {
+                    logoInput.value = '';
+                    updateLogoPreview('');
+                }
+            });
+        }
+
+        function renderRulesEditorList(rules = []) {
+            const container = document.getElementById('cfg-rules-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (rules.length === 0) {
+                container.innerHTML = '<p class="text-[11px] text-slate-500 italic p-2">कोई नियम दर्ज नहीं है। नया नियम जोड़ने के लिए बटन पर क्लिक करें।</p>';
+                return;
+            }
+
+            rules.forEach((rule, idx) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2 bg-white p-2 rounded border border-slate-200';
+                row.innerHTML = `
+                    <span class="w-6 h-6 rounded-full bg-slate-100 border text-slate-600 font-bold text-[10px] flex items-center justify-center flex-shrink-0">${idx + 1}</span>
+                    <input type="text" value="${rule.replace(/"/g, '&quot;')}" class="cfg-rule-input flex-1 bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 min-h-[34px]" placeholder="नियम विवरण...">
+                    <button type="button" class="cfg-del-rule-btn min-h-[34px] min-w-[34px] p-1.5 text-rose-700 hover:bg-rose-50 border border-rose-200 rounded flex items-center justify-center flex-shrink-0" title="नियम हटाएं">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                `;
+                row.querySelector('.cfg-del-rule-btn').addEventListener('click', () => {
+                    row.remove();
+                });
+                container.appendChild(row);
+            });
+            initIcons();
+        }
+
+        const addRuleBtn = document.getElementById('cfg-add-rule-btn');
+        if (addRuleBtn) {
+            addRuleBtn.addEventListener('click', () => {
+                const container = document.getElementById('cfg-rules-container');
+                const count = container.querySelectorAll('.cfg-rule-input').length + 1;
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2 bg-white p-2 rounded border border-slate-200';
+                row.innerHTML = `
+                    <span class="w-6 h-6 rounded-full bg-slate-100 border text-slate-600 font-bold text-[10px] flex items-center justify-center flex-shrink-0">${count}</span>
+                    <input type="text" value="" class="cfg-rule-input flex-1 bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 min-h-[34px]" placeholder="नया आरक्षण नियम विवरण...">
+                    <button type="button" class="cfg-del-rule-btn min-h-[34px] min-w-[34px] p-1.5 text-rose-700 hover:bg-rose-50 border border-rose-200 rounded flex items-center justify-center flex-shrink-0" title="नियम हटाएं">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                `;
+                row.querySelector('.cfg-del-rule-btn').addEventListener('click', () => row.remove());
+                container.appendChild(row);
+                initIcons();
+            });
+        }
+
+        const quickRulesBtn = document.getElementById('quick-edit-rules-btn');
+        if (quickRulesBtn) {
+            quickRulesBtn.addEventListener('click', () => {
+                switchTab('site-config');
+            });
+        }
+
+        const resetFormBtn = document.getElementById('cfg-reset-form-btn');
+        if (resetFormBtn) {
+            resetFormBtn.addEventListener('click', () => loadSiteConfigEditor());
+        }
+
+        const configForm = document.getElementById('portal-config-form');
+        if (configForm) {
+            configForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUser || currentUser.role !== 'admin') {
+                    showToast('केवल जिला मुख्य प्रशासक (Super Admin / DIO) को यह अनुमति है।', 'error');
+                    return;
+                }
+
+                const rulesInputs = document.querySelectorAll('.cfg-rule-input');
+                const rulesArray = [];
+                rulesInputs.forEach(inp => {
+                    const val = inp.value.trim();
+                    if (val.length > 0) rulesArray.push(val);
+                });
+
+                const newConfig = {
+                    gov_text: document.getElementById('cfg-gov-text').value.trim(),
+                    district_text: document.getElementById('cfg-district-text').value.trim(),
+                    app_title: document.getElementById('cfg-app-title').value.trim(),
+                    app_subtitle: document.getElementById('cfg-app-subtitle').value.trim(),
+                    website_text: document.getElementById('cfg-website-text').value.trim(),
+                    logo_url: document.getElementById('cfg-logo-url').value.trim(),
+                    footer_line_1: document.getElementById('cfg-footer-1').value.trim(),
+                    footer_line_2: document.getElementById('cfg-footer-2').value.trim(),
+                    footer_line_3: document.getElementById('cfg-footer-3').value.trim(),
+                    reservation_rules: rulesArray
+                };
+
+                const res = await apiPost({
+                    action: 'save_config',
+                    config: newConfig,
+                    admin_email: currentUser.email,
+                    admin_id: currentUser.id
+                });
+
+                if (res && res.success) {
+                    showToast('पोर्टल सेटिंग्स सफलतापूर्वक ऑनलाइन अपडेट की गईं।');
+                    if (res.config) {
+                        appConfigCache = { ...appConfigCache, ...res.config };
+                    } else {
+                        appConfigCache = { ...appConfigCache, ...newConfig };
+                    }
+                    applyAppConfig(appConfigCache);
+                } else {
+                    showToast(res.message || 'पोर्टल सेटिंग्स अपडेट नहीं हो सकीं।', 'error');
+                }
+            });
+        }
+
+        // ==============================================================
+        // USER & HALL CREATION / ACTIONS
+        // ==============================================================
         const openNewUserBtn = document.getElementById('open-new-user-modal-btn');
         if (openNewUserBtn) {
             openNewUserBtn.addEventListener('click', () => {
