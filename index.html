@@ -834,7 +834,7 @@
         <div id="modal-change-pwd" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
             <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-4 sm:p-6 shadow-2xl relative max-h-[95vh] overflow-y-auto">
                 <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1.5 rounded min-w-[36px] min-h-[36px] flex items-center justify-center">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+                    <i data-lucide="key" class="w-5 h-5"></i>
                 </button>
                 <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
                     <div class="w-10 h-10 rounded portal-bg-primary text-white flex items-center justify-center flex-shrink-0">
@@ -1175,6 +1175,10 @@
                         <span id="slip-vc" class="font-bold portal-text-primary text-right"></span>
                     </div>
                     <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">पी.पी.टी का इस्तेमाल (PPT Use):</span>
+                        <span id="slip-ppt" class="font-bold text-blue-900 text-right">नहीं</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
                         <span class="font-bold text-slate-600 flex-shrink-0">स्वल्पाहार:</span>
                         <span id="slip-refreshments" class="font-medium text-slate-800 text-right break-words"></span>
                     </div>
@@ -1211,10 +1215,12 @@
     </div>
 
     <!-- APPLICATION FOOTER -->
-    <footer class="w-full max-w-7xl mx-auto py-4 px-3 sm:px-6 text-center text-xs text-slate-600 border-t border-slate-200/80 mt-auto">
-        <p class="m-0 leading-relaxed font-medium">
-            ©2026 | District Administration Supaul | Developed by National Informatics Centre, Supaul
-        </p>
+    <footer class="w-full max-w-7xl mx-auto py-3 px-3 sm:px-6 text-center text-xs text-slate-600 border-t border-slate-200/80 mt-auto">
+        <div class="flex flex-col items-center justify-center space-y-0.5 leading-tight font-medium">
+            <div>District Administration Supaul</div>
+            <div>| ©2026 |</div>
+            <div>National Informatics Centre Supaul</div>
+        </div>
     </footer>
 
     <script>
@@ -1833,6 +1839,37 @@
             });
         }
 
+        function navigateToRequisitionFromNotification(notif) {
+            if (!currentUser) return;
+            const notifDropdown = document.getElementById('notif-dropdown');
+            if (notifDropdown) notifDropdown.classList.add('hidden');
+
+            let reqId = notif.req_id;
+            if (!reqId && notif.message) {
+                const match = notif.message.match(/SPL-REQ-\d+-\d+/);
+                if (match) reqId = match[0];
+            }
+
+            const targetReq = reqId ? allRequisitionsCache.find(r => r.id === reqId) : null;
+            const role = currentUser.role;
+
+            if (role === 'admin' || role === 'nazarat') {
+                switchTab('requests');
+            } else if (role === 'officer' || role === 'itm') {
+                switchTab('my-reqs');
+            } else if (role === 'technical') {
+                switchTab('tech-dashboard');
+            } else {
+                switchTab('schedule');
+            }
+
+            if (targetReq) {
+                setTimeout(() => {
+                    openSlipModal(targetReq);
+                }, 100);
+            }
+        }
+
         function loadNotifications() {
             if (!currentUser) return;
             const seenKeys = new Set();
@@ -1867,11 +1904,14 @@
                     list.innerHTML = '';
                     userNotifs.forEach(n => {
                         const item = document.createElement('div');
-                        item.className = `p-2.5 px-3 transition ${n.is_read === 0 ? 'bg-amber-50/70 font-semibold' : 'bg-white'}`;
+                        item.className = `p-2.5 px-3 transition cursor-pointer hover:bg-slate-100 ${n.is_read === 0 ? 'bg-amber-50/70 font-semibold' : 'bg-white'}`;
                         item.innerHTML = `
                             <p class="text-slate-800 m-0 leading-tight break-words">${n.message}</p>
                             <span class="text-[10px] text-slate-400 mt-1 block">${n.created_at}</span>
                         `;
+                        item.addEventListener('click', () => {
+                            navigateToRequisitionFromNotification(n);
+                        });
                         list.appendChild(item);
                     });
                 }
@@ -1969,7 +2009,10 @@
                             <span class="font-mono font-bold portal-text-primary block whitespace-nowrap">${r.id}</span>
                             <span class="text-[11px] text-slate-700 block">${r.department}</span>
                         </td>
-                        <td class="p-3 whitespace-nowrap">${r.booking_date} (${hrs})</td>
+                        <td class="p-3 whitespace-nowrap">
+                            <span class="font-semibold block">${r.hall_name || 'लहटन चौधरी सभागार'}</span>
+                            <span class="text-[11px] text-slate-600 block">${r.booking_date} (${hrs})</span>
+                        </td>
                         <td class="p-3">
                             <span class="font-semibold block truncate max-w-xs">${r.subject}</span>
                             <span class="text-[11px] portal-text-primary">अध्यक्षता: ${r.chairing_officer}</span>
@@ -2692,6 +2735,14 @@
             document.getElementById('slip-department').textContent = r.department || '';
             document.getElementById('slip-subject').textContent = r.subject || '';
             document.getElementById('slip-vc').textContent = (r.vc_required == 1) ? 'हाँ (वी.सी. बुकिंग आवश्यक)' : 'नहीं';
+
+            const pptVal = r.ppt_required;
+            const isPptRequired = (pptVal === 1 || pptVal === '1' || pptVal === true || String(pptVal).toLowerCase() === 'true');
+            const slipPptEl = document.getElementById('slip-ppt');
+            if (slipPptEl) {
+                slipPptEl.textContent = isPptRequired ? 'हाँ' : 'नहीं';
+            }
+
             document.getElementById('slip-refreshments').textContent = r.refreshments || 'Executive Tea & Biscuits';
 
             const statusEl = document.getElementById('slip-dynamic-status');
