@@ -622,9 +622,6 @@
                             <p class="text-slate-600 m-0 mt-0.5">यह पटल केवल तकनीकी टीम के अवलोकन हेतु है।</p>
                         </div>
                     </div>
-                    <span class="px-3 py-1 bg-cyan-100 text-cyan-800 rounded font-mono font-bold text-xs border border-cyan-300">
-                        लॉगिन: techteam@nic.in
-                    </span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -696,7 +693,7 @@
                 <div class="bg-white rounded-lg p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                     <h2 class="text-sm font-bold portal-text-primary flex items-center gap-2 m-0">
                         <i data-lucide="building-2" class="w-4 h-4 portal-text-primary flex-shrink-0"></i>
-                        <span>सभागार एवं कक्ष प्रबंधन (Admin Exclusive)</span>
+                        <span id="halls-section-title">सभागार एवं कक्ष प्रबंधन (Admin Exclusive)</span>
                     </h2>
                     <button type="button" id="open-new-hall-modal-btn" class="min-h-[40px] px-4 py-2 portal-bg-primary hover:opacity-90 text-white font-bold text-xs rounded flex items-center justify-center gap-1.5 shadow">
                         <i data-lucide="plus-circle" class="w-3.5 h-3.5 flex-shrink-0"></i> नया सभागार जोड़ें
@@ -1403,7 +1400,7 @@
                         <span id="slip-subject" class="font-medium text-slate-900 text-right max-w-[280px] break-words"></span>
                     </div>
                     <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
-                        <span class="font-bold text-slate-600 flex-shrink-0">वी.सी. लिंक:</span>
+                        <span class="font-bold text-slate-600 flex-shrink-0">वी.सी. बुकिंग ज़रूरी है (VC Required):</span>
                         <span id="slip-vc" class="font-bold portal-text-primary text-right"></span>
                     </div>
                     <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
@@ -1502,8 +1499,8 @@
             return `${String(hour12).padStart(2, '0')}:00 ${period}`;
         }
 
-        function formatBookingTimeSpan(hours) {
-            if (!hours) return '';
+        function normalizeBookingHours(hours) {
+            if (!hours) return [];
             let parsed = [];
             if (Array.isArray(hours)) {
                 parsed = hours.map(Number).filter(n => !isNaN(n));
@@ -1518,8 +1515,12 @@
             } else if (typeof hours === 'number') {
                 parsed = [hours];
             }
+            return parsed.sort((a, b) => a - b);
+        }
+
+        function formatBookingTimeSpan(hours) {
+            const parsed = normalizeBookingHours(hours);
             if (!parsed.length) return '';
-            parsed.sort((a, b) => a - b);
             const startHour = parsed[0];
             const endHour = parsed[parsed.length - 1] + 1;
             return `${formatDisplayTime(startHour)} – ${formatDisplayTime(endHour)}`;
@@ -1534,6 +1535,41 @@
             return dateText || timeText || '';
         }
 
+        // Uses the same booking-hour convention as formatBookingTimeSpan():
+        // the final selected hour + 1 hour is the true booking end.
+        function getBookingEndDate(bookingDate, hours) {
+            const parsedHours = normalizeBookingHours(hours);
+            if (!parsedHours.length || !bookingDate) return null;
+
+            let year, month, day;
+            const raw = String(bookingDate).trim();
+            let m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (m) {
+                year = Number(m[1]);
+                month = Number(m[2]);
+                day = Number(m[3]);
+            } else {
+                m = raw.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+                if (m) {
+                    day = Number(m[1]);
+                    month = Number(m[2]);
+                    year = Number(m[3]);
+                }
+            }
+
+            if (!year || !month || !day) return null;
+
+            const endHour = parsedHours[parsedHours.length - 1] + 1;
+            const endDate = new Date(year, month - 1, day, endHour, 0, 0, 0);
+            return isNaN(endDate.getTime()) ? null : endDate;
+        }
+
+        function isBookingSlotExpired(booking) {
+            if (!booking) return false;
+            const endDate = getBookingEndDate(booking.booking_date, booking.hours);
+            return !!endDate && new Date().getTime() >= endDate.getTime();
+        }
+
         // Centralized Online Application Cache (InMemory)
         let currentUser = null;
         try {
@@ -1545,6 +1581,12 @@
         let allRequisitionsCache = [];
         let notificationsCache = [];
         let onlineUsersRoster = [];
+
+        // Administrative status-change drafts are staged locally until Save is clicked.
+        // The database remains untouched while a draft is being selected/edited.
+        const statusDraftsByReqId = Object.create(null);
+        const statusSaveInFlight = new Set();
+        let rejectModalContext = null;
 
         // Application Configuration Cache (Source of truth: Google Spreadsheet AppConfig)
         let appConfigCache = {
@@ -1790,6 +1832,15 @@
                 document.getElementById('quick-edit-incharge-btn').classList.toggle('hidden', role !== 'admin');
                 const quickRulesBtn = document.getElementById('quick-edit-rules-btn');
                 if (quickRulesBtn) quickRulesBtn.classList.toggle('hidden', role !== 'admin');
+
+                const hallSectionTitle = document.getElementById('halls-section-title');
+                if (hallSectionTitle) {
+                    hallSectionTitle.textContent = role === 'nazarat'
+                        ? 'उपलब्ध सभागार (View Only)'
+                        : 'सभागार एवं कक्ष प्रबंधन (Admin Exclusive)';
+                }
+                const hallAddBtn = document.getElementById('open-new-hall-modal-btn');
+                if (hallAddBtn) hallAddBtn.classList.toggle('hidden', role !== 'admin');
             } else {
                 openLoginBtn.classList.remove('hidden');
                 userMenu.classList.add('hidden');
@@ -1804,6 +1855,10 @@
                 document.getElementById('quick-edit-incharge-btn').classList.add('hidden');
                 const quickRulesBtn = document.getElementById('quick-edit-rules-btn');
                 if (quickRulesBtn) quickRulesBtn.classList.add('hidden');
+                const hallSectionTitle = document.getElementById('halls-section-title');
+                if (hallSectionTitle) hallSectionTitle.textContent = 'सभागार एवं कक्ष प्रबंधन (Admin Exclusive)';
+                const hallAddBtn = document.getElementById('open-new-hall-modal-btn');
+                if (hallAddBtn) hallAddBtn.classList.add('hidden');
             }
 
             const userRole = currentUser ? currentUser.role : 'public';
@@ -1811,7 +1866,7 @@
             document.getElementById('tab-btn-my-reqs').classList.toggle('hidden', userRole !== 'officer' && userRole !== 'itm');
             document.getElementById('tab-btn-tech-dashboard').classList.toggle('hidden', !['technical', 'itm'].includes(userRole));
             document.getElementById('tab-btn-dashboard').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
-            document.getElementById('tab-btn-halls').classList.toggle('hidden', userRole !== 'admin');
+            document.getElementById('tab-btn-halls').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
             document.getElementById('tab-btn-requests').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
             document.getElementById('tab-btn-users').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
             document.getElementById('tab-btn-ledger').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
@@ -2694,6 +2749,7 @@
 
         function loadAdminData() {
             const isRoleAdmin = currentUser && currentUser.role === 'admin';
+            const isRoleNazarat = currentUser && currentUser.role === 'nazarat';
             const isRoleTech = currentUser && ['technical', 'itm'].includes(currentUser.role);
 
             const pending = allRequisitionsCache.filter(r => r.status === 'Pending').length;
@@ -2705,12 +2761,26 @@
             if (document.getElementById('stat-halls-count')) document.getElementById('stat-halls-count').textContent = hallsData.length;
 
             if (isRoleTech) renderTechDutyBoard(allRequisitionsCache);
-            if (isRoleAdmin) renderAdminHallsTable();
+            if (isRoleAdmin || isRoleNazarat) renderAdminHallsTable();
 
             const reqTbody = document.getElementById('admin-requests-table-body');
             if (reqTbody) {
                 reqTbody.innerHTML = '';
                 allRequisitionsCache.forEach(r => {
+                    const expired = isBookingSlotExpired(r);
+                    const reqKey = String(r.id);
+                    let draft = statusDraftsByReqId[reqKey] || null;
+
+                    // Discard a draft once the stored status already matches it, or once the booking is expired.
+                    if (draft && (expired || draft.status === r.status)) {
+                        delete statusDraftsByReqId[reqKey];
+                        draft = null;
+                    }
+
+                    const displayedStatus = draft ? draft.status : r.status;
+                    const saveReady = !!draft && !expired && !statusSaveInFlight.has(reqKey);
+                    const saveDisabledClass = saveReady ? 'hover:opacity-90' : 'opacity-50 cursor-not-allowed';
+                    const expiredTitle = expired ? 'समय समाप्त होने के बाद स्थिति स्थायी है' : 'स्थिति परिवर्तन सहेजें';
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition';
                     tr.innerHTML = `
@@ -2735,14 +2805,17 @@
                             }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}</span>
                         </td>
                         <td class="p-3 text-center whitespace-nowrap">
-                            <select class="change-status-select text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium min-h-[32px]" data-id="${r.id}">
-                                <option value="Pending" ${r.status === 'Pending' ? 'selected' : ''}>समीक्षाधीन (Pending)</option>
-                                <option value="Approved" ${r.status === 'Approved' ? 'selected' : ''}>स्वीकृत (Approved)</option>
-                                <option value="Rejected" ${r.status === 'Rejected' ? 'selected' : ''}>अस्वीकृत (Rejected)</option>
+                            <select class="admin-change-status-select text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium min-h-[32px] ${expired ? 'bg-slate-100 cursor-not-allowed opacity-70' : ''}" data-id="${r.id}" ${expired ? 'disabled' : ''} title="${expiredTitle}">
+                                <option value="Pending" ${displayedStatus === 'Pending' ? 'selected' : ''}>समीक्षाधीन (Pending)</option>
+                                <option value="Approved" ${displayedStatus === 'Approved' ? 'selected' : ''}>स्वीकृत (Approved)</option>
+                                <option value="Rejected" ${displayedStatus === 'Rejected' ? 'selected' : ''}>अस्वीकृत (Rejected)</option>
                             </select>
                         </td>
                         <td class="p-3 text-right pr-4 whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1.5">
+                                <button type="button" class="save-status-btn min-h-[32px] px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold inline-flex items-center gap-1 shadow-xs ${saveDisabledClass}" data-id="${r.id}" ${saveReady ? '' : 'disabled'} title="${expired ? 'समय समाप्त होने के बाद स्थिति स्थायी है' : 'चयनित स्थिति सहेजें'}">
+                                    <i data-lucide="save" class="w-3 h-3"></i> Save
+                                </button>
                                 <button type="button" class="view-slip-btn min-h-[32px] px-2.5 py-1 text-white portal-bg-primary rounded text-[11px] font-bold" data-req='${JSON.stringify(r)}'>पर्ची</button>
                                 ${isRoleAdmin ? `<button type="button" class="delete-booking-btn min-h-[32px] min-w-[32px] flex items-center justify-center px-2 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-[11px] font-bold" data-id="${r.id}" title="बुकिंग हमेशा के लिए हटाएं"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
                             </div>
@@ -2755,6 +2828,7 @@
             fetchOnlineUsersRoster();
             renderLedgerTable(allRequisitionsCache);
             bindStatusChangeEvents();
+            bindStatusSaveEvents();
             bindDeleteBookingEvents();
             bindSlipButtons();
             initIcons();
@@ -2837,6 +2911,12 @@
                 tr.className = 'hover:bg-slate-50 transition';
                 const feats = Array.isArray(hall.features) ? hall.features.slice(0, 3).join(', ') : '';
 
+                const editBtnHtml = isSuperAdmin ? `
+                    <button type="button" class="edit-hall-btn min-h-[32px] px-2.5 py-1 portal-bg-primary hover:opacity-90 text-white rounded text-[11px] font-bold inline-flex items-center gap-1 shadow-xs" data-hall-id="${hall.id}">
+                        <i data-lucide="pencil" class="w-3 h-3"></i> संपादन
+                    </button>
+                ` : '';
+
                 const deleteBtnHtml = isSuperAdmin ? `
                     <button type="button" class="delete-hall-btn min-h-[32px] px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded text-[11px] font-bold inline-flex items-center justify-center transition" data-hall-id="${hall.id}" title="सभागार हटाएं">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -2864,9 +2944,7 @@
                     </td>
                     <td class="p-3 text-right pr-4 whitespace-nowrap">
                         <div class="flex items-center justify-end gap-1.5">
-                            <button type="button" class="edit-hall-btn min-h-[32px] px-2.5 py-1 portal-bg-primary hover:opacity-90 text-white rounded text-[11px] font-bold inline-flex items-center gap-1 shadow-xs" data-hall-id="${hall.id}">
-                                <i data-lucide="pencil" class="w-3 h-3"></i> संपादन
-                            </button>
+                            ${editBtnHtml}
                             ${deleteBtnHtml}
                         </div>
                     </td>
@@ -3470,7 +3548,7 @@
                         }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}</span>
                     </td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <select class="change-status-select text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium min-h-[32px]" data-id="${r.id}">
+                        <select class="ledger-change-status-select change-status-select text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium min-h-[32px]" data-id="${r.id}">
                             <option value="Pending" ${r.status === 'Pending' ? 'selected' : ''}>समीक्षाधीन</option>
                             <option value="Approved" ${r.status === 'Approved' ? 'selected' : ''}>स्वीकृत</option>
                             <option value="Rejected" ${r.status === 'Rejected' ? 'selected' : ''}>अस्वीकृत</option>
@@ -3485,7 +3563,7 @@
                 `;
                 tbody.appendChild(tr);
             });
-            bindStatusChangeEvents();
+            bindLedgerStatusChangeEvents();
             bindDeleteBookingEvents();
             bindSlipButtons();
             initIcons();
@@ -3568,27 +3646,111 @@
             });
         }
 
+        function findAdminStatusSelect(reqId) {
+            return Array.from(document.querySelectorAll('.admin-change-status-select'))
+                .find(sel => String(sel.dataset.id) === String(reqId));
+        }
+
+        function updateStatusRowControls(reqId) {
+            const booking = allRequisitionsCache.find(r => String(r.id) === String(reqId));
+            const select = findAdminStatusSelect(reqId);
+            const saveBtn = Array.from(document.querySelectorAll('.save-status-btn'))
+                .find(btn => String(btn.dataset.id) === String(reqId));
+            if (!booking || !select || !saveBtn) return;
+
+            const expired = isBookingSlotExpired(booking);
+            const draft = statusDraftsByReqId[String(reqId)] || null;
+            if (expired) {
+                delete statusDraftsByReqId[String(reqId)];
+            }
+
+            const activeDraft = expired ? null : draft;
+            select.disabled = expired;
+            select.value = activeDraft ? activeDraft.status : booking.status;
+            select.title = expired ? 'समय समाप्त होने के बाद स्थिति स्थायी है' : 'स्थिति बदलें';
+            if (expired) {
+                select.classList.add('bg-slate-100', 'cursor-not-allowed', 'opacity-70');
+            } else {
+                select.classList.remove('bg-slate-100', 'cursor-not-allowed', 'opacity-70');
+            }
+
+            const ready = !!activeDraft && !statusSaveInFlight.has(String(reqId));
+            saveBtn.disabled = !ready;
+            saveBtn.title = expired ? 'समय समाप्त होने के बाद स्थिति स्थायी है' : 'चयनित स्थिति सहेजें';
+            saveBtn.classList.toggle('opacity-50', !ready);
+            saveBtn.classList.toggle('cursor-not-allowed', !ready);
+            saveBtn.classList.toggle('hover:bg-emerald-700', ready);
+            saveBtn.classList.toggle('hover:opacity-90', !ready);
+        }
+
+        function stageStatusChange(reqId, newStatus, rejectionReason = '') {
+            const booking = allRequisitionsCache.find(r => String(r.id) === String(reqId));
+            if (!booking) return;
+
+            if (isBookingSlotExpired(booking)) {
+                delete statusDraftsByReqId[String(reqId)];
+                const select = findAdminStatusSelect(reqId);
+                if (select) select.value = booking.status;
+                updateStatusRowControls(reqId);
+                showToast('बुकिंग समय समाप्त हो चुका है। स्थिति स्थायी है और अब बदली नहीं जा सकती।', 'error');
+                return;
+            }
+
+            if (String(newStatus) === String(booking.status) && !rejectionReason) {
+                delete statusDraftsByReqId[String(reqId)];
+            } else {
+                statusDraftsByReqId[String(reqId)] = {
+                    status: newStatus,
+                    reason: rejectionReason || ''
+                };
+            }
+            updateStatusRowControls(reqId);
+        }
+
         function bindStatusChangeEvents() {
-            document.querySelectorAll('.change-status-select').forEach(sel => {
+            document.querySelectorAll('.admin-change-status-select').forEach(sel => {
                 sel.addEventListener('change', (e) => {
                     const reqId = e.target.dataset.id;
                     const newStatus = e.target.value;
+                    const booking = allRequisitionsCache.find(r => String(r.id) === String(reqId));
+                    if (!booking) return;
+
+                    if (isBookingSlotExpired(booking)) {
+                        e.target.value = booking.status;
+                        updateStatusRowControls(reqId);
+                        showToast('बुकिंग समय समाप्त हो चुका है। स्थिति स्थायी है और अब बदली नहीं जा सकती।', 'error');
+                        return;
+                    }
 
                     if (newStatus === 'Rejected') {
                         document.getElementById('reject-req-id').value = reqId;
                         document.getElementById('reject-modal-title').textContent = `मांग संदर्भ: ${reqId}`;
+                        const existingDraft = statusDraftsByReqId[String(reqId)];
+                        rejectModalContext = {
+                            source: 'admin',
+                            reqId: String(reqId),
+                            previousDraft: existingDraft ? { status: existingDraft.status, reason: existingDraft.reason || '' } : null
+                        };
+                        const reasonInput = document.getElementById('reject-reason-input');
+                        if (reasonInput) {
+                            reasonInput.value = (existingDraft && existingDraft.status === 'Rejected' && existingDraft.reason)
+                                ? existingDraft.reason
+                                : reasonInput.defaultValue;
+                        }
                         document.getElementById('modal-reject').classList.remove('hidden');
                         return;
                     }
 
-                    applyStatusChange(reqId, newStatus, '');
+                    stageStatusChange(reqId, newStatus, '');
                 });
             });
         }
 
         async function applyStatusChange(reqId, newStatus, rejectionReason = '') {
-            const booking = allRequisitionsCache.find(r => r.id === reqId);
-            if (!booking) return;
+            const booking = allRequisitionsCache.find(r => String(r.id) === String(reqId));
+            if (!booking || !currentUser || !['admin', 'nazarat'].includes(currentUser.role)) {
+                return { success: false, message: 'स्थिति परिवर्तन हेतु अधिकृत प्रशासनिक लॉगिन आवश्यक है।' };
+            }
 
             const authority = currentUser.role === 'admin' ? 'जिला प्रशासन (Super Admin - DIO)' : 'नजारत उप समाहर्ता / NDC, सुपौल';
             const status_label_hi = (newStatus === 'Approved') ? 'स्वीकृत (Approved)' : ((newStatus === 'Pending') ? 'समीक्षाधीन (Pending)' : 'अस्वीकृत (Rejected)');
@@ -3600,24 +3762,103 @@
                 reason: rejectionReason,
                 approved_by: newStatus === 'Approved' ? authority : '',
                 approved_by_name: newStatus === 'Approved' ? currentUser.name : '',
-                approved_by_designation: newStatus === 'Approved' ? currentUser.designation : ''
+                approved_by_designation: newStatus === 'Approved' ? currentUser.designation : '',
+                user_email: currentUser.email,
+                user_id: currentUser.id
             });
 
             if (res && res.success) {
                 showToast(`मांग संदर्भ ${reqId} की स्थिति "${status_label_hi}" कर दी गई है।`);
                 await syncFromOnlineDatabase();
             } else {
-                showToast(res.message || "स्थिति अद्यतन विफल।", "error");
+                showToast((res && res.message) || 'स्थिति अद्यतन विफल।', 'error');
             }
+            return res || { success: false, message: 'स्थिति अद्यतन विफल।' };
+        }
+
+        async function saveStagedStatus(reqId) {
+            const reqKey = String(reqId);
+            if (statusSaveInFlight.has(reqKey)) return;
+
+            const booking = allRequisitionsCache.find(r => String(r.id) === reqKey);
+            const draft = statusDraftsByReqId[reqKey];
+            if (!booking || !draft) return;
+
+            if (isBookingSlotExpired(booking)) {
+                delete statusDraftsByReqId[reqKey];
+                updateStatusRowControls(reqId);
+                showToast('बुकिंग समय समाप्त हो चुका है। स्थिति स्थायी है और अब बदली नहीं जा सकती।', 'error');
+                return;
+            }
+
+            if (String(draft.status) === String(booking.status)) {
+                delete statusDraftsByReqId[reqKey];
+                updateStatusRowControls(reqId);
+                return;
+            }
+
+            statusSaveInFlight.add(reqKey);
+            updateStatusRowControls(reqId);
+            try {
+                const res = await applyStatusChange(reqId, draft.status, draft.reason || '');
+                if (res && res.success) {
+                    delete statusDraftsByReqId[reqKey];
+                }
+            } finally {
+                statusSaveInFlight.delete(reqKey);
+                updateStatusRowControls(reqId);
+            }
+        }
+
+        function bindStatusSaveEvents() {
+            document.querySelectorAll('.save-status-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await saveStagedStatus(btn.dataset.id);
+                });
+            });
+        }
+
+        function bindLedgerStatusChangeEvents() {
+            document.querySelectorAll('.ledger-change-status-select').forEach(sel => {
+                sel.addEventListener('change', (e) => {
+                    const reqId = e.target.dataset.id;
+                    const newStatus = e.target.value;
+                    if (newStatus === 'Rejected') {
+                        // Preserve the existing ledger behavior: rejection still uses the existing reason modal.
+                        document.getElementById('reject-req-id').value = reqId;
+                        document.getElementById('reject-modal-title').textContent = `मांग संदर्भ: ${reqId}`;
+                        rejectModalContext = { source: 'ledger', reqId: String(reqId) };
+                        document.getElementById('modal-reject').classList.remove('hidden');
+                        e.target.dataset.pendingLedgerReject = '1';
+                        return;
+                    }
+                    applyStatusChange(reqId, newStatus, '');
+                });
+            });
         }
 
         const confirmRejectBtn = document.getElementById('confirm-reject-btn');
         if (confirmRejectBtn) {
-            confirmRejectBtn.addEventListener('click', () => {
+            confirmRejectBtn.addEventListener('click', async () => {
                 const reqId = document.getElementById('reject-req-id').value;
                 const reason = document.getElementById('reject-reason-input').value.trim();
-                applyStatusChange(reqId, 'Rejected', reason);
+                const ctx = rejectModalContext && String(rejectModalContext.reqId) === String(reqId)
+                    ? rejectModalContext
+                    : { source: 'admin', reqId: String(reqId), previousDraft: null };
+
+                rejectModalContext = null;
                 document.getElementById('modal-reject').classList.add('hidden');
+
+                if (ctx.source === 'ledger') {
+                    const ledgerSelect = Array.from(document.querySelectorAll('.ledger-change-status-select'))
+                        .find(sel => String(sel.dataset.id) === String(reqId));
+                    if (ledgerSelect) delete ledgerSelect.dataset.pendingLedgerReject;
+                    await applyStatusChange(reqId, 'Rejected', reason);
+                    return;
+                }
+
+                // Administrative review section: stage Rejected and wait for Save.
+                stageStatusChange(reqId, 'Rejected', reason);
             });
         }
 
@@ -3652,7 +3893,7 @@
             document.getElementById('slip-chair').textContent = r.chairing_officer || '';
             document.getElementById('slip-department').textContent = r.department || '';
             document.getElementById('slip-subject').textContent = r.subject || '';
-            document.getElementById('slip-vc').textContent = (r.vc_required == 1) ? 'हाँ (वी.सी. बुकिंग आवश्यक)' : 'नहीं';
+            document.getElementById('slip-vc').textContent = (Number(r.vc_required) === 1) ? 'हाँ' : 'नहीं';
 
             const pptVal = r.ppt_required;
             const isPptRequired = (pptVal === 1 || pptVal === '1' || pptVal === true || String(pptVal).toLowerCase() === 'true');
@@ -3754,6 +3995,32 @@
 
         document.querySelectorAll('.modal-close-btn').forEach(btn => {
             btn.addEventListener('click', () => {
+                if (btn.closest('#modal-reject')) {
+                    const reqId = document.getElementById('reject-req-id').value;
+                    const booking = allRequisitionsCache.find(r => String(r.id) === String(reqId));
+                    const ctx = rejectModalContext && String(rejectModalContext.reqId) === String(reqId)
+                        ? rejectModalContext
+                        : null;
+
+                    if (booking && ctx && ctx.source === 'ledger') {
+                        const ledgerSelect = Array.from(document.querySelectorAll('.ledger-change-status-select'))
+                            .find(sel => String(sel.dataset.id) === String(reqId));
+                        if (ledgerSelect) {
+                            ledgerSelect.value = booking.status;
+                            delete ledgerSelect.dataset.pendingLedgerReject;
+                        }
+                    } else if (booking) {
+                        if (ctx && ctx.previousDraft) {
+                            statusDraftsByReqId[String(reqId)] = { ...ctx.previousDraft };
+                        } else {
+                            delete statusDraftsByReqId[String(reqId)];
+                        }
+                        const adminSelect = findAdminStatusSelect(reqId);
+                        if (adminSelect) adminSelect.value = ctx && ctx.previousDraft ? ctx.previousDraft.status : booking.status;
+                        updateStatusRowControls(reqId);
+                    }
+                    rejectModalContext = null;
+                }
                 document.querySelectorAll('#modal-login, #modal-new-user, #modal-edit-user, #modal-reject, #modal-slip, #modal-hall-edit, #modal-change-pwd, #modal-quick-incharge').forEach(m => m.classList.add('hidden'));
             });
         });
