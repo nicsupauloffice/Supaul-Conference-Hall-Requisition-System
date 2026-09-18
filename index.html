@@ -1720,52 +1720,80 @@
         }
 
         // Real-Time Online Backend Polling Engine (Single Source of Truth)
-        async function syncFromOnlineDatabase() {
-            if (!APPS_SCRIPT_URL) return;
+        let syncInProgress = false;
+        let syncTimerId = null;
+        let lastSyncSignature = '';
+
+        function scheduleOnlineSync(delayMs = 30000) {
+            if (syncTimerId) clearTimeout(syncTimerId);
+            syncTimerId = setTimeout(() => {
+                syncFromOnlineDatabase();
+            }, delayMs);
+        }
+
+        function getActiveAdminTabId() {
+            const active = document.querySelector('.nav-tab-btn.active, .nav-tab-btn[aria-selected="true"]');
+            return active ? active.id.replace('tab-btn-', '') : '';
+        }
+
+        async function syncFromOnlineDatabase(options = {}) {
+            if (!APPS_SCRIPT_URL || syncInProgress) return;
+            syncInProgress = true;
             try {
-                const res = await fetch(APPS_SCRIPT_URL + "?action=bootstrap");
+                const res = await fetch(APPS_SCRIPT_URL + "?action=bootstrap", { cache: 'no-store' });
                 const data = await res.json();
                 if (data && data.success) {
+                    const previousHalls = JSON.stringify(hallsData);
+                    const previousReqs = JSON.stringify(allRequisitionsCache);
+                    const previousNotifs = JSON.stringify(notificationsCache);
+                    const previousConfig = JSON.stringify(appConfigCache);
+
                     if (Array.isArray(data.halls)) {
                         hallsData = data.halls;
-                        if (!selectedHallId && hallsData.length > 0) {
-                            selectedHallId = hallsData[0].id;
+                        if (!selectedHallId && hallsData.length > 0) selectedHallId = hallsData[0].id;
+                        if (selectedHallId && !hallsData.some(h => String(h.id) === String(selectedHallId))) {
+                            selectedHallId = hallsData.length ? hallsData[0].id : null;
                         }
                     }
-
-                    if (Array.isArray(data.requisitions)) {
-                        allRequisitionsCache = data.requisitions;
-                    }
-
-                    if (Array.isArray(data.notifications)) {
-                        notificationsCache = data.notifications;
-                    }
-
+                    if (Array.isArray(data.requisitions)) allRequisitionsCache = data.requisitions;
+                    if (Array.isArray(data.notifications)) notificationsCache = data.notifications;
                     if (data.config) {
                         appConfigCache = { ...appConfigCache, ...data.config };
-                        applyAppConfig(appConfigCache);
                     }
 
-                    renderVenuesList();
-                    loadSchedule();
-                    loadNotifications();
+                    const hallsChanged = previousHalls !== JSON.stringify(hallsData);
+                    const reqsChanged = previousReqs !== JSON.stringify(allRequisitionsCache);
+                    const notifsChanged = previousNotifs !== JSON.stringify(notificationsCache);
+                    const configChanged = previousConfig !== JSON.stringify(appConfigCache);
+                    const forceRender = !!options.forceRender;
 
-                    // If popup is currently open, refresh availability live
+                    if (configChanged || forceRender) applyAppConfig(appConfigCache);
+                    if (hallsChanged || reqsChanged || forceRender) {
+                        renderVenuesList();
+                        loadSchedule();
+                    }
+                    if (notifsChanged || forceRender) loadNotifications();
+
                     const popupModal = document.getElementById('modal-vacancy-calendar');
-                    if (popupModal && !popupModal.classList.contains('hidden')) {
+                    if ((hallsChanged || reqsChanged || forceRender) && popupModal && !popupModal.classList.contains('hidden')) {
                         renderPopupSlotsGrid();
                     }
 
                     if (currentUser) {
+                        const activeTab = getActiveAdminTabId();
                         if (currentUser.role === 'officer' || currentUser.role === 'itm') {
-                            loadMyRequisitions();
-                        } else {
-                            loadAdminData();
+                            if (reqsChanged || forceRender) loadMyRequisitions();
+                        } else if (activeTab === 'dashboard' || activeTab === 'requests' || activeTab === 'ledger' || activeTab === 'halls' || activeTab === 'tech-dashboard') {
+                            if (reqsChanged || hallsChanged || forceRender) loadAdminData(activeTab);
                         }
                     }
+                    lastSyncSignature = String(Date.now());
                 }
             } catch (err) {
                 console.warn("Online sync offline check:", err);
+            } finally {
+                syncInProgress = false;
+                if (document.visibilityState !== 'hidden') scheduleOnlineSync(30000);
             }
         }
 
@@ -1783,7 +1811,16 @@
             }
         }
 
-        setInterval(syncFromOnlineDatabase, 10000);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                syncFromOnlineDatabase();
+            } else if (syncTimerId) {
+                clearTimeout(syncTimerId);
+                syncTimerId = null;
+            }
+        });
+
+        scheduleOnlineSync(30000);
 
         function updateAuthUI() {
             const isAuth = !!currentUser;
@@ -1943,7 +1980,7 @@
                     selectedHallId = hall.id;
                     selectedHours = [];
                     updateSelectionBar();
-                    renderVenuesList();
+                    updateActiveHallBanner();
                     loadSchedule();
                 });
 
@@ -2381,7 +2418,11 @@
             }
 
             if (['dashboard', 'requests', 'ledger', 'users', 'halls', 'tech-dashboard'].includes(tabId)) {
-                loadAdminData();
+                if (tabId === 'users') {
+                    fetchOnlineUsersRoster();
+                } else {
+                    loadAdminData(tabId);
+                }
             } else if (tabId === 'my-reqs') {
                 loadMyRequisitions();
             } else if (tabId === 'site-config') {
@@ -2511,7 +2552,7 @@
                     reqForm.reset();
                     selectedHours = [];
                     updateSelectionBar();
-                    await syncFromOnlineDatabase();
+                    syncFromOnlineDatabase({ forceRender: true });
 
                     if (isDirect) {
                         switchTab('requests');
@@ -2747,7 +2788,7 @@
             bindSlipButtons();
         }
 
-        function loadAdminData() {
+        function loadAdminData(activeTabId = getActiveAdminTabId()) {
             const isRoleAdmin = currentUser && currentUser.role === 'admin';
             const isRoleNazarat = currentUser && currentUser.role === 'nazarat';
             const isRoleTech = currentUser && ['technical', 'itm'].includes(currentUser.role);
@@ -2760,11 +2801,11 @@
             if (document.getElementById('badge-pending-count')) document.getElementById('badge-pending-count').textContent = pending;
             if (document.getElementById('stat-halls-count')) document.getElementById('stat-halls-count').textContent = hallsData.length;
 
-            if (isRoleTech) renderTechDutyBoard(allRequisitionsCache);
-            if (isRoleAdmin || isRoleNazarat) renderAdminHallsTable();
+            if (isRoleTech && activeTabId === 'tech-dashboard') renderTechDutyBoard(allRequisitionsCache);
+            if ((isRoleAdmin || isRoleNazarat) && activeTabId === 'halls') renderAdminHallsTable();
 
             const reqTbody = document.getElementById('admin-requests-table-body');
-            if (reqTbody) {
+            if (reqTbody && (activeTabId === 'requests' || activeTabId === 'dashboard')) {
                 reqTbody.innerHTML = '';
                 allRequisitionsCache.forEach(r => {
                     const expired = isBookingSlotExpired(r);
@@ -2825,13 +2866,19 @@
                 });
             }
 
-            fetchOnlineUsersRoster();
-            renderLedgerTable(allRequisitionsCache);
-            bindStatusChangeEvents();
-            bindStatusSaveEvents();
-            bindDeleteBookingEvents();
-            bindSlipButtons();
-            initIcons();
+            if (activeTabId === 'ledger' || activeTabId === 'dashboard') renderLedgerTable(allRequisitionsCache);
+            if (activeTabId === 'requests' || activeTabId === 'dashboard') {
+                bindStatusChangeEvents();
+                bindStatusSaveEvents();
+                bindDeleteBookingEvents();
+                bindSlipButtons();
+            }
+            if (activeTabId === 'ledger') {
+                bindLedgerStatusChangeEvents();
+                bindDeleteBookingEvents();
+                bindSlipButtons();
+            }
+            if (activeTabId === 'dashboard' || activeTabId === 'requests' || activeTabId === 'ledger' || activeTabId === 'halls' || activeTabId === 'tech-dashboard') initIcons();
         }
 
         function renderUsersTable() {
@@ -3027,7 +3074,7 @@
 
                     if (res && res.success) {
                         showToast(res.message || 'सभागार सुरक्षित रूप से अभिलेखित किया गया।');
-                        await syncFromOnlineDatabase();
+                        syncFromOnlineDatabase({ forceRender: true });
                     } else {
                         showToast(res.message || 'सभागार हटाने में त्रुटि', 'error');
                     }
@@ -3093,7 +3140,7 @@
                 if (res && res.success) {
                     showToast(`सभागार "${name_hi}" का विवरण सफलतापूर्वक सहेजा गया।`);
                     document.getElementById('modal-hall-edit').classList.add('hidden');
-                    await syncFromOnlineDatabase();
+                    syncFromOnlineDatabase({ forceRender: true });
                 } else {
                     showToast(res.message || 'सभागार सहेजने में विफल।', 'error');
                 }
@@ -3135,7 +3182,7 @@
                     if (res && res.success) {
                         showToast('नोडल प्राधिकारी का विवरण सफलतापूर्वक अद्यतित किया गया।');
                         document.getElementById('modal-quick-incharge').classList.add('hidden');
-                        await syncFromOnlineDatabase();
+                        syncFromOnlineDatabase({ forceRender: true });
                     } else {
                         showToast(res.message || 'अद्यतन विफल।', 'error');
                     }
@@ -3570,9 +3617,12 @@
         }
 
         const ledgerSearchInput = document.getElementById('ledger-search-input');
+        let ledgerSearchTimer = null;
         if (ledgerSearchInput) {
             ledgerSearchInput.addEventListener('input', (e) => {
+                clearTimeout(ledgerSearchTimer);
                 const q = e.target.value.toLowerCase().trim();
+                ledgerSearchTimer = setTimeout(() => {
                 const filtered = allRequisitionsCache.filter(r => 
                     r.subject.toLowerCase().includes(q) ||
                     (r.memo_no && r.memo_no.toLowerCase().includes(q)) ||
@@ -3581,6 +3631,7 @@
                     r.department.toLowerCase().includes(q)
                 );
                 renderLedgerTable(filtered);
+                }, 180);
             });
         }
 
@@ -3769,7 +3820,7 @@
 
             if (res && res.success) {
                 showToast(`मांग संदर्भ ${reqId} की स्थिति "${status_label_hi}" कर दी गई है।`);
-                await syncFromOnlineDatabase();
+                syncFromOnlineDatabase({ forceRender: true });
             } else {
                 showToast((res && res.message) || 'स्थिति अद्यतन विफल।', 'error');
             }
@@ -3873,7 +3924,7 @@
                     const res = await apiPost({ action: 'delete', id: reqId });
                     if (res && res.success) {
                         showToast(`बुकिंग संदर्भ ${reqId} को पूर्णतः हटा दिया गया है।`);
-                        await syncFromOnlineDatabase();
+                        syncFromOnlineDatabase({ forceRender: true });
                     } else {
                         showToast(res.message || "बुकिंग हटाने में विफल।", "error");
                     }
