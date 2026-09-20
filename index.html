@@ -499,10 +499,11 @@
 
                 <form id="requisition-form" class="space-y-4 text-xs">
                     <div>
-                        <label class="block text-slate-700 font-bold mb-1">
-                            बैठक का विषय / Agenda Title <span class="text-rose-600">*</span>
+                        <label class="block text-slate-700 font-bold mb-1 flex items-center justify-between gap-2">
+                            <span>बैठक का विषय / Agenda Title (संक्षिप्त/Brief) <span class="text-rose-600">*</span></span>
+                            <span id="req-subject-word-count" class="text-[10px] font-semibold text-slate-500 whitespace-nowrap">0/25 शब्द</span>
                         </label>
-                        <input type="text" id="req-subject" required placeholder="उदा. अनुमंडल राजस्व एवं विधि-व्यवस्था समीक्षा बैठक" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary min-h-[38px]">
+                        <input type="text" id="req-subject" required data-max-words="25" placeholder="उदा. अनुमंडल राजस्व एवं विधि-व्यवस्था समीक्षा बैठक" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary min-h-[38px]">
                     </div>
 
                     <div>
@@ -1400,6 +1401,10 @@
                         <span id="slip-subject" class="font-medium text-slate-900 text-right max-w-[280px] break-words"></span>
                     </div>
                     <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
+                        <span class="font-bold text-slate-600 flex-shrink-0">विस्तृत एजेंडा:</span>
+                        <span id="slip-agenda" class="font-medium text-slate-800 text-right max-w-[360px] break-words whitespace-pre-line">—</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200 pb-1 gap-2">
                         <span class="font-bold text-slate-600 flex-shrink-0">वी.सी. बुकिंग ज़रूरी है (VC Required):</span>
                         <span id="slip-vc" class="font-bold portal-text-primary text-right"></span>
                     </div>
@@ -1872,8 +1877,8 @@
 
                 const hallSectionTitle = document.getElementById('halls-section-title');
                 if (hallSectionTitle) {
-                    hallSectionTitle.textContent = role === 'nazarat'
-                        ? 'उपलब्ध सभागार (View Only)'
+                    hallSectionTitle.textContent = (role === 'nazarat')
+                        ? 'सभागार एवं कक्ष प्रबंधन (NDC / Admin)'
                         : 'सभागार एवं कक्ष प्रबंधन (Admin Exclusive)';
                 }
                 const hallAddBtn = document.getElementById('open-new-hall-modal-btn');
@@ -2473,6 +2478,32 @@
             });
         });
 
+        const reqSubjectInput = document.getElementById('req-subject');
+        const reqSubjectWordCount = document.getElementById('req-subject-word-count');
+        const MAX_REQ_SUBJECT_WORDS = 25;
+
+        function updateReqSubjectWordLimit() {
+            if (!reqSubjectInput) return true;
+            const words = reqSubjectInput.value.trim().split(/\s+/).filter(Boolean);
+            if (words.length > MAX_REQ_SUBJECT_WORDS) {
+                reqSubjectInput.value = words.slice(0, MAX_REQ_SUBJECT_WORDS).join(' ');
+                showToast('बैठक का विषय अधिकतम 25 शब्दों तक सीमित है।', 'error');
+            }
+            const count = reqSubjectInput.value.trim().split(/\s+/).filter(Boolean).length;
+            if (reqSubjectWordCount) {
+                reqSubjectWordCount.textContent = `${count}/${MAX_REQ_SUBJECT_WORDS} शब्द`;
+                reqSubjectWordCount.className = count >= MAX_REQ_SUBJECT_WORDS
+                    ? 'text-[10px] font-bold text-amber-700 whitespace-nowrap'
+                    : 'text-[10px] font-semibold text-slate-500 whitespace-nowrap';
+            }
+            return count <= MAX_REQ_SUBJECT_WORDS;
+        }
+
+        if (reqSubjectInput) {
+            reqSubjectInput.addEventListener('input', updateReqSubjectWordLimit);
+            updateReqSubjectWordLimit();
+        }
+
         const reqForm = document.getElementById('requisition-form');
         if (reqForm) {
             reqForm.addEventListener('submit', async (e) => {
@@ -2500,6 +2531,10 @@
                 const subject = document.getElementById('req-subject').value.trim();
                 if (!subject) {
                     showToast('बैठक का विषय रिक्त नहीं हो सकता।', 'error');
+                    return;
+                }
+                if (!updateReqSubjectWordLimit()) {
+                    showToast('बैठक का विषय अधिकतम 25 शब्दों तक सीमित है।', 'error');
                     return;
                 }
 
@@ -2952,13 +2987,14 @@
             tbody.innerHTML = '';
 
             const isSuperAdmin = currentUser && currentUser.role === 'admin';
+            const canEditHalls = currentUser && (currentUser.role === 'admin' || currentUser.role === 'nazarat');
 
             hallsData.forEach(hall => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
                 const feats = Array.isArray(hall.features) ? hall.features.slice(0, 3).join(', ') : '';
 
-                const editBtnHtml = isSuperAdmin ? `
+                const editBtnHtml = canEditHalls ? `
                     <button type="button" class="edit-hall-btn min-h-[32px] px-2.5 py-1 portal-bg-primary hover:opacity-90 text-white rounded text-[11px] font-bold inline-flex items-center gap-1 shadow-xs" data-hall-id="${hall.id}">
                         <i data-lucide="pencil" class="w-3 h-3"></i> संपादन
                     </button>
@@ -3099,8 +3135,8 @@
         if (hallEditForm) {
             hallEditForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if (!currentUser || currentUser.role !== 'admin') {
-                    showToast('केवल Super Admin / DIO ही सभागार संपादित कर सकते हैं।', 'error');
+                if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'nazarat')) {
+                    showToast('केवल Super Admin / DIO या NDC ही सभागार संपादित कर सकते हैं।', 'error');
                     return;
                 }
 
@@ -3944,6 +3980,8 @@
             document.getElementById('slip-chair').textContent = r.chairing_officer || '';
             document.getElementById('slip-department').textContent = r.department || '';
             document.getElementById('slip-subject').textContent = r.subject || '';
+            const slipAgendaEl = document.getElementById('slip-agenda');
+            if (slipAgendaEl) slipAgendaEl.textContent = String(r.agenda || '').trim() || '—';
             document.getElementById('slip-vc').textContent = (Number(r.vc_required) === 1) ? 'हाँ' : 'नहीं';
 
             const pptVal = r.ppt_required;
