@@ -501,14 +501,17 @@
                     <div>
                         <label class="block text-slate-700 font-bold mb-1 flex items-center justify-between gap-2">
                             <span>बैठक का विषय / Agenda Title (संक्षिप्त/Brief) <span class="text-rose-600">*</span></span>
-                            <span id="req-subject-word-count" class="text-[10px] font-semibold text-slate-500 whitespace-nowrap">0/25 शब्द</span>
+                            <span id="req-subject-word-count" class="text-[10px] font-semibold text-slate-500 whitespace-nowrap">0/50 अक्षर</span>
                         </label>
-                        <input type="text" id="req-subject" required data-max-words="25" placeholder="उदा. अनुमंडल राजस्व एवं विधि-व्यवस्था समीक्षा बैठक" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary min-h-[38px]">
+                        <input type="text" id="req-subject" required maxlength="50" data-max-characters="50" placeholder="उदा. अनुमंडल राजस्व एवं विधि-व्यवस्था समीक्षा बैठक" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary min-h-[38px]">
                     </div>
 
                     <div>
-                        <label class="block text-slate-700 font-bold mb-1">विस्तृत एजेंडा</label>
-                        <textarea id="req-agenda" rows="2" placeholder="कार्यवाही के मुख्य बिंदु..." class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary"></textarea>
+                        <label class="block text-slate-700 font-bold mb-1 flex items-center justify-between gap-2">
+                            <span>विस्तृत एजेंडा</span>
+                            <span id="req-agenda-char-count" class="text-[10px] font-semibold text-slate-500 whitespace-nowrap">0/75 अक्षर</span>
+                        </label>
+                        <textarea id="req-agenda" rows="2" maxlength="75" data-max-characters="75" placeholder="कार्यवाही के मुख्य बिंदु..." class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary"></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -634,7 +637,7 @@
                         <span class="text-xs text-slate-500 font-bold block uppercase">पी.पी.टी. आवश्यक बैठकें</span>
                         <p id="stat-tech-ppt" class="text-2xl font-extrabold text-blue-700 m-0 mt-1">0</p>
                     </div>
-                    <div class="bg-white rounded-lg p-4 border-l-4 border-emerald-600 border border-slate-200 shadow-sm">
+                    <div class="bg-white rounded-lg p-4 border-l-4 portal-border-accent border border-slate-200 shadow-sm">
                         <span class="text-xs text-slate-500 font-bold block uppercase">स्वीकृत सभागार सत्र</span>
                         <p id="stat-tech-total-approved" class="text-2xl font-extrabold text-emerald-700 m-0 mt-1">0</p>
                     </div>
@@ -670,19 +673,19 @@
             <!-- SECTION 4: DASHBOARD -->
             <div id="section-dashboard" class="portal-section hidden space-y-6">
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="admin-stats-container">
-                    <div data-dashboard-target="requests" role="button" tabindex="0" aria-label="समीक्षाधीन आवेदन खोलें" class="dashboard-category-card bg-white rounded-lg p-3 sm:p-4 border-l-4 border-amber-500 border border-slate-200 shadow-sm">
+                    <div data-dashboard-target="requests" role="button" tabindex="0" aria-label="समीक्षाधीन आवेदन खोलें" class="dashboard-category-card bg-white rounded-lg p-3 sm:p-4 border-l-4 portal-border-accent border border-slate-200 shadow-sm">
                         <span class="text-[11px] sm:text-xs text-slate-500 font-bold block uppercase truncate">समीक्षाधीन आवेदन</span>
                         <p id="stat-pending" class="text-xl sm:text-2xl font-extrabold portal-text-primary m-0 mt-1">0</p>
                     </div>
-                    <div data-dashboard-target="requests" role="button" tabindex="0" aria-label="स्वीकृत बैठकें खोलें" class="dashboard-category-card bg-white rounded-lg p-3 sm:p-4 border-l-4 border-emerald-600 border border-slate-200 shadow-sm">
+                    <div data-dashboard-target="requests" role="button" tabindex="0" aria-label="स्वीकृत बैठकें खोलें" class="dashboard-category-card bg-white rounded-lg p-3 sm:p-4 border-l-4 portal-border-accent border border-slate-200 shadow-sm">
                         <span class="text-[11px] sm:text-xs text-slate-500 font-bold block uppercase truncate">स्वीकृत बैठकें</span>
                         <p id="stat-approved" class="text-xl sm:text-2xl font-extrabold text-emerald-700 m-0 mt-1">0</p>
                     </div>
-                    <div data-dashboard-target="halls" role="button" tabindex="0" aria-label="उपलब्ध सभागार खोलें" class="dashboard-category-card bg-white rounded-lg p-3 sm:p-4 border-l-4 portal-border-primary border border-slate-200 shadow-sm">
+                    <div data-dashboard-target="halls" role="button" tabindex="0" aria-label="उपलब्ध सभागार खोलें" class="dashboard-category-card bg-white rounded-lg p-3 sm:p-4 border-l-4 portal-border-accent border border-slate-200 shadow-sm">
                         <span class="text-[11px] sm:text-xs text-slate-500 font-bold block uppercase truncate">उपलब्ध सभागार</span>
                         <p id="stat-halls-count" class="text-xl sm:text-2xl font-extrabold portal-text-primary m-0 mt-1">0</p>
                     </div>
-                    <div data-dashboard-target="users" role="button" tabindex="0" aria-label="पंजीकृत अधिकारी खोलें" class="dashboard-category-card bg-white rounded-lg p-3 sm:p-4 border-l-4 border-indigo-600 border border-slate-200 shadow-sm">
+                    <div data-dashboard-target="users" role="button" tabindex="0" aria-label="पंजीकृत अधिकारी खोलें" class="dashboard-category-card bg-white rounded-lg p-3 sm:p-4 border-l-4 portal-border-accent border border-slate-200 shadow-sm">
                         <span class="text-[11px] sm:text-xs text-slate-500 font-bold block uppercase truncate">पंजीकृत अधिकारी</span>
                         <p id="stat-users" class="text-xl sm:text-2xl font-extrabold text-indigo-900 m-0 mt-1">0</p>
                     </div>
@@ -2088,9 +2091,9 @@
                           '<span class="text-[9px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold flex-shrink-0">रिक्त</span>'}
                     </div>
                     <div class="mt-1.5 text-xs w-full">
-                        ${isApproved ? `<span class="font-bold text-rose-950 text-[11px] block truncate">${bookingInfo.booking.subject}</span>` :
+                        ${isApproved ? `<span class="font-bold text-rose-950 text-[11px] block whitespace-normal break-words overflow-wrap-anywhere">${bookingInfo.booking.subject}</span>` :
                           isExpired ? `<span class="text-[10px] text-slate-400">समय समाप्त / अनुपलब्ध</span>` :
-                          isPending ? `<span class="text-amber-950 font-semibold text-[11px] block truncate">${bookingInfo.booking.subject}</span>` :
+                          isPending ? `<span class="text-amber-950 font-semibold text-[11px] block whitespace-normal break-words overflow-wrap-anywhere">${bookingInfo.booking.subject}</span>` :
                           isSelected ? '<span class="portal-text-primary text-xs font-bold">स्लॉट चुना गया</span>' :
                           '<span class="text-slate-500 text-[11px]">चयन करने हेतु क्लिक करें</span>'}
                     </div>
@@ -2295,9 +2298,9 @@
                           '<span class="text-[9px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold flex-shrink-0">रिक्त</span>'}
                     </div>
                     <div class="mt-1 text-[11px] w-full">
-                        ${isApproved ? `<span class="font-bold text-rose-950 block truncate">${bookingInfo.booking.subject}</span>` :
+                        ${isApproved ? `<span class="font-bold text-rose-950 block whitespace-normal break-words overflow-wrap-anywhere">${bookingInfo.booking.subject}</span>` :
                           isExpired ? `<span class="text-[10px] text-slate-400">समय समाप्त</span>` :
-                          isPending ? `<span class="text-amber-950 font-semibold block truncate">${bookingInfo.booking.subject}</span>` :
+                          isPending ? `<span class="text-amber-950 font-semibold block whitespace-normal break-words overflow-wrap-anywhere">${bookingInfo.booking.subject}</span>` :
                           isSelected ? '<span class="portal-text-primary font-bold">स्लॉट चुना गया</span>' :
                           '<span class="text-slate-500">क्लिक करें</span>'}
                     </div>
@@ -2480,28 +2483,55 @@
 
         const reqSubjectInput = document.getElementById('req-subject');
         const reqSubjectWordCount = document.getElementById('req-subject-word-count');
-        const MAX_REQ_SUBJECT_WORDS = 25;
+        const reqAgendaInput = document.getElementById('req-agenda');
+        const reqAgendaCharCount = document.getElementById('req-agenda-char-count');
+        const MAX_REQ_SUBJECT_CHARS = 50;
+        const MAX_REQ_AGENDA_CHARS = 75;
 
-        function updateReqSubjectWordLimit() {
+        function getCharacterCount(value) {
+            return Array.from(String(value || '')).length;
+        }
+
+        function updateReqSubjectCharacterLimit(showError = true) {
             if (!reqSubjectInput) return true;
-            const words = reqSubjectInput.value.trim().split(/\s+/).filter(Boolean);
-            if (words.length > MAX_REQ_SUBJECT_WORDS) {
-                reqSubjectInput.value = words.slice(0, MAX_REQ_SUBJECT_WORDS).join(' ');
-                showToast('बैठक का विषय अधिकतम 25 शब्दों तक सीमित है।', 'error');
-            }
-            const count = reqSubjectInput.value.trim().split(/\s+/).filter(Boolean).length;
+            const count = getCharacterCount(reqSubjectInput.value);
             if (reqSubjectWordCount) {
-                reqSubjectWordCount.textContent = `${count}/${MAX_REQ_SUBJECT_WORDS} शब्द`;
-                reqSubjectWordCount.className = count >= MAX_REQ_SUBJECT_WORDS
+                reqSubjectWordCount.textContent = `${count}/${MAX_REQ_SUBJECT_CHARS} अक्षर`;
+                reqSubjectWordCount.className = count >= MAX_REQ_SUBJECT_CHARS
                     ? 'text-[10px] font-bold text-amber-700 whitespace-nowrap'
                     : 'text-[10px] font-semibold text-slate-500 whitespace-nowrap';
             }
-            return count <= MAX_REQ_SUBJECT_WORDS;
+            if (count > MAX_REQ_SUBJECT_CHARS) {
+                if (showError) showToast('बैठक का विषय अधिकतम 50 अक्षरों तक सीमित है।', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        function updateReqAgendaCharacterLimit(showError = false) {
+            if (!reqAgendaInput) return true;
+            const count = getCharacterCount(reqAgendaInput.value);
+            if (reqAgendaCharCount) {
+                reqAgendaCharCount.textContent = `${count}/${MAX_REQ_AGENDA_CHARS} अक्षर`;
+                reqAgendaCharCount.className = count >= MAX_REQ_AGENDA_CHARS
+                    ? 'text-[10px] font-bold text-amber-700 whitespace-nowrap'
+                    : 'text-[10px] font-semibold text-slate-500 whitespace-nowrap';
+            }
+            if (count > MAX_REQ_AGENDA_CHARS) {
+                if (showError) showToast('विस्तृत एजेंडा अधिकतम 75 अक्षरों तक सीमित है।', 'error');
+                return false;
+            }
+            return true;
         }
 
         if (reqSubjectInput) {
-            reqSubjectInput.addEventListener('input', updateReqSubjectWordLimit);
-            updateReqSubjectWordLimit();
+            reqSubjectInput.addEventListener('input', () => updateReqSubjectCharacterLimit(false));
+            updateReqSubjectCharacterLimit(false);
+        }
+
+        if (reqAgendaInput) {
+            reqAgendaInput.addEventListener('input', () => updateReqAgendaCharacterLimit(false));
+            updateReqAgendaCharacterLimit(false);
         }
 
         const reqForm = document.getElementById('requisition-form');
@@ -2533,8 +2563,11 @@
                     showToast('बैठक का विषय रिक्त नहीं हो सकता।', 'error');
                     return;
                 }
-                if (!updateReqSubjectWordLimit()) {
-                    showToast('बैठक का विषय अधिकतम 25 शब्दों तक सीमित है।', 'error');
+                if (!updateReqSubjectCharacterLimit(true)) {
+                    return;
+                }
+
+                if (!updateReqAgendaCharacterLimit(true)) {
                     return;
                 }
 
