@@ -433,6 +433,7 @@
                             <div class="bg-blue-50/60 p-3 rounded-lg border border-blue-200 text-xs text-slate-700 self-start sm:self-auto flex-shrink-0 w-full sm:w-56">
                                 <span class="text-[10px] uppercase font-bold text-slate-500 block">नोडल प्राधिकार (In-Charge)</span>
                                 <span id="current-hall-incharge" class="font-bold portal-text-primary block mt-1 text-xs break-words">नजारत उप समाहर्ता, सुपौल</span>
+                                <span id="current-hall-incharge-mobile" class="text-[11px] text-slate-600 block mt-1 break-words"><i data-lucide="phone" class="w-3 h-3 inline-block align-[-1px] mr-0.5"></i><span id="current-hall-incharge-mobile-text">मोबाइल नंबर उपलब्ध नहीं</span></span>
                                 <button type="button" id="quick-edit-incharge-btn" class="hidden mt-2.5 w-full text-[10px] font-bold portal-text-primary bg-white hover:bg-blue-100 border border-blue-300 py-1.5 px-2 rounded flex items-center justify-center gap-1 transition shadow-xs min-h-[32px]">
                                     <i data-lucide="edit-3" class="w-3 h-3"></i> नोडल प्राधिकार बदलें
                                 </button>
@@ -1151,6 +1152,30 @@
             </div>
         </div>
 
+        <!-- MODAL: CANCEL MY BOOKING -->
+        <div id="modal-cancel-booking" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-4 sm:p-5 shadow-2xl relative max-h-[95vh] overflow-y-auto">
+                <button type="button" class="modal-close-btn absolute top-3.5 right-3.5 text-slate-400 hover:text-black p-1.5 rounded min-w-[36px] min-h-[36px] flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <div class="flex items-center gap-3 mb-3 pb-2 border-b border-slate-200">
+                    <div class="w-9 h-9 rounded bg-rose-600 text-white flex items-center justify-center flex-shrink-0"><i data-lucide="circle-x" class="w-5 h-5"></i></div>
+                    <div><h2 class="text-base font-bold portal-text-primary m-0">बुकिंग रद्द करें</h2><p class="text-[11px] text-slate-500 m-0">रद्दीकरण के लिए कारण देना अनिवार्य है।</p></div>
+                </div>
+                <form id="cancel-booking-form" class="space-y-3 text-xs">
+                    <input type="hidden" id="cancel-req-id">
+                    <div><label class="block text-slate-700 font-bold mb-1">मांग संदर्भ: <span id="cancel-req-label" class="portal-text-primary"></span></label></div>
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">रद्द करने का कारण / Remark *</label>
+                        <textarea id="cancel-booking-remark" required rows="3" maxlength="500" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary resize-y" placeholder="रद्द करने का कारण लिखें..."></textarea>
+                        <p id="cancel-booking-error" class="hidden mt-1 text-[11px] text-rose-700 font-medium"></p>
+                    </div>
+                    <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-200">
+                        <button type="button" class="modal-close-btn min-h-[40px] px-3.5 py-1.5 rounded text-slate-600 hover:text-black">वापस</button>
+                        <button type="submit" id="cancel-booking-submit-btn" class="min-h-[40px] px-4 py-1.5 rounded bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1 shadow-xs"><i data-lucide="circle-x" class="w-3.5 h-3.5"></i> रद्द करें</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- MODAL: QUICK EDIT NODAL IN-CHARGE -->
         <div id="modal-quick-incharge" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
             <div class="bg-white border-2 portal-border-primary rounded-lg max-w-md w-full p-4 sm:p-5 shadow-2xl relative max-h-[95vh] overflow-y-auto">
@@ -1174,6 +1199,10 @@
                     <div>
                         <label class="block text-slate-700 font-bold mb-1">प्रभारी प्राधिकारी / पदनाम (Nodal In-Charge) *</label>
                         <input type="text" id="qi-incharge-input" required class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary min-h-[38px]">
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1">मोबाइल नंबर / Mobile Number</label>
+                        <input type="tel" id="qi-incharge-mobile-input" inputmode="numeric" autocomplete="tel" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="10-digit mobile number" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-slate-800 focus:outline-none portal-border-primary min-h-[38px]">
                     </div>
                     <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-200">
                         <button type="button" class="modal-close-btn min-h-[40px] px-3.5 py-1.5 rounded text-slate-600 hover:text-black">रद्द करें</button>
@@ -2056,6 +2085,7 @@
             const wingsEl = document.getElementById('current-hall-wings');
             const descEl = document.getElementById('current-hall-desc');
             const inchargeEl = document.getElementById('current-hall-incharge');
+            const inchargeMobileTextEl = document.getElementById('current-hall-incharge-mobile-text');
             const sumVenueEl = document.getElementById('summary-venue');
             const sumCapEl = document.getElementById('summary-capacity');
             const featsContainer = document.getElementById('current-hall-features');
@@ -2065,6 +2095,7 @@
             if (wingsEl) wingsEl.textContent = hall.wings || '';
             if (descEl) descEl.textContent = hall.description || 'जिला समाहरणालय सुपौल का सुसज्जित सभागार।';
             if (inchargeEl) inchargeEl.textContent = hall.in_charge || 'नजारत उप समाहर्ता, सुपौल';
+            if (inchargeMobileTextEl) inchargeMobileTextEl.textContent = hall.in_charge_mobile ? hall.in_charge_mobile : 'मोबाइल नंबर उपलब्ध नहीं';
             if (sumVenueEl) sumVenueEl.textContent = hall.name_hi || hall.name;
             if (sumCapEl) sumCapEl.textContent = `${hall.capacity} Seats`;
 
@@ -2871,37 +2902,48 @@
             const tbody = document.getElementById('my-reqs-table-body');
             if (!tbody) return;
             tbody.innerHTML = '';
-
             if (myReqs.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-500">अभी तक कोई मांग-पत्र प्रस्तुत नहीं किया गया है।</td></tr>';
                 return;
             }
-
             myReqs.forEach(r => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
+                const isEligibleForCancellation = ['Approved', 'Pending'].includes(r.status) && !isBookingSlotExpired(r);
+                const statusClass = r.status === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' :
+                    r.status === 'Pending' ? 'bg-amber-50 text-amber-800 border border-amber-300' :
+                    r.status === 'Cancelled' ? 'bg-slate-100 text-slate-700 border border-slate-300' :
+                    'bg-rose-50 text-rose-800 border border-rose-300';
+                const statusText = r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : r.status === 'Cancelled' ? 'रद्द' : 'अस्वीकृत';
                 tr.innerHTML = `
                     <td class="p-3 pl-4 font-mono font-bold portal-text-primary whitespace-nowrap">${r.id}</td>
-                    <td class="p-3 whitespace-nowrap">
-                        <span class="font-semibold block">${r.hall_name || 'लहटन चौधरी सभागार'}</span>
-                        <span class="text-[11px] text-slate-600 block">${formatBookingPeriod(r.booking_date, r.hours)}</span>
-                    </td>
+                    <td class="p-3 whitespace-nowrap"><span class="font-semibold block">${r.hall_name || 'लहटन चौधरी सभागार'}</span><span class="text-[11px] text-slate-600 block">${formatBookingPeriod(r.booking_date, r.hours)}</span></td>
                     <td class="p-3 break-words max-w-xs">${r.subject}</td>
                     <td class="p-3 break-words">${r.chairing_officer}</td>
-                    <td class="p-3 text-center whitespace-nowrap">
-                        <span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold ${
-                            r.status === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' :
-                            r.status === 'Pending' ? 'bg-amber-50 text-amber-800 border border-amber-300' :
-                            'bg-rose-50 text-rose-800 border border-rose-300'
-                        }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}</span>
-                    </td>
+                    <td class="p-3 text-center whitespace-nowrap"><span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold ${statusClass}">${statusText}</span></td>
                     <td class="p-3 text-right pr-4 whitespace-nowrap">
                         <button type="button" class="view-slip-btn min-h-[32px] px-2.5 py-1 rounded portal-bg-primary text-white text-[11px] font-bold" data-req='${JSON.stringify(r)}'>आदेश पर्ची</button>
-                    </td>
-                `;
+                        ${isEligibleForCancellation ? `<button type="button" class="cancel-my-req-btn min-h-[32px] px-2.5 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold ml-1" data-req-id="${r.id}">रद्द करें</button>` : ''}
+                    </td>`;
                 tbody.appendChild(tr);
             });
             bindSlipButtons();
+            tbody.querySelectorAll('.cancel-my-req-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const booking = allRequisitionsCache.find(r => String(r.id) === String(btn.dataset.reqId));
+                    if (!booking || booking.officer_email !== currentUser.email) {
+                        showToast('आप केवल अपनी स्वयं की बुकिंग रद्द कर सकते हैं।', 'error');
+                        return;
+                    }
+                    document.getElementById('cancel-req-id').value = booking.id;
+                    document.getElementById('cancel-req-label').textContent = booking.id;
+                    document.getElementById('cancel-booking-remark').value = '';
+                    document.getElementById('cancel-booking-error').classList.add('hidden');
+                    document.getElementById('cancel-booking-error').textContent = '';
+                    document.getElementById('modal-cancel-booking').classList.remove('hidden');
+                    initIcons();
+                });
+            });
         }
 
         function loadAdminData(activeTabId = getActiveAdminTabId()) {
@@ -3263,6 +3305,50 @@
             });
         }
 
+        const cancelBookingForm = document.getElementById('cancel-booking-form');
+        if (cancelBookingForm) {
+            cancelBookingForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const reqId = document.getElementById('cancel-req-id').value;
+                const remarkEl = document.getElementById('cancel-booking-remark');
+                const errorEl = document.getElementById('cancel-booking-error');
+                const remark = remarkEl.value.trim();
+                if (!remark) {
+                    errorEl.textContent = 'रद्द करने का कारण / Remark अनिवार्य है।';
+                    errorEl.classList.remove('hidden');
+                    remarkEl.focus();
+                    return;
+                }
+                const booking = allRequisitionsCache.find(r => String(r.id) === String(reqId));
+                if (!currentUser || !booking || booking.officer_email !== currentUser.email) {
+                    showToast('आप केवल अपनी स्वयं की बुकिंग रद्द कर सकते हैं।', 'error');
+                    return;
+                }
+                if (!['Approved', 'Pending'].includes(booking.status) || isBookingSlotExpired(booking)) {
+                    showToast('यह बुकिंग अब रद्द नहीं की जा सकती।', 'error');
+                    document.getElementById('modal-cancel-booking').classList.add('hidden');
+                    return;
+                }
+                const submitBtn = document.getElementById('cancel-booking-submit-btn');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                const res = await apiPost({
+                    action: 'cancel_booking', id: reqId, remark: remark,
+                    user_email: currentUser.email, user_id: currentUser.id, user_name: currentUser.name
+                });
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                if (res && res.success) {
+                    showToast(`मांग संदर्भ ${reqId} को सफलतापूर्वक रद्द कर दिया गया है।`);
+                    document.getElementById('modal-cancel-booking').classList.add('hidden');
+                    syncFromOnlineDatabase({ forceRender: true });
+                } else {
+                    errorEl.textContent = (res && res.message) || 'रद्दीकरण विफल।';
+                    errorEl.classList.remove('hidden');
+                }
+            });
+        }
+
         const quickInchargeBtn = document.getElementById('quick-edit-incharge-btn');
         if (quickInchargeBtn) {
             quickInchargeBtn.addEventListener('click', () => {
@@ -3271,6 +3357,7 @@
                 document.getElementById('qi-hall-id').value = hall.id;
                 document.getElementById('qi-hall-name').textContent = hall.name_hi || hall.name;
                 document.getElementById('qi-incharge-input').value = hall.in_charge || '';
+                document.getElementById('qi-incharge-mobile-input').value = hall.in_charge_mobile || '';
                 document.getElementById('modal-quick-incharge').classList.remove('hidden');
                 initIcons();
             });
@@ -3286,9 +3373,15 @@
                 }
                 const hallId = document.getElementById('qi-hall-id').value;
                 const inCharge = document.getElementById('qi-incharge-input').value.trim();
+                const inChargeMobile = document.getElementById('qi-incharge-mobile-input').value.trim();
+                if (inChargeMobile && !/^[6-9][0-9]{9}$/.test(inChargeMobile)) {
+                    showToast('कृपया 10-अंकों का वैध भारतीय मोबाइल नंबर दर्ज करें।', 'error');
+                    document.getElementById('qi-incharge-mobile-input').focus();
+                    return;
+                }
                 const hall = hallsData.find(h => h.id === hallId);
                 if (hall) {
-                    const updated = { ...hall, in_charge: inCharge };
+                    const updated = { ...hall, in_charge: inCharge, in_charge_mobile: inChargeMobile };
                     const res = await apiPost({
                         action: 'save_hall',
                         data: updated,
@@ -4182,7 +4275,7 @@
                     }
                     rejectModalContext = null;
                 }
-                document.querySelectorAll('#modal-login, #modal-new-user, #modal-edit-user, #modal-reject, #modal-slip, #modal-hall-edit, #modal-change-pwd, #modal-quick-incharge').forEach(m => m.classList.add('hidden'));
+                document.querySelectorAll('#modal-login, #modal-new-user, #modal-edit-user, #modal-reject, #modal-slip, #modal-hall-edit, #modal-change-pwd, #modal-quick-incharge, #modal-cancel-booking').forEach(m => m.classList.add('hidden'));
             });
         });
 
