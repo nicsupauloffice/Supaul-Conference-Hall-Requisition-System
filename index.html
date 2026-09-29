@@ -278,7 +278,6 @@
                                         <span class="truncate">अद्यतन सूचनाएं (Status Alerts)</span>
                                     </span>
                                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                                        <button type="button" id="notif-mark-read-btn" class="text-[10px] text-slate-600 hover:text-slate-900 font-medium whitespace-nowrap">सब पढ़ा हुआ चिह्नित करें</button>
                                         <button type="button" id="notif-close-btn" class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition flex items-center justify-center" aria-label="सूचना पटल बंद करें" title="बंद करें / Close">
                                             <i data-lucide="x" class="w-3.5 h-3.5"></i>
                                         </button>
@@ -679,11 +678,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-white rounded-lg p-4 border-l-4 border-cyan-600 border border-slate-200 shadow-sm">
+                    <div class="bg-white rounded-lg p-4 border-l-4 portal-border-accent border border-slate-200 shadow-sm">
                         <span class="text-xs text-slate-500 font-bold block uppercase">वी.सी. आवश्यक बैठकें</span>
                         <p id="stat-tech-vc" class="text-2xl font-extrabold text-cyan-700 m-0 mt-1">0</p>
                     </div>
-                    <div class="bg-white rounded-lg p-4 border-l-4 border-blue-600 border border-slate-200 shadow-sm">
+                    <div class="bg-white rounded-lg p-4 border-l-4 portal-border-accent border border-slate-200 shadow-sm">
                         <span class="text-xs text-slate-500 font-bold block uppercase">पी.पी.टी. आवश्यक बैठकें</span>
                         <p id="stat-tech-ppt" class="text-2xl font-extrabold text-blue-700 m-0 mt-1">0</p>
                     </div>
@@ -2820,6 +2819,51 @@
             return `${parts.day}-${parts.month}-${parts.year} ${parts.hour}:${parts.minute}:${parts.second} ${(parts.dayPeriod || '').toUpperCase()}`.trim();
         }
 
+        function getNotificationReadBy(n) {
+            if (!n || !n.read_by) return [];
+            try {
+                const parsed = typeof n.read_by === 'string' ? JSON.parse(n.read_by) : n.read_by;
+                return Array.isArray(parsed)
+                    ? parsed.map(v => String(v || '').toLowerCase().trim()).filter(Boolean)
+                    : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function isNotificationReadForCurrentUser(n) {
+            if (!currentUser || !n) return Number(n && n.is_read) === 1;
+            const email = String(currentUser.email || '').toLowerCase().trim();
+            const readBy = getNotificationReadBy(n);
+            if (readBy.length) return readBy.includes(email);
+            return Number(n.is_read) === 1;
+        }
+
+        async function markNotificationRead(n) {
+            if (!currentUser || !n || isNotificationReadForCurrentUser(n)) return true;
+
+            const res = await apiPost({
+                action: 'mark_notification_read',
+                notification_id: n.id,
+                email: currentUser.email,
+                role: currentUser.role,
+                user_id: currentUser.id
+            });
+
+            if (res && res.success) {
+                n.is_read = 1;
+                const readBy = getNotificationReadBy(n);
+                const email = String(currentUser.email || '').toLowerCase().trim();
+                if (!readBy.includes(email)) readBy.push(email);
+                n.read_by = JSON.stringify(readBy);
+                loadNotifications();
+                return true;
+            }
+
+            showToast((res && res.message) || 'सूचना को पढ़ा हुआ चिह्नित नहीं किया जा सका।', 'error');
+            return false;
+        }
+
         function loadNotifications() {
             if (!currentUser) return;
             const seenKeys = new Set();
@@ -2833,7 +2877,7 @@
             }
 
             const userNotifs = deduplicatedNotifs.filter(n => n.recipient_email === currentUser.email || (n.recipient_role && n.recipient_role.includes(currentUser.role)));
-            const unread = userNotifs.filter(n => n.is_read === 0).length;
+            const unread = userNotifs.filter(n => !isNotificationReadForCurrentUser(n)).length;
 
             const badge = document.getElementById('notif-unread-badge');
             const list = document.getElementById('notif-list-container');
@@ -2854,13 +2898,14 @@
                     list.innerHTML = '';
                     userNotifs.forEach(n => {
                         const item = document.createElement('div');
-                        item.className = `p-2.5 px-3 transition cursor-pointer hover:bg-slate-100 ${n.is_read === 0 ? 'bg-amber-50/70 font-semibold' : 'bg-white'}`;
+                        item.className = `p-2.5 px-3 transition cursor-pointer hover:bg-slate-100 ${!isNotificationReadForCurrentUser(n) ? 'bg-amber-50/70 font-semibold' : 'bg-white'}`;
                         const displayMsg = formatNotificationMessage(n.message);
                         item.innerHTML = `
                             <p class="text-slate-800 m-0 leading-tight break-words">${displayMsg}</p>
                             <span class="text-[10px] text-slate-400 mt-1 block">${formatNotificationDateTime(n.created_at)}</span>
                         `;
-                        item.addEventListener('click', () => {
+                        item.addEventListener('click', async () => {
+                            await markNotificationRead(n);
                             navigateToRequisitionFromNotification(n);
                         });
                         list.appendChild(item);
@@ -2878,22 +2923,6 @@
         const notifCloseBtn = document.getElementById('notif-close-btn');
         if (notifCloseBtn && notifDropdown) {
             notifCloseBtn.addEventListener('click', () => notifDropdown.classList.add('hidden'));
-        }
-
-        const notifMarkReadBtn = document.getElementById('notif-mark-read-btn');
-        if (notifMarkReadBtn) {
-            notifMarkReadBtn.addEventListener('click', async () => {
-                if (!currentUser) return;
-                const res = await apiPost({ action: 'mark_notifications_read', email: currentUser.email, role: currentUser.role });
-                if (res && res.success) {
-                    notificationsCache.forEach(n => {
-                        if (n.recipient_email === currentUser.email || (n.recipient_role && n.recipient_role.includes(currentUser.role))) {
-                            n.is_read = 1;
-                        }
-                    });
-                    loadNotifications();
-                }
-            });
         }
 
         function loadMyRequisitions() {
@@ -2914,7 +2943,7 @@
                     r.status === 'Pending' ? 'bg-amber-50 text-amber-800 border border-amber-300' :
                     r.status === 'Cancelled' ? 'bg-slate-100 text-slate-700 border border-slate-300' :
                     'bg-rose-50 text-rose-800 border border-rose-300';
-                const statusText = r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : r.status === 'Cancelled' ? 'रद्द' : 'अस्वीकृत';
+                const statusText = r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : r.status === 'Cancelled' ? 'रद्द(By User)' : 'अस्वीकृत';
                 tr.innerHTML = `
                     <td class="p-3 pl-4 font-mono font-bold portal-text-primary whitespace-nowrap">${r.id}</td>
                     <td class="p-3 whitespace-nowrap"><span class="font-semibold block">${r.hall_name || 'लहटन चौधरी सभागार'}</span><span class="text-[11px] text-slate-600 block">${formatBookingPeriod(r.booking_date, r.hours)}</span></td>
@@ -3000,8 +3029,9 @@
                             <span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold ${
                                 r.status === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' :
                                 r.status === 'Pending' ? 'bg-amber-50 text-amber-800 border border-amber-300' :
+                                r.status === 'Cancelled' ? 'bg-slate-100 text-slate-700 border border-slate-300' :
                                 'bg-rose-50 text-rose-800 border border-rose-300'
-                            }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}</span>
+                            }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : r.status === 'Cancelled' ? 'रद्द(By User)' : 'अस्वीकृत'}</span>
                         </td>
                         <td class="p-3 text-center whitespace-nowrap">
                             <select class="admin-change-status-select text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium min-h-[32px] ${expired ? 'bg-slate-100 cursor-not-allowed opacity-70' : ''}" data-id="${r.id}" ${expired ? 'disabled' : ''} title="${expiredTitle}">
@@ -3729,6 +3759,7 @@
                 const hasTechReq = (r.vc_required == 1 || r.ppt_required == 1);
                 const statusBadge = (r.status === 'Approved') ? '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">स्वीकृत</span>' :
                                   (r.status === 'Pending') ? '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-amber-50 text-amber-800 border border-amber-300">समीक्षाधीन</span>' :
+                                  (r.status === 'Cancelled') ? '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-slate-100 text-slate-700 border border-slate-300">रद्द(By User)</span>' :
                                   '<span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold bg-rose-50 text-rose-800 border border-rose-300">अस्वीकृत</span>';
 
                 const tr = document.createElement('tr');
@@ -3800,8 +3831,9 @@
                         <span class="inline-block text-[10px] px-2 py-0.5 rounded font-bold ${
                             r.status === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' :
                             r.status === 'Pending' ? 'bg-amber-50 text-amber-800 border border-amber-300' :
+                            r.status === 'Cancelled' ? 'bg-slate-100 text-slate-700 border border-slate-300' :
                             'bg-rose-50 text-rose-800 border border-rose-300'
-                        }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}</span>
+                        }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : r.status === 'Cancelled' ? 'रद्द(By User)' : 'अस्वीकृत'}</span>
                     </td>
                     <td class="p-3 text-right pr-4 whitespace-nowrap">
                         <div class="flex items-center justify-end gap-1.5">
@@ -3879,7 +3911,7 @@
                         `"${r.attendees || 0}"`,
                         `"${r.vc_required == 1 ? 'हाँ' : 'नहीं'}"`,
                         `"${(r.refreshments || '').replace(/"/g, '""')}"`,
-                        `"${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}"`,
+                        `"${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : r.status === 'Cancelled' ? 'रद्द(By User)' : 'अस्वीकृत'}"`,
                         `"${(r.approved_by || '').replace(/"/g, '""')}"`
                     ];
                 });
@@ -4185,6 +4217,20 @@
                 }
                 if (authorityRow) authorityRow.style.display = 'flex';
                 document.getElementById('slip-authority').textContent = r.rejection_reason ? `अस्वीकृत (कारण: ${r.rejection_reason})` : 'सक्षम प्राधिकार द्वारा निरस्त';
+
+                if (signatureBlock) {
+                    signatureBlock.style.visibility = 'hidden';
+                }
+            } else if (r.status === 'Cancelled' && (r.cancelled_by || r.cancelled_by_name || r.cancelled_at || r.cancellation_remark)) {
+                if (headTitle) headTitle.textContent = 'सभागार आरक्षण मांग-पत्र';
+                if (statusEl) {
+                    statusEl.className = 'font-bold text-slate-700 block text-xs';
+                    statusEl.textContent = 'स्थिति: रद्द(By User)';
+                }
+                if (authorityRow) authorityRow.style.display = 'flex';
+                document.getElementById('slip-authority').textContent = r.cancellation_remark
+                    ? `उपयोगकर्ता द्वारा रद्द (कारण: ${r.cancellation_remark})`
+                    : 'यह मांग-पत्र उपयोगकर्ता द्वारा रद्द किया गया है।';
 
                 if (signatureBlock) {
                     signatureBlock.style.visibility = 'hidden';
