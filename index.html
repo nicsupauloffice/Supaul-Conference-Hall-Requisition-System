@@ -8,80 +8,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            /* Government portal visual system */
             --portal-primary: #0b3b60;
-            --portal-secondary: #334155;
-            --portal-bg: #edf1f5;
-            --portal-card: #ffffff;
-            --portal-border: #cbd5df;
-            --portal-shadow: 0 2px 5px rgba(15, 23, 42, 0.075), 0 1px 2px rgba(15, 23, 42, 0.045);
-            --portal-success: #3f6b52;
-            --portal-warning: #996515;
-            --portal-danger: #8f3b39;
             --portal-accent: #f59e0b;
+            --portal-bg: #f8fafc;
         }
-
-        /* Clean government-style page surface: neutral blue-gray canvas + white cards. */
-        .portal-page-body {
-            background: var(--portal-bg) !important;
-        }
-
-        #supaul-portal-app {
-            background-color: var(--portal-bg) !important;
-        }
-
-        /* Main content cards: subtle 1px border and very soft elevation. */
-        #supaul-portal-app .portal-section .bg-white.rounded-lg.border,
-        #supaul-portal-app .portal-section .bg-white.rounded-xl.border {
-            background-color: var(--portal-card) !important;
-            border-color: var(--portal-border) !important;
-            box-shadow: var(--portal-shadow) !important;
-        }
-
-        /* Keep nested information surfaces flatter than the primary cards. */
-        #supaul-portal-app .portal-section .bg-slate-50 {
-            border-color: #e5e9ef;
-        }
-
-        /* Muted semantic palette for status accents without changing layout. */
-        #supaul-portal-app .text-emerald-600,
-        #supaul-portal-app .text-emerald-700,
-        #supaul-portal-app .text-emerald-800,
-        #supaul-portal-app .text-emerald-900 { color: var(--portal-success) !important; }
-
-        #supaul-portal-app .bg-emerald-500,
-        #supaul-portal-app .bg-emerald-600,
-        #supaul-portal-app .bg-emerald-700,
-        #supaul-portal-app .bg-emerald-800 { background-color: var(--portal-success) !important; }
-
-        #supaul-portal-app .border-emerald-300,
-        #supaul-portal-app .border-emerald-400,
-        #supaul-portal-app .border-emerald-500 { border-color: #7fa68e !important; }
-
-        #supaul-portal-app .text-amber-600,
-        #supaul-portal-app .text-amber-700,
-        #supaul-portal-app .text-amber-800,
-        #supaul-portal-app .text-amber-900 { color: var(--portal-warning) !important; }
-
-        #supaul-portal-app .bg-amber-500,
-        #supaul-portal-app .bg-amber-600,
-        #supaul-portal-app .bg-amber-700 { background-color: var(--portal-warning) !important; }
-
-        #supaul-portal-app .text-rose-600,
-        #supaul-portal-app .text-rose-700,
-        #supaul-portal-app .text-rose-800,
-        #supaul-portal-app .text-rose-900 { color: var(--portal-danger) !important; }
-
-        #supaul-portal-app .bg-rose-500,
-        #supaul-portal-app .bg-rose-600,
-        #supaul-portal-app .bg-rose-700,
-        #supaul-portal-app .bg-rose-800 { background-color: var(--portal-danger) !important; }
-
-        #supaul-portal-app .border-rose-200,
-        #supaul-portal-app .border-rose-300,
-        #supaul-portal-app .border-rose-400,
-        #supaul-portal-app .border-rose-600,
-        #supaul-portal-app .border-rose-700 { border-color: #c98a88 !important; }
 
         .portal-bg-primary { background-color: var(--portal-primary) !important; }
         .portal-text-primary { color: var(--portal-primary) !important; }
@@ -287,7 +217,7 @@
         }
     </style>
 </head>
-<body class="portal-page-body bg-slate-100 min-h-screen py-1 px-1.5 sm:px-4 flex flex-col justify-between">
+<body class="bg-slate-100 min-h-screen py-1 px-1.5 sm:px-4 flex flex-col justify-between">
 
     <div id="supaul-portal-app" style="background-color: var(--portal-bg);" class="font-sans antialiased text-slate-800 border border-slate-200 rounded-xl shadow-md my-0 portal-responsive-shell w-full flex-1 flex flex-col overflow-hidden">
         
