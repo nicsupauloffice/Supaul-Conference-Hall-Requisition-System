@@ -859,8 +859,7 @@
                                 <th class="p-3">सभागार एवं समय</th>
                                 <th class="p-3">अध्यक्षता</th>
                                 <th class="p-3">बैठक का विषय एवं विभाग</th>
-                                <th class="p-3 text-center">स्थिति</th>
-                                <th class="p-3 text-center">स्थिति नियंत्रण</th>
+                                <th class="p-3 text-center">अंतिम स्थिति</th>
                                 <th class="p-3 text-right pr-4">कार्यवाही</th>
                             </tr>
                         </thead>
@@ -1838,7 +1837,7 @@
 
                     if (currentUser) {
                         const activeTab = getActiveAdminTabId();
-                        if (currentUser.role === 'officer' || currentUser.role === 'itm') {
+                        if (['officer', 'itm', 'technical'].includes(currentUser.role)) {
                             if (reqsChanged || forceRender) loadMyRequisitions();
                         } else if (activeTab === 'dashboard' || activeTab === 'requests' || activeTab === 'ledger' || activeTab === 'halls' || activeTab === 'tech-dashboard') {
                             if (reqsChanged || hallsChanged || forceRender) loadAdminData(activeTab);
@@ -1956,8 +1955,8 @@
             }
 
             const userRole = currentUser ? currentUser.role : 'public';
-            document.getElementById('tab-btn-new-req').classList.toggle('hidden', !isAuth || userRole === 'technical');
-            document.getElementById('tab-btn-my-reqs').classList.toggle('hidden', userRole !== 'officer' && userRole !== 'itm');
+            document.getElementById('tab-btn-new-req').classList.toggle('hidden', !isAuth);
+            document.getElementById('tab-btn-my-reqs').classList.toggle('hidden', !['officer', 'itm', 'technical'].includes(userRole));
             document.getElementById('tab-btn-tech-dashboard').classList.toggle('hidden', !['technical', 'itm'].includes(userRole));
             document.getElementById('tab-btn-dashboard').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
             document.getElementById('tab-btn-halls').classList.toggle('hidden', userRole !== 'admin' && userRole !== 'nazarat');
@@ -2991,7 +2990,6 @@
                 bindSlipButtons();
             }
             if (activeTabId === 'ledger') {
-                bindLedgerStatusChangeEvents();
                 bindDeleteBookingEvents();
                 bindSlipButtons();
             }
@@ -3688,7 +3686,7 @@
             tbody.innerHTML = '';
 
             if (!items || items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-500">मास्टर पंजी में कोई अभिलेख नहीं मिला।</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-500">मास्टर पंजी में कोई अभिलेख नहीं मिला।</td></tr>';
                 return;
             }
 
@@ -3712,13 +3710,6 @@
                             'bg-rose-50 text-rose-800 border border-rose-300'
                         }">${r.status === 'Approved' ? 'स्वीकृत' : r.status === 'Pending' ? 'समीक्षाधीन' : 'अस्वीकृत'}</span>
                     </td>
-                    <td class="p-3 text-center whitespace-nowrap">
-                        <select class="ledger-change-status-select change-status-select text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium min-h-[32px]" data-id="${r.id}">
-                            <option value="Pending" ${r.status === 'Pending' ? 'selected' : ''}>समीक्षाधीन</option>
-                            <option value="Approved" ${r.status === 'Approved' ? 'selected' : ''}>स्वीकृत</option>
-                            <option value="Rejected" ${r.status === 'Rejected' ? 'selected' : ''}>अस्वीकृत</option>
-                        </select>
-                    </td>
                     <td class="p-3 text-right pr-4 whitespace-nowrap">
                         <div class="flex items-center justify-end gap-1.5">
                             <button type="button" class="view-slip-btn min-h-[32px] px-2.5 py-1 text-white portal-bg-primary rounded text-[11px] font-bold" data-req='${JSON.stringify(r)}'>पर्ची</button>
@@ -3728,7 +3719,6 @@
                 `;
                 tbody.appendChild(tr);
             });
-            bindLedgerStatusChangeEvents();
             bindDeleteBookingEvents();
             bindSlipButtons();
             initIcons();
